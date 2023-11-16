@@ -134,6 +134,97 @@
           type="number"
         ></up-input>
       </view>
+
+      <view class="uni-form-item uni-column">
+        <view class="title">
+          <up-text
+            class="title"
+            text="二维码大小等级(1～10)"
+            type="info"
+          ></up-text>
+        </view>
+
+        <up-input
+          border="surround"
+          v-model="printPage.QRCodeLevel"
+          placeholder="输入二维码大小等级"
+          clearable
+          type="number"
+        ></up-input>
+      </view>
+	  
+	  <view class="uni-form-item uni-column">
+	    <view class="title">
+	      <up-text
+	        class="title"
+	        text="二维码左偏移(mm)"
+	        type="info"
+	      ></up-text>
+	    </view>
+	  
+	    <up-input
+	      border="surround"
+	      v-model="printPage.QRCodeLeftOffset"
+	      placeholder="输入二维码左偏移量"
+	      clearable
+	      type="number"
+	    ></up-input>
+	  </view>
+	  
+	  <view class="uni-form-item uni-column">
+	    <view class="title">
+	      <up-text
+	        class="title"
+	        text="二维码上偏移(mm)"
+	        type="info"
+	      ></up-text>
+	    </view>
+	  
+	    <up-input
+	      border="surround"
+	      v-model="printPage.QRCodeTopOffset"
+	      placeholder="输入二维码上偏移量"
+	      clearable
+	      type="number"
+	    ></up-input>
+	  </view>
+	  
+	  <view class="uni-form-item uni-column">
+	    <view class="title">
+	      <up-text
+	        class="title"
+	        text="文本左偏移(mm)"
+	        type="info"
+	      ></up-text>
+	    </view>
+	  
+	    <up-input
+	      border="surround"
+	      v-model="printPage.textLeftOffset"
+	      placeholder="输入文本左偏移量"
+	      clearable
+	      type="number"
+	    ></up-input>
+	  </view>
+	  
+	  <view class="uni-form-item uni-column">
+	    <view class="title">
+	      <up-text
+	        class="title"
+	        text="文本上偏移(mm)"
+	        type="info"
+	      ></up-text>
+	    </view>
+	  
+	    <up-input
+	      border="surround"
+	      v-model="printPage.textTopOffset"
+	      placeholder="输入文本上偏移量"
+	      clearable
+	      type="number"
+	    ></up-input>
+	  </view>
+	  
     </view>
   </view>
 </template>
@@ -159,16 +250,16 @@ const subChange = (index: number) => {
 const searchClick = () => {
   if (searching.value) {
     blueTooth.stopDiscoveryPrinter()
-	searching.value = false
+    searching.value = false
   } else {
     blueTooth.discoveryPrinter()
-	searching.value = true
+    searching.value = true
   }
 }
 
 // 重新连接
 const reConnect = () => {
-	blueTooth.reConnect()
+  blueTooth.reConnect()
 }
 // 设备列表选择改变
 const radioChange = (e: any) => {

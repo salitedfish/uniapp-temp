@@ -9,8 +9,8 @@ const loginForm = ref({
 
 const initLogin = async () => {
   try {
+	uni.setStorageSync("token", "123456")
     const res = await auth.login({})
-    uni.setStorageSync("token", "123456")
     uni.setStorageSync("userInfo", {})
   } catch (err) {
     uni.showToast({

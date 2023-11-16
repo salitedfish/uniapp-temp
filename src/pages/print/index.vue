@@ -1,11 +1,11 @@
 <template>
   <view class="content">
     <view class="button-box">
-      <up-button @click="setPrint(0)" type="primary">0号</up-button>
-      <up-button @click="setPrint(1)" type="primary">1号</up-button>
-      <up-button @click="setPrint(2)" type="primary">2号</up-button>
-      <up-button @click="setPrint(3)" type="primary">3号</up-button>
-      <up-button @click="setPrint(4)" type="primary">4号</up-button>
+      <button @click="setPrint(0)" type="primary">0号</button>
+      <button @click="setPrint(1)" type="primary">1号</button>
+      <button @click="setPrint(2)" type="primary">2号</button>
+      <button @click="setPrint(3)" type="primary">3号</button>
+      <button @click="setPrint(4)" type="primary">4号</button>
       <!-- <button @click="print.initPrint" type="primary">render 调 script</button> -->
       <Printer :printData="printData"></Printer>
     </view>
