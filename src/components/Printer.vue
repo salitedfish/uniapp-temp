@@ -1,7 +1,7 @@
 <template>
 	<button @click="print.initPrint" type="primary">打印</button>
 
-	<!-- 下面数据提供给renderjs使用(垃圾renderjs，这不行，那不行，没办法才用这种方式传值) -->
+	<!-- 下面数据提供给renderjs使用(renderjs有很多限制，没办法才用这种方式传值) -->
 	<view class="printPage_width" style="display: none">
 		{{ printPage.width }}
 	</view>
@@ -31,16 +31,13 @@
 <script>
 	import {
 		printPage,
-		textOptions,
-		qrcodeOptions,
-		customTextOptions,
 	} from "../store/print"
 	import {
 		blueToothStore
 	} from "../store/blueTooth"
 	import {
 		Printer
-	} from "./printer"
+	} from "../fun/printer"
 
 	export default {
 		props: ["printData"],
@@ -56,37 +53,10 @@
 				const printer = new Printer()
 				printer.setPrinterParams(blueToothStore)
 
-				// 将具体的数据加在模版上
-				const tsplTemplateWithData = this.genTSPLWithData(tsplTemplate)
+				console.log('最终打印指令', tsplTemplate)
 
 				// 开始打印
-				printer.print([tsplTemplateWithData])
-			},
-			// 循环把需要赋值的数据替换掉
-			genTSPLWithData(tsplTemplate) {
-				let tsplTemplateWithData = tsplTemplate
-				// 文本值替换
-				for (const item of textOptions) {
-					tsplTemplateWithData = tsplTemplateWithData.replace(
-						item,
-						this.printData[item]
-					)
-				}
-				// 二维码值替换
-				for (const item of qrcodeOptions) {
-					tsplTemplateWithData = tsplTemplateWithData.replace(
-						item,
-						this.printData[item]
-					)
-				}
-				// 自定义文本值替换
-				// for(const item of customTextOptions) {
-				// 	// 自定义文本，怎么取值还不确定
-				// 	tsplTemplateWithData = tsplTemplateWithData.replace(item, printData[item])
-				// }
-
-				// 返回最终的tspl指令
-				return tsplTemplateWithData
+				printer.print([tsplTemplate])
 			},
 			err(msg) {
 				uni.showToast({
@@ -122,7 +92,7 @@
 					this.$ownerInstance.callMethod('startPrint', tsplTemplate)
 				}
 			},
-			// 获取打印纸设置(垃圾renderjs，这不行，那不行，没办法才用这种方式传值)
+			// 获取打印纸设置(renderjs有很多限制，没办法才用这种方式传值)
 			genPrintPage() {
 				const w = document.getElementsByClassName("printPage_width")[0].innerText
 				const h = document.getElementsByClassName("printPage_height")[0].innerText
@@ -170,13 +140,13 @@
 				for (const item of textOptions) {
 					const optionDom = document.getElementsByClassName(`template-${item}`)
 					if (optionDom.length > 0) {
-						// const currentDom = optionDom[0].childNodes[0].childNodes[0]
+						const currentDom = optionDom[0].childNodes[0].childNodes[0]
 						// const { left, top } = this.genPosition(currentDom, rootDom)
 						const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
 						const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
 						const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.textLeftOffset)))
 						const topDots = Math.round(mmToDot(top * ratio - Number(printPage.textTopOffset)))
-						command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${item}"\n `
+						command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${currentDom.innerText}"\n `
 					}
 				}
 
@@ -184,7 +154,7 @@
 				for (const item of qrcodeOptions) {
 					const optionDom = document.getElementsByClassName(`template-${item}`)
 					if (optionDom.length > 0) {
-						// const currentDom = optionDom[0].childNodes[0].childNodes[0]
+						const currentDom = optionDom[0].childNodes[0].childNodes[0]
 						// const { left, top } = this.genPosition(currentDom, rootDom)
 						const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
 						const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
@@ -193,7 +163,8 @@
 						const topDots = Math.round(mmToDot(top * ratio - Number(printPage.QRCodeTopOffset)))
 						const sizeLevel = Number(printPage.QRCodeLevel) ? Number(printPage.QRCodeLevel) : this
 							.genQRCodeSizeLevel(w, ratio)
-						command = command + `QRCODE ${leftDots},${topDots},L,${sizeLevel},A,0,"${item}"\n `
+						const content = currentDom.getAttribute('data-shortUrl')
+						command = command + `QRCODE ${leftDots},${topDots},L,${sizeLevel},A,0,"${content}"\n `
 					}
 				}
 
@@ -231,18 +202,6 @@
 
 		button {
 			font-size: 28rpx;
-		}
-	}
-
-	.template {
-		display: flex;
-		justify-content: space-around;
-		margin-top: 12rpx;
-		position: relative;
-
-		.html-template {
-			position: relative;
-			box-shadow: 0 0 12rpx 6rpx rgba(0, 0, 0, 0.15);
 		}
 	}
 </style>

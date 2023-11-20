@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { onMounted, ref } from "vue"
 	import { useThrottle } from "@ultra-man/noa"
-	import { BlueTooth } from "../../components/blueTooth"
+	import { BlueTooth } from "../../fun/blueTooth"
 	import { blueToothStore } from "../../store/blueTooth"
 	import { printPage } from "../../store/print"
 	import { globalColor } from "../../store/theme"
@@ -43,6 +43,16 @@
 	const reConnect = useThrottle(() => {
 		blueTooth.reConnect()
 	})
+	// 断开连接
+	const closeConnect = useThrottle(() => {
+		blueTooth.closeConnect()
+		deviceId = ""
+		blueToothStore.deviceId = ""
+		blueToothStore.servers = []
+		blueToothStore.serviceId = ""
+		blueToothStore.characteristics = []
+		blueToothStore.characteristicId = ""
+	})
 	// 设备列表选择改变
 	const radioChange = useThrottle(async (value : string) => {
 		if (deviceId === value) return
@@ -58,8 +68,8 @@
 		} catch (err) { } finally {
 			deviceId = value
 			blueToothStore.deviceId = value
-			blueToothStore.serviceId = ""
 			blueToothStore.servers = []
+			blueToothStore.serviceId = ""
 			blueToothStore.characteristics = []
 			blueToothStore.characteristicId = ""
 			//连接蓝牙
@@ -116,8 +126,9 @@
 			<view class="print-option">
 				<view class="btn-box">
 					<up-button class="search-btn" @click="searchClick" type="primary" :loading="blueToothStore.searching"
-						text="开始搜索" loading-text="搜索中" shape="circle"></up-button>
-					<up-button class="search-btn" @click="reConnect" type="primary" text="重新连接" shape="circle"></up-button>
+						text="开始搜索" loading-text="搜索中" loadingMode="circle"></up-button>
+					<up-button class="search-btn" @click="reConnect" type="primary" text="重新连接"></up-button>
+					<up-button class="search-btn" @click="closeConnect" type="warning" text="断开连接"></up-button>
 				</view>
 
 				<u-subsection :list="subList" :current="subSelect" @change="subChange" mode="subsection"></u-subsection>
@@ -273,7 +284,7 @@
 
 				.search-btn {
 					margin-top: 12rpx;
-					border-radius: 60rpx;
+					// border-radius: 60rpx;
 
 					&+.search-btn {
 						margin-left: 12rpx;

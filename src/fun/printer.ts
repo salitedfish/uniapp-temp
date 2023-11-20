@@ -1,4 +1,4 @@
-const gbk = require("./gbk")
+const gbk = require("../util/gbk")
 
 interface PrinterParams {
 	deviceId : string

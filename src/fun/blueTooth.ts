@@ -81,10 +81,14 @@ export class BlueTooth {
 				}, 2000)
 			},
 			fail: (res) => {
-				uni.showToast({
-					icon: "none",
-					title: `蓝牙连接失败:${res.errMsg}`,
-				})
+				// 如果当前没在连接状态则报个连接错误
+				if (!blueToothStore.connected) {
+					uni.showToast({
+						icon: "none",
+						title: `蓝牙连接失败:${res.errMsg}`,
+					})
+				}
+
 			},
 		})
 	}
