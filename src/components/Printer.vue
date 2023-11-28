@@ -53,7 +53,9 @@
 				const printer = new Printer()
 				printer.setPrinterParams(blueToothStore)
 
-				console.log('最终打印指令', tsplTemplate)
+				console.log(`最终打印指令：
+${tsplTemplate}
+				`)
 
 				// 开始打印
 				printer.print([tsplTemplate])
@@ -86,6 +88,9 @@
 
 				// 构建tspl模版
 				const tsplTemplate = this.genTSPL(printPage);
+				if (!tsplTemplate) {
+					return
+				}
 
 				if (tsplTemplate) {
 					// 调用普通script层并传递模版
@@ -118,6 +123,10 @@
 			genTSPL(printPage) {
 				// 获取标签要打印的根节点, 获取打印纸的长和宽
 				const rootDom = document.getElementsByClassName("html-template")[0]
+				if (!rootDom) {
+					console.log('未获取到打印区域节点')
+					return
+				}
 				const rootWidth = rootDom.style.cssText.split(" ")[1].slice(0, -3)
 				const rootHeight = rootDom.style.cssText.split(" ")[3].slice(0, -3)
 				if (!rootWidth || !rootHeight || isNaN(Number(rootWidth)) || isNaN(Number(rootHeight))) {
@@ -167,6 +176,9 @@
 						command = command + `QRCODE ${leftDots},${topDots},L,${sizeLevel},A,0,"${content}"\n `
 					}
 				}
+
+				// 条形码
+				// todo。。。
 
 				// 自定义文本节点
 				for (const item of customTextOptions) {

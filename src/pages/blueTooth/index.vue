@@ -117,7 +117,7 @@
 		<!-- 蓝牙连接状态 -->
 		<u-sticky>
 			<up-button class="btn-item" @click="show = true" :type="blueToothStore.connected? 'success' : 'primary' "
-				:text="blueToothStore.connected? '蓝牙已连接' : '连接蓝牙'">
+				:text="blueToothStore.connected? '蓝牙已连接' : '蓝牙未连接'">
 			</up-button>
 		</u-sticky>
 
@@ -269,6 +269,7 @@
 	.print {
 		width: 100%;
 
+
 		.print-option {
 			position: relative;
 			width: 85vw;
@@ -284,7 +285,6 @@
 
 				.search-btn {
 					margin-top: 12rpx;
-					// border-radius: 60rpx;
 
 					&+.search-btn {
 						margin-left: 12rpx;
@@ -304,7 +304,7 @@
 				.option-item {
 					display: flex;
 					padding: 20rpx 30rpx;
-					border: 1rpx solid v-bind("globalColor.default");
+					border: 1rpx solid $u-info;
 					border-radius: 10rpx;
 					align-items: center;
 					margin-top: 12rpx;
@@ -327,18 +327,18 @@
 					.option-value {
 						flex: 1;
 						width: 0;
-						color: v-bind("globalColor.default")
+						color: $u-info
 					}
 				}
 
 				.option-active {
-					border: 1rpx solid v-bind("globalColor.primary");
+					border: 1rpx solid $u-primary;
 					background-color: v-bind("globalColor.primary_background");
 
 					.option-value {
 						flex: 1;
 						width: 0;
-						color: v-bind("globalColor.primary")
+						color: $u-primary
 					}
 				}
 			}

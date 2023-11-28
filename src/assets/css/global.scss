@@ -1,0 +1,37 @@
+	$bg-color-default: rgba(245,245,248, 0.8);
+	$bg-color-primary: rgba(84, 157, 248, 0.1);
+	
+	.common-section-title {
+		margin: 16rpx 0;
+		color: $u-tips-color;
+	}
+	.common-form {
+		border-radius: 4px;
+		padding: 0 24rpx;
+		border: 1px solid $u-border-color;
+		.common-form-item+.common-form-item {
+			border-top: 1px solid $u-border-color;
+		}
+	}
+	.common-table {
+		.uni-table-th {
+			font-size: 12px !important;
+		}
+		.uni-table-td {
+			font-size: 12px !important;
+		}
+		.checkbox__inner {
+			width: 12px !important;
+			height: 12px !important;
+			.checkbox__inner-icon {
+				top: 0 !important;
+				left: 3px !important;
+			}
+		}
+	}
+	.warning {
+		color: $u-warning !important;
+	}
+	.primary {
+		color: $u-primary !important;
+	}

@@ -130,11 +130,15 @@
 			<button @click="setPrint(4)" type="primary">4号</button>
 			<Printer></Printer>
 		</view>
-		<PrintTemp :tempData="printData" :tempStr="originContent.template"></PrintTemp>
+		<view class="print-template-box">
+			<view class="print-template" v-show="originContent.template">
+				<PrintTemp :tempData="printData" :tempStr="originContent.template"></PrintTemp>
+			</view>
+		</view>
 	</view>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	.button-box {
 		display: flex;
 
@@ -143,14 +147,12 @@
 		}
 	}
 
-	.template {
+	.print-template-box {
 		display: flex;
 		justify-content: space-around;
 		margin-top: 12rpx;
-		position: relative;
 
-		.html-template {
-			position: relative;
+		.print-template {
 			box-shadow: 0 0 12rpx 6rpx rgba(0, 0, 0, 0.15);
 		}
 	}

@@ -1,20 +1,16 @@
 import { createSSRApp } from "vue"
 import uviewPlus from "uview-plus"
 import App from "./App.vue"
+import { initInterceptor } from "./util/interceptor"
+import "./assets/css/global.scss"
+
+// 初始化导航拦截器
+initInterceptor()
 
 export function createApp() {
-  const app = createSSRApp(App)
-  app.use(uviewPlus)
-  return {
-    app,
-  }
-}
-
-const a = {
-  a: 1,
-  b: 2,
-}
-
-for (const key in a) {
-  a[key as keyof typeof a]
+	const app = createSSRApp(App)
+	app.use(uviewPlus)
+	return {
+		app,
+	}
 }
