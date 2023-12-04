@@ -1,15 +1,37 @@
 <script lang="ts" setup>
 	import { ref, watch } from "vue";
-	import ScanCode from "../../components/ScanCode.vue"
-	import UpInputScan from "../../components/UpInputScan.vue"
-	import ChooseImage from "../../components/ChooseImage.vue"
-	import MediaUpload from "../../components/MediaUpload.vue"
-	import FileUpload from "../../components/FileUpload.vue"
-	import { routes } from "../../store/route"
-	import { useLogout } from "../../hook/useLogout"
-	import type { UploadMedia, UploadFile } from "../../type/file"
+	import { onLoad, onShow, onUnload, onHide } from "@dcloudio/uni-app"
+	import ScanCode from "@/components/ScanCode.vue"
+	import UpInputScan from "@/components/UpInputScan.vue"
+	import ChooseImage from "@/components/ChooseImage.vue"
+	import MediaUpload from "@/components/MediaUpload.vue"
+	import FileUpload from "@/components/FileUpload.vue"
+	import { routes } from "@/store/route"
+	import { useLogout } from "@/hook/useLogout"
+	import LoadMore from "@/components/LoadMore.vue"
+	import type { UploadMedia, UploadFile } from "@/type/file"
+	import { onReachBottom, onPullDownRefresh } from "@dcloudio/uni-app";
+
+
+	onLoad(() => { console.log("demo 页面 onLoad") })
+	onShow(() => { console.log("demo 页面 onShow") })
+	onUnload(() => { console.log("demo 页面 onUnload") })
+	onHide(() => { console.log("demo 页面 onHide") })
 
 	const modelValue = ref("")
+
+	const goNav = () => {
+		uni.navigateTo({
+			url: `${routes.demoInside.path}?id=abc`,
+		})
+	}
+
+	onPullDownRefresh(() => {
+		console.log("demo 下拉刷新")
+		setTimeout(() => {
+			uni.stopPullDownRefresh()
+		}, 2000)
+	})
 
 	const chooseImage = (tempFiles : UniApp.ChooseImageSuccessCallbackResult["tempFiles"]) => {
 		console.log(tempFiles)
@@ -21,11 +43,9 @@
 		})
 	}
 	const goLogout = async () => {
-		await useLogout()
 		uni.redirectTo({
 			url: routes.login.path
 		})
-
 	}
 	const clearLogin = () => {
 		uni.removeStorageSync("token")
@@ -62,17 +82,62 @@
 		})
 	}
 
+	const list = ref([{
+		name: "Jeson",
+		date: "2020",
+		address: "海定",
+		info: "信息",
+		options: "操作"
+	}, {
+		name: "Jeson",
+		date: "2020",
+		address: "海定",
+		info: "信息",
+		options: "操作"
+	}])
+
+	const status = ref("loadmore")
+	onReachBottom(() => {
+		console.log("触底加载更多")
+		status.value = "loading"
+		setTimeout(() => {
+			list.value.push({
+				name: "Jeson",
+				date: "2020",
+				address: "海定",
+				info: "信息",
+				options: "操作"
+			})
+			status.value = "loadmore"
+		}, 2000)
+	})
+	const loadmore = () => {
+		console.log("点击加载全部")
+		status.value = "loading"
+		setTimeout(() => {
+			list.value.push({
+				name: "Jeson",
+				date: "2020",
+				address: "海定",
+				info: "信息",
+				options: "操作"
+			})
+			status.value = "nomore"
+		}, 2000)
+	}
+
 	const medias = ref<UploadMedia[]>([{
 		name: "atqi0-ymtgk.png",
 		status: "fail",
 		type: "image",
-		url: "https://ts4.cn.mm.bing.net/th?id=OIP-C.9rZlLx_ZN0dOCow_2AupoQAAAA&w=80&h=80&c=1&vt=10&bgcl=10c559&r=0&o=6&dpr=2&pid=5.1",
+		url: "https://img95.699pic.com/photo/40005/0347.jpg_wh860.jpg",
 	}])
-	const files = ref<UploadFile[]>([{ name: "测试文件.png", path: "http://123456.com" }])
+	const files = ref<UploadFile[]>([{ name: "atqi0-ymtgk.png", path: "https://img95.699pic.com/photo/40005/0347.jpg_wh860.jpg" }, { name: "README.md", path: "https://gitee.com/yinlunxx/pre-litigation-adjustment-web/blob/main_new/README.md" }])
 </script>
 
 <template>
 	<view class="uni-common-mt">
+		<up-button @click="goNav" type="primary">跳转</up-button>
 		<up-button @click="goLogin" type="primary">登录</up-button>
 		<up-button @click="goLogout" type="primary">退出</up-button>
 		<up-button @click="clearLogin" type="primary">清空登录信息</up-button>
@@ -154,35 +219,16 @@
 					<uni-th align="left" width="100rpx">操作</uni-th>
 				</uni-tr>
 				<!-- 表格数据行 -->
-				<uni-tr>
-					<uni-td>2020</uni-td>
-					<uni-td>Jeson</uni-td>
-					<uni-td>海淀</uni-td>
-					<uni-td class="primary" @click="showPopup">信息</uni-td>
-					<uni-td class="warning" @click="del">删除</uni-td>
+				<uni-tr v-for="item,key in list" :key="key">
+					<uni-td>{{ item.date }}</uni-td>
+					<uni-td>{{ item.name }}</uni-td>
+					<uni-td>{{ item.address }}</uni-td>
+					<uni-td class="primary" @click="showPopup">{{ item.info }}</uni-td>
+					<uni-td class="warning" @click="del">{{ item.options }}</uni-td>
 				</uni-tr>
-				<uni-tr>
-					<uni-td>2020</uni-td>
-					<uni-td>HanMei</uni-td>
-					<uni-td>北京</uni-td>
-					<uni-td>信息</uni-td>
-					<uni-td class="warning">删除</uni-td>
-				</uni-tr>
-				<uni-tr>
-					<uni-td>2020</uni-td>
-					<uni-td>LiLei</uni-td>
-					<uni-td>海淀</uni-td>
-					<uni-td>信息</uni-td>
-					<uni-td class="warning">删除</uni-td>
-				</uni-tr>
-				<uni-tr>
-					<uni-td>2020</uni-td>
-					<uni-td>Danner</uni-td>
-					<uni-td>海淀</uni-td>
-					<uni-td>信息</uni-td>
-					<uni-td class="warning">删除</uni-td>
-				</uni-tr>
+
 			</uni-table>
+			<LoadMore :status="status" @loadmore="loadmore"></LoadMore>
 			<uni-pagination title="分页" show-icon="true" :total="50" :current="1" :pageSize="10"></uni-pagination>
 		</view>
 

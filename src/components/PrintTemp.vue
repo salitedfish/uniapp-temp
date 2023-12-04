@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref, watch } from "vue"
-	import { keyToLabel } from "../store/print"
-	import { genLocalFileUrl } from "../util/env"
+	import { keyToLabel } from "@/store/print"
+	import { genLocalFileUrl } from "@/util/common"
 
 	// 传递模版和替换的数据
 	const props = withDefaults(defineProps<{
@@ -78,7 +78,7 @@
 				}, 1000)
 			}
 
-			// 条维码
+			// 条形码
 			if (props.tempData.barShortUrl) {
 				const url = props.tempData.barShortUrl
 				// 等条形码渲染完之后再去获取条形码图片路径

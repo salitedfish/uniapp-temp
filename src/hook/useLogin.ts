@@ -1,7 +1,8 @@
 import { ref } from "vue"
-import { login as loginApi, geUserInfo } from "../api/auth"
+import { login as loginApi, geUserInfo } from "@/api/auth"
 
 export const useLogin = () => {
+
 	const logging = ref(false)
 	const login = async (loginForm : { jobNo : string, password : string }) => {
 		const res = await loginApi(loginForm)

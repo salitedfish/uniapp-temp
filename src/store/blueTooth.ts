@@ -1,5 +1,5 @@
 import { reactive } from "vue"
-import type { BlueToothDevice, BlueToothService, BlueToothCharacteristic } from "../type/blueTooth"
+import type { BlueToothDevice, BlueToothService, BlueToothCharacteristic } from "@/type/blueTooth"
 
 
 export const blueToothStore = reactive({

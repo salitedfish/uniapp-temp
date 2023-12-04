@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import ScanCode from "./ScanCode.vue"
+	import ScanCode from "@/components/ScanCode.vue"
 
 	const props = defineProps<{
 		modelValue : string

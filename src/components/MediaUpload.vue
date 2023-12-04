@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-	import { getBaseUrl } from "../util/env"
-	import type { UploadMedia } from "../type/file"
+	import { getBaseUrl } from "@/util/common"
+	import type { UploadMedia } from "@/type/file"
 
 	// 直接改props里的数据算了
 	const props = defineProps<{
@@ -55,7 +55,6 @@
 				filePath: url,
 				name: 'file',
 				formData: {
-					user: 'test',
 				},
 				header: {
 					token: uni.getStorageSync("token")

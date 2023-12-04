@@ -1,6 +1,6 @@
 import { uRequest } from "./instance"
-import type { Return } from "../type/common"
-import type { UserInfo } from "../type/auth"
+import type { Return } from "@/type/common"
+import type { UserInfo } from "@/type/auth"
 
 // 登录
 export const login = async (data : { jobNo : string, password : string }) => {

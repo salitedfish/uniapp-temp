@@ -1,43 +1,73 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"name": "blank",
 			"path": "pages/blank/index",
 			"style": {
 				"navigationBarTitleText": ""
-			}
+			},
+			"type": "nav"
 		},
 		{
+			"name": "login",
 			"path": "pages/login/index",
 			"style": {
 				"navigationBarTitleText": "登录"
-			}
+			},
+			"type": "nav"
 		},
 		{
+			"name": "home",
 			"path": "pages/home/index",
 			"style": {
 				"navigationBarTitleText": "首页"
-			}
+
+			},
+			"type": "tab"
 		},
 		{
+			"name": "blueTooth",
 			"path": "pages/blueTooth/index",
 			"style": {
 				"navigationBarTitleText": "蓝牙连接"
-			}
+			},
+			"type": "tab"
 		},
 
 		{
+			"name": "demo",
 			"path": "pages/demo/index",
 			"style": {
-				"navigationBarTitleText": "测试"
-			}
+				"navigationBarTitleText": "测试",
+				"app-plus": {
+					"pullToRefresh": {
+						"support": true,
+						"style": "default"
+					}
+				}
+			},
+			"type": "tab",
+			"needLogin": true
 		},
 		{
+			"name": "demoInside",
+			"path": "pages/demo/demoInside",
+			"style": {
+				"navigationBarTitleText": "内部测试"
+			},
+			"type": "nav"
+		},
+		{
+			"name": "print",
 			"path": "pages/print/index",
 			"style": {
 				"navigationBarTitleText": "打印标签"
-			}
+			},
+			"type": "tab"
 		}
 	],
+
+
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
@@ -64,24 +94,26 @@
 		"spacing": "3px",
 		"iconfontSrc": "static/iconfont.ttf", // app tabbar 字体.ttf文件路径 app 3.4.4+
 		"list": [{
-			"pagePath": "pages/blueTooth/index",
-			"iconPath": "static/tabbar/blueTooth.png",
-			"selectedIconPath": "static/tabbar/blueTooth_active.png",
-			"text": "蓝牙"
-		}, {
-			"pagePath": "pages/demo/index",
-			"text": "测试"
-		}, {
-			"pagePath": "pages/print/index",
-			"iconPath": "static/tabbar/blueTooth.png",
-			"selectedIconPath": "static/tabbar/blueTooth_active.png",
-			"text": "打印"
-		}, {
-			"pagePath": "pages/home/index",
-			"iconPath": "static/tabbar/home.png",
-			"selectedIconPath": "static/tabbar/home_active.png",
-			"text": "首页"
-		}]
+				"pagePath": "pages/blueTooth/index",
+				"iconPath": "static/tabbar/blueTooth.png",
+				"selectedIconPath": "static/tabbar/blueTooth_active.png",
+				"text": "蓝牙"
+			},
+			{
+				"pagePath": "pages/demo/index",
+				"text": "测试"
+			}, {
+				"pagePath": "pages/print/index",
+				"iconPath": "static/tabbar/blueTooth.png",
+				"selectedIconPath": "static/tabbar/blueTooth_active.png",
+				"text": "打印"
+			}, {
+				"pagePath": "pages/home/index",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home_active.png",
+				"text": "首页"
+			}
+		]
 	},
 	"easycom": {
 		// 注意一定要放在custom里，否则无效，https://ask.dcloud.net.cn/question/131175

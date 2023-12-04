@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 	import { ref } from "vue"
 	import { useThrottle } from "@ultra-man/noa"
-	import { globalColor } from "../../store/theme"
-	import { routes } from "../../store/route"
-	import { useLogin } from "../../hook/useLogin"
+	import { globalColor } from "@/store/theme"
+	import { routes } from "@/store/route"
+	import { useLogin } from "@/hook/useLogin"
 
 	const { logging, login } = useLogin()
 
@@ -45,6 +45,7 @@
 			uni.switchTab({
 				url: routes.home.path
 			})
+
 		} catch (err) {
 			// 失败请求接口统一处理
 		} finally {
@@ -106,6 +107,7 @@
 			position: absolute;
 			top: 0;
 			left: 0;
+			border-radius: 50%;
 		}
 
 		.form-item {

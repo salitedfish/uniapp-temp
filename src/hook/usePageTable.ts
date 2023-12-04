@@ -1,57 +1,66 @@
 import { ref } from "vue"
 import type { Ref } from "vue"
-import type { Paging, Return, ReturnList } from "../type/common"
-
+import type { Paging, Return, ReturnList } from "@/type/common"
 
 /**
- * 分页hook
+ * 请求列表bahook
  */
-export const usePageTable = <P extends Paging, R>(
-	getListRequest : (searchParams : P) => Promise<Return<ReturnList<R>>>,
-	options : {
-		size ?: number;
-		params ?: Omit<P, "page" | "size">;
-	} = {
-			size: 10,
-		}
-) => {
-	type SearchParams = Omit<P, "page" | "size">;
-
-	// 筛选的参数
+export function useTable<P, R>(
+	getListRequest : (searchParams : P) => Promise<Return<R>>,
+	options : Partial<P> = {}
+) {
+	// 筛选的参数(不管需不需要分页都给他加上分页参数，反正不用也无所谓)
 	const searchParam = <Ref<P>>ref({
 		page: 1,
-		size: options.size || 10,
+		size: 10,
 	});
-	searchParam.value = { ...searchParam.value, ...options.params };
-	// 数据总数
-	const totalPage = ref(0);
+	searchParam.value = { ...searchParam.value, ...options };
 	// 查询状态
 	const searching = ref(false);
-	// 展示的列表
-	const list : Ref<R[]> = ref([]);
+	// 请求结果数据
+	const result : Ref<Return<R> | null> = ref(null)
 
-	// 整合筛选参数再请求数据
-	const submitSearch = (params : SearchParams) => {
+	// 搜索列表
+	const searchList = async (params : P) => {
 		searchParam.value = { ...searchParam.value, ...params };
-		getList();
+		await getList();
 	};
+
+	// 重制列表
+	const reSetList = async () => {
+		searchParam.value = {
+			page: 1,
+			size: 10,
+			...<P>options
+		}
+		result.value = null
+		searching.value = false
+		await getList();
+	}
 
 	// 请求数据
 	const getList = async () => {
-		searching.value = true;
-		const res = await getListRequest(searchParam.value);
-		if (res) {
-			list.value = res.data.data;
-			totalPage.value = res.data.totalPage;
+
+		try {
+			searching.value = true;
+			const res = await getListRequest(searchParam.value);
+			if (res) {
+				result.value = res
+			}
+		} catch (err) {
+			console.log(err)
+		} finally {
+			searching.value = false;
 		}
-		searching.value = false;
 	};
+
 	return {
-		searchParam,
-		totalPage,
 		searching,
-		list,
-		submitSearch,
+		searchParam,
+		result,
+
+		reSetList,
+		searchList,
 		getList,
 	}
 }

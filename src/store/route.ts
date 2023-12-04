@@ -1,21 +1,15 @@
-import { RouteType } from '../type/route'
+import pagesJSON from "@/pages.json"
+import type { Route, RouteName } from "@/type/route"
 
-// 路由配置
-export const routes = {
-	login: {
-		path: "/pages/login/index",
-		needLogin: false,
-		type: RouteType.NAV
-	},
-	// 下面是tab
-	blueTooth: {
-		path: "/pages/blueTooth/index",
-		needLogin: false,
-		type: RouteType.TAB
-	},
-	home: {
-		path: "/pages/home/index",
-		needLogin: false,
-		type: RouteType.TAB
-	}
+const pages = pagesJSON.pages
+
+// 类型强行断言，实际路由包含的数据比看到的多，提供跳转的只有RouteName配置的
+const routes = {} as Record<RouteName, Route>
+for (const item of pages) {
+	item.path = `/${item.path}`
+	routes[item.name as RouteName] = item
+}
+
+export {
+	routes
 }

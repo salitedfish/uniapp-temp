@@ -1,13 +1,12 @@
-import { blueToothStore } from "../store/blueTooth"
+import { blueToothStore } from "@/store/blueTooth"
 
 export class BlueTooth {
 	// 开启蓝牙
 	public openBluetoothAdapter() {
 		uni.openBluetoothAdapter({
 			complete: (e) => {
-				console.log(e)
 				if (!e.errCode) {
-					console.log("初始化完成")
+					console.log("蓝牙初始化完成")
 				} else if (e.errCode == 10001) {
 					uni.showToast({
 						icon: "none",
@@ -143,6 +142,8 @@ export class BlueTooth {
 						title: "设备服务获取完成",
 					})
 					blueToothStore.servers = res.services
+					// 获取到服务列表后，默认选择一个服务
+					this.setDefaultService()
 				}
 			},
 			fail: (e) => {
@@ -172,6 +173,8 @@ export class BlueTooth {
 						title: "特征值获取成功",
 					})
 					blueToothStore.characteristics = res.characteristics
+					// 获取到特征列表后，默认选择一个特征
+					this.setDefaultCharacteristic()
 				}
 			},
 			fail: (res) => {
@@ -181,5 +184,30 @@ export class BlueTooth {
 				})
 			},
 		})
+	}
+
+	// 默认选择一个服务
+	private setDefaultService() {
+		for (const item of blueToothStore.servers) {
+			// 默认选择的服务id，要根据实际情况改变
+			if (item.uuid.startsWith("49535343") || item.uuid.startsWith("E7810A71")) {
+				blueToothStore.serviceId = item.uuid
+				break
+			}
+		}
+		// 如果有满足条件的服务再去获取特征值列表
+		if (blueToothStore.serviceId) {
+			this.getBLEDeviceCharacteristics()
+		}
+	}
+	// 默认选择一个特征
+	private setDefaultCharacteristic() {
+		for (const item of blueToothStore.characteristics) {
+			if (item.properties.write) {
+				blueToothStore.characteristic = item
+				blueToothStore.characteristicId = item.uuid
+				break
+			}
+		}
 	}
 }

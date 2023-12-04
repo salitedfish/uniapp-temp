@@ -50,7 +50,7 @@
 					multiple: true,
 				},
 				mounted() {
-					console.log('加载webview');
+					this.debug && console.log('加载webview');
 					_this = this;
 					this.files = new Map();
 					document.addEventListener('plusready', (e) => {

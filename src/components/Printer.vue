@@ -31,13 +31,13 @@
 <script>
 	import {
 		printPage,
-	} from "../store/print"
+	} from "@/store/print"
 	import {
 		blueToothStore
-	} from "../store/blueTooth"
+	} from "@/store/blueTooth"
 	import {
 		Printer
-	} from "../fun/printer"
+	} from "@/fun/printer"
 
 	export default {
 		props: ["printData"],
@@ -122,6 +122,7 @@ ${tsplTemplate}
 			// 构建tspl模版
 			genTSPL(printPage) {
 				// 获取标签要打印的根节点, 获取打印纸的长和宽
+				// 这里的html-template要根据实际情况修改
 				const rootDom = document.getElementsByClassName("html-template")[0]
 				if (!rootDom) {
 					console.log('未获取到打印区域节点')

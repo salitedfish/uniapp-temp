@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 	import { ref } from "vue"
-	import { Platform } from "../util/env"
-	import { ScanCode } from "../fun/scanCode"
-	import { globalColor } from "../store/theme"
+	import { Platform } from "@/util/env"
+	import { ScanCode } from "@/fun/scanCode"
+	import { globalColor } from "@/store/theme"
 
 	const props = defineProps<{
 		label ?: string

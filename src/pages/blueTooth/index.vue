@@ -1,13 +1,25 @@
 <script setup lang="ts">
-	import { onMounted, ref } from "vue"
+	import { onMounted, ref, } from "vue"
 	import { useThrottle } from "@ultra-man/noa"
-	import { BlueTooth } from "../../fun/blueTooth"
-	import { blueToothStore } from "../../store/blueTooth"
-	import { printPage } from "../../store/print"
-	import { globalColor } from "../../store/theme"
+	import { BlueTooth } from "@/fun/blueTooth"
+	import { blueToothStore } from "@/store/blueTooth"
+	import { printPage } from "@/store/print"
+	import { globalColor } from "@/store/theme"
 
 	const show = ref(false)
 	const blueTooth = new BlueTooth()
+
+	// 打印纸类型(打印机指令中并没有纸张类型这个参数，但是设置纸张间隙，打印机会自动识别纸张类型，value的实际意义是纸张间隙mm)
+	const printPaperTypes = [
+		{
+			name: "连续纸",
+			value: "0"
+		},
+		{
+			name: "间隙纸",
+			value: "3"
+		},
+	]
 
 	// 分段器数据
 	const subList = ["设备", "服务", "特征"]
@@ -30,7 +42,7 @@
 			blueTooth.discoveryPrinter()
 		} else {
 			uni.showToast({
-				icon: "error",
+				icon: "none",
 				title: "不支持蓝牙搜索"
 			})
 		}
@@ -196,6 +208,18 @@
 		<view class="uni-common-mt">
 			<view class="uni-form-item uni-column">
 				<view class="title">
+					<up-text class="title" text="打印纸类型" type="info"></up-text>
+				</view>
+				<u-radio-group v-model="printPage.gap" placement="column">
+					<u-radio :customStyle="{marginBottom: '8px'}" v-for="(item, index) in printPaperTypes" :key="index"
+						:label="item.name" :name="item.value">
+					</u-radio>
+				</u-radio-group>
+				<!-- <up-input border="surround" v-model="printPage.gap" placeholder="输入打印纸间隙" clearable type="number"></up-input> -->
+			</view>
+
+			<view class="uni-form-item uni-column">
+				<view class="title">
 					<up-text text="打印纸宽度(mm)" type="info"></up-text>
 				</view>
 				<up-input border="surround" v-model="printPage.width" placeholder="输入打印纸宽度" clearable type="number"></up-input>
@@ -210,18 +234,19 @@
 
 			<view class="uni-form-item uni-column">
 				<view class="title">
-					<up-text class="title" text="打印纸间隙(mm)" type="info"></up-text>
+					<up-text class="title" text="文本左偏移(mm)" type="info"></up-text>
 				</view>
 
-				<up-input border="surround" v-model="printPage.gap" placeholder="输入打印纸间隙" clearable type="number"></up-input>
+				<up-input border="surround" v-model="printPage.textLeftOffset" placeholder="输入文本左偏移量" clearable
+					type="number"></up-input>
 			</view>
 
 			<view class="uni-form-item uni-column">
 				<view class="title">
-					<up-text class="title" text="二维码大小等级(1～10)" type="info"></up-text>
+					<up-text class="title" text="文本上偏移(mm)" type="info"></up-text>
 				</view>
 
-				<up-input border="surround" v-model="printPage.QRCodeLevel" placeholder="输入二维码大小等级" clearable
+				<up-input border="surround" v-model="printPage.textTopOffset" placeholder="输入文本上偏移量" clearable
 					type="number"></up-input>
 			</view>
 
@@ -245,21 +270,14 @@
 
 			<view class="uni-form-item uni-column">
 				<view class="title">
-					<up-text class="title" text="文本左偏移(mm)" type="info"></up-text>
+					<up-text class="title" text="二维码大小等级(1～10)" type="info"></up-text>
 				</view>
 
-				<up-input border="surround" v-model="printPage.textLeftOffset" placeholder="输入文本左偏移量" clearable
+				<up-input border="surround" v-model="printPage.QRCodeLevel" placeholder="输入二维码大小等级" clearable
 					type="number"></up-input>
 			</view>
 
-			<view class="uni-form-item uni-column">
-				<view class="title">
-					<up-text class="title" text="文本上偏移(mm)" type="info"></up-text>
-				</view>
 
-				<up-input border="surround" v-model="printPage.textTopOffset" placeholder="输入文本上偏移量" clearable
-					type="number"></up-input>
-			</view>
 
 		</view>
 	</view>

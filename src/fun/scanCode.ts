@@ -1,4 +1,4 @@
-import { Platform } from "../util/env"
+import { Platform } from "@/util/env"
 import { Html5Qrcode } from "html5-qrcode"
 
 interface FunConfig { container : string }

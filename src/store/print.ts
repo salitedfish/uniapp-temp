@@ -1,6 +1,6 @@
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
 
-export const printPage = reactive({
+export const printPage = ref({
 	width: null,
 	height: null,
 	gap: null,
@@ -10,6 +10,15 @@ export const printPage = reactive({
 	textLeftOffset: null,
 	textTopOffset: null,
 })
+export const savePrintPage = () => {
+	uni.setStorageSync("printPage", printPage.value)
+}
+export const initPrintPage = () => {
+	const printPageOrigin = uni.getStorageSync("printPage") as typeof printPage.value
+	if (printPageOrigin) {
+		printPage.value = printPageOrigin
+	}
+}
 
 // 标签模版取值对应的key
 export const textOptions = [

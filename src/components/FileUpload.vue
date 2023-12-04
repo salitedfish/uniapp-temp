@@ -14,11 +14,13 @@
 			<!-- #endif -->
 				<image class="icon" style="margin-right: 10px" src="/static/common/file.svg" alt="" />
 
-				<text class="item-name"
-					:class="{fail: item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)}">{{ item.name }}</text>
+				<Download :info="item" class="item-name"
+					:class="{fail: item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)}">
+				</Download>
 				<text v-if="['waiting', 'loading' ].includes(item.type)" class="item-process"
 					style="margin-left: 10rpx;">{{item.progress + "%"}}</text>
 
+				<!-- type为sucess只是文件发送成功，后端不一定成功，所以还要根据后端返回的数据来判断 -->
 				<image v-if="item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)"
 					style="margin-left: 10px" class="icon" src="/static/common/fail.svg" alt="" />
 				<image v-else-if="item.type === 'success'" style="margin-left: 10px" class="icon"
@@ -34,7 +36,9 @@
 <script>
 	import {
 		getBaseUrl
-	} from "../util/env"
+	} from "@/util/common"
+	import Download from "@/components/Download.vue"
+
 	export default {
 		props: {
 			modelValue: {
@@ -57,6 +61,9 @@
 			}
 		},
 		emits: ["update:modelValue"],
+		components: {
+			Download
+		},
 		data() {
 			return {
 				// 上传接口参数
@@ -177,8 +184,9 @@
 			 */
 			updateList() {
 				this.filelist = this.files.values()
-			}
+			},
 			// #endif
+
 		},
 		mounted() {
 			// 初始化设置预设文件列表

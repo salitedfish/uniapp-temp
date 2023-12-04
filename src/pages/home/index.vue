@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-	import { routes } from "../../store/route"
-	import { RouteType } from "../../type/route"
+	import { routes } from "@/store/route"
+	import { RouteType, type Route } from "@/type/route"
 
 	interface FunItem {
 		name ?: string,
 		title ?: string,
 		icon ?: string,
-		path ?: string,
-		type ?: RouteType
+		route ?: Route
 	}
 
 	const baseList : FunItem[] = [
@@ -15,22 +14,19 @@
 			name: 'photo',
 			title: '采购到货',
 			icon: "/static/home/arrival.svg",
-			path: routes.login.path,
-			type: routes.login.type
+			route: routes.login
 		},
 		{
 			name: 'lock',
 			title: '采购入库',
 			icon: "/static/home/storage.svg",
-			path: routes.login.path,
-			type: routes.login.type
+			route: routes.login,
 		},
 		{
 			name: 'star',
 			title: '材料出库',
 			icon: "/static/home/out_storage.svg",
-			path: routes.login.path,
-			type: routes.login.type
+			route: routes.login,
 		}
 	]
 	const othersList : FunItem[] = [
@@ -38,50 +34,37 @@
 			name: 'photo',
 			title: '成品入库',
 			icon: "/static/home/good_storage.svg",
-			path: "",
-			type: RouteType.NAV
+
 		},
 		{
 			name: 'lock',
 			title: '货位调整',
 			icon: "/static/home/change_storage.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 			name: 'star',
 			title: '调拨入库',
 			icon: "/static/home/stowage_adjustment.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 			name: 'star',
 			title: '条码盘点',
 			icon: "/static/home/code_inventory.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 			name: 'star',
 			title: '其他入库单',
 			icon: "/static/home/storage_order.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 			name: 'star',
 			title: '其他出库单',
 			icon: "/static/home/outbound_order.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 			name: 'star',
 			title: '退货单',
 			icon: "/static/home/returned_order.svg",
-			path: "",
-			type: RouteType.NAV
 		},
 		{
 		},
@@ -91,15 +74,15 @@
 
 	// 点击跳转，不同类型路由跳转方式不一样
 	const itemClick = (item : FunItem) => {
-		if (item.path) {
-			if (item.type === RouteType.NAV) {
+		if (item.route) {
+			if (item.route.type === RouteType.NAV) {
 				uni.navigateTo({
-					url: item.path + "?a=123"
+					url: item.route.path + "?a=123"
 				})
 			}
-			if (item.type === RouteType.TAB) {
+			if (item.route.type === RouteType.TAB) {
 				uni.switchTab({
-					url: item.path
+					url: item.route.path
 				})
 			}
 		}
