@@ -7,17 +7,21 @@
 
 	const emit = defineEmits<{
 		(event : "update:modelValue", result : string) : void;
+		(event : "scanSuccess", result : string) : void;
 	}>()
 
 	const valueChange = (res : string) => {
 		emit("update:modelValue", res)
+	}
+	const scanSuccess = (res : string) => {
+		emit("scanSuccess", res)
 	}
 </script>
 
 <template>
 	<up-input :modelValue="props.modelValue" @update:modelValue="valueChange">
 		<template #suffix>
-			<ScanCode @scanSuccess="valueChange"></ScanCode>
+			<ScanCode @scanSuccess="scanSuccess"></ScanCode>
 		</template>
 	</up-input>
 </template>

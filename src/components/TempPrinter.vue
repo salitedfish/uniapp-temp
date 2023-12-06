@@ -123,7 +123,8 @@ ${tsplTemplate}
 			genTSPL(printPage) {
 				// 获取标签要打印的根节点, 获取打印纸的长和宽
 				// 这里的html-template要根据实际情况修改
-				const rootDom = document.getElementsByClassName("html-template")[0]
+				const rootDoms = document.getElementsByClassName("html-template")
+				const rootDom = rootDoms[0]
 				if (!rootDom) {
 					console.log('未获取到打印区域节点')
 					return
@@ -141,61 +142,66 @@ ${tsplTemplate}
 				const pageWidth = printPage.width ? printPage.width : rootWidth * 10
 				const pageHeight = printPage.height ? printPage.height : rootHeight * 10
 				const pageGap = printPage.gap ? printPage.gap : 0
-				let command = `SIZE ${pageWidth} mm, ${pageHeight} mm\n GAP ${pageGap} mm, 0 mm\n DIRECTION 0\n CLS\n `
 
-				// 计算毫米和px的比值
-				const ratio = pageWidth / width
+				let command = ""
+				// 循环每个标签根dom，生成每个打印指令
+				for (const rootDom of rootDoms) {
+					command = command + `SIZE ${pageWidth} mm, ${pageHeight} mm\n GAP ${pageGap} mm, 0 mm\n DIRECTION 0\n CLS\n `
 
-				// 文本节点
-				for (const item of textOptions) {
-					const optionDom = document.getElementsByClassName(`template-${item}`)
-					if (optionDom.length > 0) {
-						const currentDom = optionDom[0].childNodes[0].childNodes[0]
-						// const { left, top } = this.genPosition(currentDom, rootDom)
-						const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
-						const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
-						const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.textLeftOffset)))
-						const topDots = Math.round(mmToDot(top * ratio - Number(printPage.textTopOffset)))
-						command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${currentDom.innerText}"\n `
+					// 计算毫米和px的比值
+					const ratio = pageWidth / width
+
+					// 文本节点
+					for (const item of textOptions) {
+						const optionDom = rootDom.getElementsByClassName(`template-${item}`)
+						if (optionDom.length > 0) {
+							const currentDom = optionDom[0].childNodes[0].childNodes[0]
+							// const { left, top } = this.genPosition(currentDom, rootDom)
+							const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
+							const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
+							const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.textLeftOffset)))
+							const topDots = Math.round(mmToDot(top * ratio - Number(printPage.textTopOffset)))
+							command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${currentDom.innerText}"\n `
+						}
 					}
-				}
 
-				// 二维码节点
-				for (const item of qrcodeOptions) {
-					const optionDom = document.getElementsByClassName(`template-${item}`)
-					if (optionDom.length > 0) {
-						const currentDom = optionDom[0].childNodes[0].childNodes[0]
-						// const { left, top } = this.genPosition(currentDom, rootDom)
-						const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
-						const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
-						const w = window.getComputedStyle(optionDom[0]).getPropertyValue("width").slice(0, -2)
-						const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.QRCodeLeftOffset)))
-						const topDots = Math.round(mmToDot(top * ratio - Number(printPage.QRCodeTopOffset)))
-						const sizeLevel = Number(printPage.QRCodeLevel) ? Number(printPage.QRCodeLevel) : this
-							.genQRCodeSizeLevel(w, ratio)
-						const content = currentDom.getAttribute('data-shortUrl')
-						command = command + `QRCODE ${leftDots},${topDots},L,${sizeLevel},A,0,"${content}"\n `
+					// 二维码节点
+					for (const item of qrcodeOptions) {
+						const optionDom = rootDom.getElementsByClassName(`template-${item}`)
+						if (optionDom.length > 0) {
+							const currentDom = optionDom[0].childNodes[0].childNodes[0]
+							// const { left, top } = this.genPosition(currentDom, rootDom)
+							const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
+							const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
+							const w = window.getComputedStyle(optionDom[0]).getPropertyValue("width").slice(0, -2)
+							const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.QRCodeLeftOffset)))
+							const topDots = Math.round(mmToDot(top * ratio - Number(printPage.QRCodeTopOffset)))
+							const sizeLevel = Number(printPage.QRCodeLevel) ? Number(printPage.QRCodeLevel) : this
+								.genQRCodeSizeLevel(w, ratio)
+							const content = currentDom.getAttribute('data-shortUrl')
+							command = command + `QRCODE ${leftDots},${topDots},L,${sizeLevel},A,0,"${content}"\n `
+						}
 					}
-				}
 
-				// 条形码
-				// todo。。。
+					// 条形码
+					// todo。。。
 
-				// 自定义文本节点
-				for (const item of customTextOptions) {
-					const optionDom = document.getElementsByClassName(`template-${item}`)
-					if (optionDom.length > 0) {
-						const currentDom = optionDom[0].childNodes[0].childNodes[0]
-						// const { left, top } = this.genPosition(currentDom, rootDom
-						const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
-						const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
-						const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.textLeftOffset)))
-						const topDots = Math.round(mmToDot(top * ratio - Number(printPage.textTopOffset)))
-						command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${currentDom.innerText}"\n `
+					// 自定义文本节点
+					for (const item of customTextOptions) {
+						const optionDom = rootDom.getElementsByClassName(`template-${item}`)
+						if (optionDom.length > 0) {
+							const currentDom = optionDom[0].childNodes[0].childNodes[0]
+							// const { left, top } = this.genPosition(currentDom, rootDom
+							const left = optionDom[0].style.getPropertyValue("left").slice(0, -2)
+							const top = optionDom[0].style.getPropertyValue("top").slice(0, -2)
+							const leftDots = Math.round(mmToDot(left * ratio - Number(printPage.textLeftOffset)))
+							const topDots = Math.round(mmToDot(top * ratio - Number(printPage.textTopOffset)))
+							command = command + `TEXT ${leftDots},${topDots},"TSS24.BF2",0,1,1,"${currentDom.innerText}"\n `
+						}
 					}
-				}
 
-				command = command + `PRINT 1\n `
+					command = command + `PRINT 1\n `
+				}
 
 				return command
 			},

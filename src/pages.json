@@ -21,9 +21,129 @@
 			"path": "pages/home/index",
 			"style": {
 				"navigationBarTitleText": "首页"
-
 			},
 			"type": "tab"
+		},
+		// 首页功能子页面
+		{
+			"name": "purchaseArrival",
+			"path": "pages/purchaseArrival/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "采购到货"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "purchaseStockroom",
+			"path": "pages/purchaseStockroom/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "采购入库"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "materialOutStockroom",
+			"path": "pages/materialOutStockroom/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "材料出库"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "productionStockroom",
+			"path": "pages/productionStockroom/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "成品入库"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "deliveryMaterial",
+			"path": "pages/deliveryMaterial/index",
+			"style": {
+				// "navigationStyle": "custom",
+				// "backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "发货备料"
+			},
+			"type": "nav",
+			"needLogin": true
+		}, {
+			"name": "shelfChange",
+			"path": "pages/shelfChange/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "货位调整"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "stockroomChange",
+			"path": "pages/stockroomChange/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "调拨入库"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "codeCheck",
+			"path": "pages/codeCheck/index",
+			"style": {
+				// "navigationStyle": "custom",
+				// "backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "条码盘点"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "otherStockDoc",
+			"path": "pages/otherStockDoc/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "其他入库单"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "otherOutStockDoc",
+			"path": "pages/otherOutStockDoc/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "其他出库单"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "refundDoc",
+			"path": "pages/refundDoc/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "退货单"
+			},
+			"type": "nav",
+			"needLogin": true
 		},
 		{
 			"name": "blueTooth",
@@ -38,6 +158,8 @@
 			"name": "demo",
 			"path": "pages/demo/index",
 			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "测试",
 				"app-plus": {
 					"pullToRefresh": {
@@ -56,14 +178,6 @@
 				"navigationBarTitleText": "内部测试"
 			},
 			"type": "nav"
-		},
-		{
-			"name": "print",
-			"path": "pages/print/index",
-			"style": {
-				"navigationBarTitleText": "打印标签"
-			},
-			"type": "tab"
 		}
 	],
 
@@ -102,11 +216,6 @@
 			{
 				"pagePath": "pages/demo/index",
 				"text": "测试"
-			}, {
-				"pagePath": "pages/print/index",
-				"iconPath": "static/tabbar/blueTooth.png",
-				"selectedIconPath": "static/tabbar/blueTooth_active.png",
-				"text": "打印"
 			}, {
 				"pagePath": "pages/home/index",
 				"iconPath": "static/tabbar/home.png",

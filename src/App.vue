@@ -40,6 +40,7 @@
 </script>
 <style lang="scss">
 	@import "uview-plus/index.scss";
+	@import "@/static/iconfont.css";
 
 	* {
 		box-sizing: border-box;

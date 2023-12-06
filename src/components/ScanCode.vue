@@ -12,7 +12,7 @@
 	}>()
 
 	/**
-	 * 是否显示照相机，只有在web环境下才需要显示
+	 * 是否显示照相机，只有在web环境下才需要显示, app自动会显示
 	 */
 	const showWebCamera = ref(false)
 
@@ -46,7 +46,8 @@
 
 	<view @click="initScan" class="scan_btn">
 		<view class="scan_label" v-if="props.label">{{ props.label }}</view>
-		<image class="scan_icon" src="../assets/scanCode_primary.svg" alt="" />
+		<uni-icons custom-prefix="custom-icon" type="icon-saomiao" size="18" :color="globalColor.primary"></uni-icons>
+		<!-- <image class="scan_icon" src="../assets/scanCode_primary.svg" alt="" /> -->
 	</view>
 
 	<view class="scan-container" v-if="showWebCamera">
@@ -67,7 +68,7 @@
 	.scan_btn {
 		display: flex;
 		align-items: center;
-		color: $u-primary;
+		color: v-bind("globalColor.primary");
 
 		.scan_label {
 			margin-right: 3px;

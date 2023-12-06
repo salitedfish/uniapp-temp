@@ -38,12 +38,13 @@ export class URequest {
 		if (!config.header) {
 			config.header = genHeader()
 		}
-		config.withCredentials = true
+		// config.withCredentials = true          
 		config.url = this.baseConfig.baseUrl + config.url
 
 		return new Promise<T>((resolve, reject) => {
 			// 响应拦截器
 			config.success = (res) => {
+				console.log("请求返回res：", res)
 				if (res.statusCode === 200) {
 					// 请求成功
 					if ((res.data as any).status === 200) {
@@ -67,12 +68,14 @@ export class URequest {
 				}
 			}
 			config.fail = (err) => {
+				console.log("请求返回err：", err)
 				uni.showToast({
 					icon: "none",
 					title: err.errMsg
 				})
 				reject()
 			}
+			console.log("请求配置：", config)
 			uni.request(config)
 		})
 	}

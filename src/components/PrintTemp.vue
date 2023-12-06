@@ -57,14 +57,14 @@
 						try {
 							// @ts-ignore
 							const res = await qrcodeRef.value.GetCodeImg()
-							// // app和web做兼容处理，web这里返回的是base64，app则是文件路径需要处理后使用
+							// app和web做兼容处理，web这里返回的是base64，app则是文件路径需要处理后使用
 							let urlTemplate = genLocalFileUrl(res.tempFilePath)
 							// // 将原字符串中的二维码base64替换成，生成的二维码文件路径
 							originContent = originContent.replace(
 								/src="data:image\/png;base64[^"]*/,
 								`data-shortUrl="${url}" src="${urlTemplate}"`
 							)
-							// // 再赋值给要渲染的模版字符串
+							// 再赋值给要渲染的模版字符串
 							renderStr.value = originContent
 						} catch (err) {
 							uni.showToast({
@@ -87,14 +87,14 @@
 						try {
 							// @ts-ignore
 							const res = await barcodeRef.value.GetCodeImg()
-							// // app和web做兼容处理，web这里返回的是base64，app则是文件路径需要处理后使用
+							// app和web做兼容处理，web这里返回的是base64，app则是文件路径需要处理后使用
 							let urlTemplate = genLocalFileUrl(res.tempFilePath)
 							// // 将原字符串中的二维码base64替换成，生成的二维码文件路径
 							originContent = originContent.replace(
 								/src="data:image\/png;base64[^"]*/,
 								`data-barShortUrl="${url}" src="${urlTemplate}"`
 							)
-							// // 再赋值给要渲染的模版字符串
+							// 再赋值给要渲染的模版字符串
 							renderStr.value = originContent
 						} catch (err) {
 							uni.showToast({
@@ -139,46 +139,3 @@
 		position: relative;
 	}
 </style>
-
-
-
-// 二维码
-// if (props.tempData && props.tempData.shortUrl) {
-// const url = props.tempData.shortUrl
-// // 等二维码渲染完之后再去获取二维码图片路径
-// setTimeout(() => {
-// if (qrcodeRef.value) {
-// // @ts-ignore
-// qrcodeRef.value.toTempFilePath({
-// success: (res : any) => {
-// // app和web做兼容处理，web这里返回的是base64，app则是文件路径需要处理后使用
-// let urlTemplate = genLocalFileUrl(res.tempFilePath)
-// // 将原字符串中的二维码base64替换成，生成的二维码文件路径
-// originContent = originContent.replace(
-// /src="data:image\/png;base64[^"]*/,
-// `data-shortUrl="${url}" src="${urlTemplate}"`
-// )
-// // 再赋值给要渲染的模版字符串
-// renderStr.value = originContent
-// },
-// complete: (res : any) => {
-// console.log(res)
-// uni.hideLoading()
-// },
-// fail: (res : any) => {
-// uni.showToast({
-// icon: "none",
-// title: res,
-// })
-// },
-// })
-// }
-// }, 1000)
-// } else {
-// renderStr.value = originContent
-// uni.hideLoading()
-// }
-
-<!-- 生成二维码 -->
-<!-- 	<uqrcode ref="qrcodeRef" canvas-id="qrcode" v-if="props.tempData && props.tempData.shortUrl"
-		:value="props.tempData.shortUrl" :options="{ margin: 10 }" style="position: fixed; left: -9999px"></uqrcode> -->

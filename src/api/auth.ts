@@ -1,12 +1,19 @@
 import { uRequest } from "./instance"
 import type { Return } from "@/type/common"
 import type { UserInfo } from "@/type/auth"
-
+import { Platform } from "@/util/env"
 // 登录
 export const login = async (data : { jobNo : string, password : string }) => {
 	return await uRequest.post<Return<string>>({
 		url: "token/login",
-		data,
+		data: {
+			jobNo: data.jobNo,
+			password: data.password,
+			loginSource: Platform.isApp() ? "PDA" : "DD"
+		},
+		header: {
+			"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+		}
 	})
 }
 

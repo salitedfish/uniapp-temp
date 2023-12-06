@@ -153,9 +153,11 @@
 							<view class="option-item" :class="{'option-active': blueToothStore.deviceId === item.deviceId }"
 								@click="radioChange(item.deviceId)">
 								<view class="option-label">
-									<image class="option-icon" v-if="blueToothStore.deviceId === item.deviceId "
+									<!-- 									<image class="option-icon" v-if="blueToothStore.deviceId === item.deviceId "
 										src="../../assets/blueTooth_active.svg" alt="" />
-									<image class="option-icon" v-else src="../../assets/blueTooth.svg" alt="" />
+									<image class="option-icon" v-else src="../../assets/blueTooth.svg" alt="" /> -->
+									<uni-icons custom-prefix="custom-icon" type="icon-lanya" class="option-icon"
+										:color="blueToothStore.deviceId === item.deviceId ? globalColor.primary : globalColor.default"></uni-icons>
 								</view>
 								<view class="option-value">
 									{{ item.name }}
@@ -345,18 +347,18 @@
 					.option-value {
 						flex: 1;
 						width: 0;
-						color: $u-info
+						color: v-bind("globalColor.info")
 					}
 				}
 
 				.option-active {
-					border: 1rpx solid $u-primary;
+					border: 1rpx solid v-bind("globalColor.primary");
 					background-color: v-bind("globalColor.primary_background");
 
 					.option-value {
 						flex: 1;
 						width: 0;
-						color: $u-primary
+						color: v-bind("globalColor.primary")
 					}
 				}
 			}

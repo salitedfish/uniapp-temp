@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+	import { globalColor } from "@/store/theme"
 	const props = defineProps<{
 		label ?: string
 	}>()
@@ -23,7 +24,7 @@
 <template>
 	<view @click="chooseImage" class="btn">
 		<view class="label" v-if="props.label">{{ props.label }}</view>
-		<image class="icon" src="../assets/takePhoto.svg" alt="" />
+		<uni-icons custom-prefix="custom-icon" type="icon-camera" size="18" :color="globalColor.primary"></uni-icons>
 	</view>
 </template>
 
@@ -31,7 +32,7 @@
 	.btn {
 		display: flex;
 		align-items: center;
-		color: $u-primary;
+		color: v-bind("globalColor.primary");
 
 		.label {
 			margin-right: 3px;

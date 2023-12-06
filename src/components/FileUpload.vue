@@ -2,7 +2,8 @@
 	<lsj-upload ref="lsjUpload" childId="upload1" :width="width" :height="height" :option="option" :size="size"
 		:formats="formats" :debug="debug" :instantly="instantly" @uploadEnd="onuploadEnd" @progress="onprogre"
 		@change="change" :count="count">
-		<image class="icon" src="../assets/fileSelect.svg" alt="" />
+		<uni-icons custom-prefix="custom-icon" type="icon-folder" size="18" :color="globalColor.primary"></uni-icons>
+		<!-- <image class="icon" src="../assets/fileSelect.svg" alt="" /> -->
 	</lsj-upload>
 
 	<view class="padding">
@@ -12,7 +13,8 @@
 			<!-- #ifdef H5 -->
 			<view v-for="item in filelist" :key="item.name" class="file-item">
 			<!-- #endif -->
-				<image class="icon" style="margin-right: 10px" src="/static/common/file.svg" alt="" />
+				<uni-icons custom-prefix="custom-icon" type="icon-file" size="16" :color="globalColor.primary"
+					style="margin-right: 10px"></uni-icons>
 
 				<Download :info="item" class="item-name"
 					:class="{fail: item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)}">
@@ -21,13 +23,14 @@
 					style="margin-left: 10rpx;">{{item.progress + "%"}}</text>
 
 				<!-- type为sucess只是文件发送成功，后端不一定成功，所以还要根据后端返回的数据来判断 -->
-				<image v-if="item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)"
-					style="margin-left: 10px" class="icon" src="/static/common/fail.svg" alt="" />
-				<image v-else-if="item.type === 'success'" style="margin-left: 10px" class="icon"
-					src="/static/common/success.svg" alt="" />
+				<uni-icons custom-prefix="custom-icon" type="icon-shibai" size="16" :color="globalColor.fail"
+					style="margin-left: 10px"
+					v-if="item.type === 'fail' || (item.responseText && JSON.parse(item.responseText).status !== 200)"></uni-icons>
+				<uni-icons custom-prefix="custom-icon" type="icon-chenggong" size="16" :color="globalColor.success"
+					style="margin-left: 10px" v-else-if="item.type === 'success'"></uni-icons>
 
-				<image style="margin-left: 10px" class="icon" src="/static/common/delete.svg" alt=""
-					@click="clear(item.name)" />
+				<uni-icons custom-prefix="custom-icon" type="icon-shanchu" size="16" :color="globalColor.fail"
+					style="margin-left: 10px" @click="clear(item.name)"></uni-icons>
 			</view>
 		</view>
 </template>
@@ -38,6 +41,9 @@
 		getBaseUrl
 	} from "@/util/common"
 	import Download from "@/components/Download.vue"
+	import {
+		globalColor
+	} from "@/store/theme"
 
 	export default {
 		props: {
@@ -66,6 +72,7 @@
 		},
 		data() {
 			return {
+				globalColor,
 				// 上传接口参数
 				option: {
 					// 上传服务器地址，需要替换为你的接口地址
@@ -212,7 +219,7 @@
 		}
 
 		.fail {
-			color: rgb(199, 52, 32);
+			color: v-bind("globalColor.fail");
 		}
 
 		.item-process {

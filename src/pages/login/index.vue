@@ -76,7 +76,7 @@
 		</up-form>
 		<up-button class="btn-item" @click="initLogin" type="primary" text="登录" :loading="logging"
 			loadingMode="circle"></up-button>
-		<up-button class="btn-item" @click="initLogin" type="primary" text="系统配置"></up-button>
+		<!-- <up-button class="btn-item" @click="initLogin" type="primary" text="系统配置"></up-button> -->
 	</view>
 </template>
 
