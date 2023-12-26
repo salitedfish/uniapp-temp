@@ -3,37 +3,355 @@
 	import {
 		defineComponent,
 		ref,
-		reactive,
-		onMounted
+		computed,
+		onMounted,
 	} from 'vue';
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
+	import UpInputScan from "@/components/UpInputScan.vue"
+	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
+	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	// 工具
+	import {
+		useTimeFormat,
+		useCheckEmptyInObj
+	} from "@ultra-man/noa"
+	import {
+		onShow
+	} from "@dcloudio/uni-app"
 	// 接口
+	import {
+		getPurchaseArrivalList,
+		confirmArrival
+	} from "@/api/purchaseArrival"
 	// 数据
 	import {
 		routes
 	} from "@/store/route"
 	// 类型
+	import type {
+		Business,
+	} from "@/type/business"
 	export default defineComponent({
 		name: ''
 	});
 </script>
 
 <script lang='ts' setup>
+	// nav右上角点击
 	const rightClick = () => {
-		uni.showToast({
-			icon: "none",
-			title: "默认参数"
+		uni.navigateTo({
+			url: routes.pADefaultSetPage.path
 		})
 	}
+
+	onShow(() => {
+		const configStr = uni.getStorageSync("pADefaultSet")
+		if (configStr) {
+			const config = JSON.parse(configStr)
+			if (depSelected.value.length <= 0) {
+				depSelected.value = config.depSelected
+			}
+		}
+	})
+
+	onMounted(() => {
+		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
+	})
+
+	// 扫描成功后如果有值则请求列表
+	const codeText = ref("")
+	const searching = ref(false)
+	const scanSuccess = async (res: string) => {
+		if (res) {
+			try {
+				codeText.value = res
+				searching.value = true
+				const result = await getPurchaseArrivalList({
+					code: res
+				})
+				if (result.data.list.length > 0) {
+					tableData.value = result.data.list
+					for (const item of tableData.value) {
+						item.count = item.quantity
+					}
+					supplier.value = tableData.value[0]
+				}
+			} catch (err) {
+				console.log(err)
+			} finally {
+				searching.value = false
+			}
+		}
+	}
+	// 扫描带出供应商
+	const supplier = ref < Obj > ({})
+
+	// 选择的部门
+	const depSelected = ref < Business[] > ([])
+
+	// 日期
+	const dateSelected = ref < string[] > ([])
+
+	// 表格数据
+	const tableData = ref < Obj[] > ([])
+	// 表格操作
+	const index = ref(0)
+	const count = ref("")
+	const originData = ref < Obj > ({})
+	const showPopup = ref(false)
+	const open = (item: Obj, key: number) => {
+		if (submiting.value) return
+		originData.value = item
+		count.value = item.count
+		index.value = key
+		showPopup.value = true
+	}
+	// 编辑完弹窗数据
+	const edit = () => {
+		const value = Number(count.value)
+		const max = Number(originData.value.quantity)
+		const min = 0
+		if (value > max) {
+			uni.showToast({
+				icon: "none",
+				title: "到货数量不能大于订单数量"
+			})
+			return
+		}
+		if (value <= min) {
+			uni.showToast({
+				icon: "none",
+				title: "到货数量不能小于0"
+			})
+			return
+		}
+		originData.value.count = count.value
+		showPopup.value = false
+	}
+	// 删除一行
+	const deleteTable = (key: number) => {
+		if (submiting.value) return
+		uni.showModal({
+			content: "确定要删除吗？",
+			showCancel: true,
+			success(res) {
+				if (res.confirm) {
+					tableData.value.splice(key, 1)
+					uni.showToast({
+						icon: "none",
+						title: "删除成功"
+					})
+				}
+			}
+		})
+	}
+
+	// 重置所有数据
+	const reset = () => {
+		codeText.value = ""
+		supplier.value = {}
+		tableData.value = []
+	}
+
+	// 确认到货
+	const submiting = ref(false)
+	const submit = async () => {
+		try {
+			// 默认值检查
+			const configStr = uni.getStorageSync("pADefaultSet")
+			const config: Obj = configStr ? JSON.parse(configStr) : {}
+			if (useCheckEmptyInObj([config.busTypeSelected, config.purTypeSelected], [])) {
+				uni.showToast({
+					title: "请填写完默认参数",
+					icon: "none"
+				})
+				return
+			}
+			if (depSelected.value.length <= 0) {
+				uni.showToast({
+					title: "请选择部门",
+					icon: "none"
+				})
+				return
+			}
+			//
+			submiting.value = true
+			uni.showLoading({
+				title: "提交中",
+				icon: "none",
+				mask: true
+			})
+
+			// 参数赋值
+			const params = {
+				billDate: dateSelected.value[0],
+				busType: config.busTypeSelected[0].name,
+				deptCode: depSelected.value[0].code,
+				deptName: depSelected.value[0].name,
+				list: tableData.value.map(item => {
+					return {
+						...item,
+						quantity: item.count
+					}
+				}),
+				purchaseTypeCode: config.purTypeSelected[0].code,
+				purchaseTypeName: config.purTypeSelected[0].name,
+			}
+
+			// 请求
+			await confirmArrival(params)
+			reset()
+			uni.showToast({
+				title: "提交成功",
+				icon: "none"
+			})
+
+		} catch (err) {
+			console.log(err)
+		} finally {
+			uni.hideLoading()
+			submiting.value = false
+		}
+	}
+
+	// 提交按钮可不可用
+	const submitDisabled = computed(() => {
+		if (!codeText.value || submiting.value || !supplier.value.supplierCode || tableData.value.length <= 0 ||
+			depSelected.value.length <= 0 || dateSelected.value.length <= 0) {
+			return true
+		}
+		return false
+	})
 </script>
 
 <template>
-	<CustomNavBar :title="routes.purchaseArrival.style.navigationBarTitleText" @rightClick="rightClick"></CustomNavBar>
+	<view class="common-page common-page-container">
+		<CustomNavBar :title="routes.purchaseArrival.style.navigationBarTitleText" @rightClick="rightClick"></CustomNavBar>
 
+		<view>
+			<view class="common-section-title">
+				基本信息
+			</view>
+			<up-form class="common-form" labelPosition="left">
+				<up-form-item class="common-form-item" label="箱/托/发货单码:" borderBottom labelWidth="120" style="padding: 0">
+					<up-input-scan v-model="codeText" border="none" placeholder="请扫箱/托/发货单码" clearable class="input-item"
+						@scanSuccess="scanSuccess" readonly></up-input-scan>
+				</up-form-item>
+				<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">
+					<up-input border="none" placeholder="扫码后自动带出供应商" clearable class="input-item" v-model="supplier.supplierName"
+						readonly>
+					</up-input>
+				</up-form-item>
+				<up-form-item class="common-form-item" label="部门:" borderBottom labelWidth="80" style="padding: 0">
+					<UpInputDepPicker border="none" placeholder="选择部门" readonly clearable class="input-item"
+						v-model:selected="depSelected">
+					</UpInputDepPicker>
+				</up-form-item>
+				<up-form-item class="common-form-item" label="制单日期:" borderBottom labelWidth="80" style="padding: 0">
+					<UpInputDatePicker border="none" placeholder="选择制单日期" clearable class="input-item" readonly
+						v-model:selected="dateSelected">
+					</UpInputDatePicker>
+				</up-form-item>
+			</up-form>
+			<view class="common-section-title">
+				到货信息明细
+			</view>
+		</view>
+		<view class="table-box common-page-largest">
+			<view class="common-table">
+				<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
+					<!-- 表头行 -->
+					<uni-tr>
+						<uni-th align="left" width="60rpx">序号</uni-th>
+						<uni-th align="left" width="100rpx">物料编码</uni-th>
+						<uni-th align="left" width="100rpx">物料名称</uni-th>
+						<uni-th align="left" width="100rpx">数量信息</uni-th>
+						<uni-th align="left" width="80rpx">操作</uni-th>
+					</uni-tr>
+					<!-- 表格数据行 -->
+					<!-- <uni-tr v-for="item,key in resultData?.data" :key="key" @click="open(item)"> -->
+					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key)">
+						<uni-td>{{ key + 1 }}</uni-td>
+						<uni-td>{{ item.invCode}}</uni-td>
+						<uni-td>{{ item.invName }}</uni-td>
+						<uni-td>{{ item.quantity + item.invUnit }}</uni-td>
+						<uni-td class="warning" @click.stop="deleteTable(key)">删除</uni-td>
+					</uni-tr>
+				</uni-table>
+
+				<u-popup :show="showPopup" mode="right" @close="showPopup = false" safeAreaInsetTop>
+					<view class="popup-content common-page-container" style="width: 85vw">
+						<view class="common-section-title">
+							到货详情信息
+						</view>
+						<view class="popup-form common-page-largest">
+							<up-form class="common-form" labelPosition="left">
+								<up-form-item class="common-form-item" label="行号:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" :modelValue="index + 1" readonly>
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invCode"
+										readonly>
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invName"
+										readonly>
+									</up-input>
+								</up-form-item>
+								<!-- 								<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="supplier.name" readonly>
+									</up-input>
+								</up-form-item> -->
+								<up-form-item class="common-form-item" label="订单数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.quantity"
+										readonly type="number">
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="未到数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item"
+										:modelValue="count ? Number(originData.quantity) - Number(count) : 0" readonly type="number">
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="到货数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input placeholder="" clearable class="input-item" v-model="count" type="number">
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="计量单位:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="supplier.invUnit"
+										readonly>
+									</up-input>
+								</up-form-item>
+							</up-form>
+						</view>
+						<view class="btn-box">
+							<up-button type="info" text="退出" class="bottom-button" @click="showPopup = false"
+								shape="circle"></up-button>
+							<up-button type="primary" text="确定" class="bottom-button" @click="edit" shape="circle"></up-button>
+						</view>
+					</view>
+				</u-popup>
+			</view>
+		</view>
+		<view class="btn-box">
+			<up-button type="primary" text="确认到货" class="bottom-button" shape="circle" @click="submit" :loading="submiting"
+				:disabled="submitDisabled"></up-button>
+		</view>
+
+	</view>
 </template>
 
-<style scoped lang='less'>
+<style scoped lang='scss'>
+	.popup-content {
+		height: 95vh;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
 
+		.btn-box {
+			display: flex;
+		}
+	}
 </style>

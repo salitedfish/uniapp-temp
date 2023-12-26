@@ -39,3 +39,13 @@ export const getBaseUrl = () => {
 	}
 	return baseUrl
 }
+
+// 分隔扫码后的数据
+export const splitCodeInfo = (code : string) => {
+	const codes = code.split("^")
+	return {
+		default: codes[0],
+		supplierCode: codes[6]
+	}
+
+}

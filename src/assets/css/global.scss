@@ -1,17 +1,38 @@
 	$bg-color-default: rgba(245,245,248, 0.8);
 	$bg-color-primary: rgba(84, 157, 248, 0.1);
 	
+	
+	.common-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	.common-page-container {
+		padding: 0 24rpx 0;
+	}
+	.common-page-largest {
+		flex: 1;
+		overflow-y: scroll;
+	}
+	
 	.common-section-title {
 		margin: 16rpx 0;
 		color: $u-tips-color;
 	}
 	.common-form {
 		border-radius: 4px;
-		padding: 0 24rpx;
+		padding: 0 32rpx;
 		border: 1px solid $u-border-color;
 		.common-form-item+.common-form-item {
 			border-top: 1px solid $u-border-color;
 		}
+	}
+	.uni-input-input {
+		padding-left: 5px;
+	}
+	.uni-input-placeholder {
+		padding-left: 5px;
 	}
 	.common-table {
 		.uni-table-th {
@@ -19,6 +40,9 @@
 		}
 		.uni-table-td {
 			font-size: 12px !important;
+			// white-space: nowrap !important;
+			// overflow: hidden !important;
+			// text-overflow: ellipsis !important;
 		}
 		.checkbox__inner {
 			width: 12px !important;
@@ -28,6 +52,9 @@
 				left: 3px !important;
 			}
 		}
+	}
+	.error {
+		color: $u-error !important;
 	}
 	.warning {
 		color: $u-warning !important;

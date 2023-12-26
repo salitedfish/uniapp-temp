@@ -2,9 +2,7 @@
 	// 框架
 	import {
 		defineComponent,
-		ref,
-		reactive,
-		onMounted
+		useAttrs
 	} from 'vue';
 	// 组件
 	// 工具
@@ -20,6 +18,7 @@
 </script>
 
 <script lang='ts' setup>
+	const attrs = useAttrs()
 	const leftClick = () => {
 		uni.switchTab({
 			url: routes.home.path
@@ -28,7 +27,7 @@
 </script>
 
 <template>
-	<u-navbar :fixed="true" placeholder @leftClick="leftClick">
+	<u-navbar :fixed="true" placeholder @leftClick="leftClick" v-bind="attrs">
 		<template #right>
 			<view class="link">
 				默认参数

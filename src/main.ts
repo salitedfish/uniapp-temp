@@ -2,7 +2,10 @@ import { createSSRApp } from "vue"
 import uviewPlus from "uview-plus"
 import App from "./App.vue"
 import { initInterceptor } from "./util/interceptor"
+import directive from "./util/directive"
 import "./assets/css/global.scss"
+import mqtt from 'mqtt'
+console.log(mqtt)
 
 // 初始化导航拦截器
 initInterceptor()
@@ -18,6 +21,7 @@ initInterceptor()
 export function createApp() {
 	const app = createSSRApp(App)
 	app.use(uviewPlus)
+	directive(app)
 	return {
 		app,
 	}

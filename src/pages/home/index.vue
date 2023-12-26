@@ -80,6 +80,10 @@
 			route: routes.refundDoc,
 		},
 		{
+			name: routes.outSrDocFlieUpload.name,
+			title: routes.outSrDocFlieUpload.style.navigationBarTitleText,
+			icon: "/static/home/out_sr_doc_upload.svg",
+			route: routes.outSrDocFlieUpload,
 		},
 	]
 

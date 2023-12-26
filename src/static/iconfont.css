@@ -12,6 +12,22 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-mei-xuanze:before {
+	content: "\e6c1";
+}
+
+.icon-xuanze:before {
+	content: "\e619";
+}
+
+.icon-rili:before {
+	content: "\e60a";
+}
+
+.icon-chaxun:before {
+	content: "\ec4c";
+}
+
 .icon-folder:before {
 	content: "\eac6";
 }

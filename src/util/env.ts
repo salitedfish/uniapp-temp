@@ -1,5 +1,3 @@
-
-
 // 判断平台
 export class Platform {
 	static platform = ""

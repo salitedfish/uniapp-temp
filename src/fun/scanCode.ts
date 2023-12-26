@@ -27,7 +27,6 @@ export class ScanCode {
 			uni.scanCode({
 				autoDecodeCharset: true,
 				success(res) {
-					console.log(res)
 					resolve(res.result)
 				},
 				fail(err) {

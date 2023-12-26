@@ -7,22 +7,16 @@ export type Return<T> = {
 
 // 分页返回的列表类型
 export type ReturnList<T> = {
-	data : T[];
-	dataSize : number;
-	end : number;
-	hasNextPage : boolean;
-	hasPrePage : boolean;
-	pageNumber : number;
+	list : T[];
+	currentPage : number;
 	pageSize : number;
-	start : number;
-	totalPage : number;
-	totalSize : number;
+	totalCount : number;
 };
 
 // 分页请求参数类型
 export type Paging = {
-	page : number;
-	size : number;
+	currentPage ?: number;
+	pageSize ?: number;
 }
 
 // 设置所有进程的通用状态

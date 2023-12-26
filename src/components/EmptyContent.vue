@@ -1,0 +1,30 @@
+<script lang='ts'>
+	// 框架
+	import {
+		defineComponent,
+		ref,
+		reactive
+	} from 'vue';
+	// 组件
+	// 工具
+	// 接口
+	// 数据
+	// 类型
+	export default defineComponent({
+		name: ''
+	});
+</script>
+
+<script lang='ts' setup>
+
+</script>
+
+<template>
+	<div>
+
+	</div>
+</template>
+
+<style scoped lang='less'>
+
+</style>
