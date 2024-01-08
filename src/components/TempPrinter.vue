@@ -1,30 +1,31 @@
 <template>
-	<button @click="print.initPrint" type="primary">打印</button>
-
-	<!-- 下面数据提供给renderjs使用(renderjs有很多限制，没办法才用这种方式传值) -->
-	<view class="printPage_width" style="display: none">
-		{{ printPage.width }}
-	</view>
-	<view class="printPage_height" style="display: none">
-		{{ printPage.height }}
-	</view>
-	<view class="printPage_gap" style="display: none">
-		{{ printPage.gap }}
-	</view>
-	<view class="printPage_QRCodeLevel" style="display: none">
-		{{ printPage.QRCodeLevel }}
-	</view>
-	<view class="printPage_QRCodeLeftOffset" style="display: none">
-		{{ printPage.QRCodeLeftOffset }}
-	</view>
-	<view class="printPage_QRCodeTopOffset" style="display: none">
-		{{ printPage.QRCodeTopOffset }}
-	</view>
-	<view class="printPage_textLeftOffset" style="display: none">
-		{{ printPage.textLeftOffset }}
-	</view>
-	<view class="printPage_textTopOffset" style="display: none">
-		{{ printPage.textTopOffset }}
+	<view @click="print.initPrint">
+		<up-button type="primary" text="打印" class="bottom-button" shape="circle" size="small"></up-button>
+		<!-- 下面数据提供给renderjs使用(renderjs有很多限制，没办法才用这种方式传值) -->
+		<view class="printPage_width" style="display: none">
+			{{ printPage.width }}
+		</view>
+		<view class="printPage_height" style="display: none">
+			{{ printPage.height }}
+		</view>
+		<view class="printPage_gap" style="display: none">
+			{{ printPage.gap }}
+		</view>
+		<view class="printPage_QRCodeLevel" style="display: none">
+			{{ printPage.QRCodeLevel }}
+		</view>
+		<view class="printPage_QRCodeLeftOffset" style="display: none">
+			{{ printPage.QRCodeLeftOffset }}
+		</view>
+		<view class="printPage_QRCodeTopOffset" style="display: none">
+			{{ printPage.QRCodeTopOffset }}
+		</view>
+		<view class="printPage_textLeftOffset" style="display: none">
+			{{ printPage.textLeftOffset }}
+		</view>
+		<view class="printPage_textTopOffset" style="display: none">
+			{{ printPage.textTopOffset }}
+		</view>
 	</view>
 </template>
 
@@ -45,6 +46,7 @@
 			return {
 				// 页面根据实际情况设置打印纸宽、高、间隙
 				printPage,
+				printer: null
 			}
 		},
 		methods: {
@@ -216,11 +218,16 @@ ${tsplTemplate}
 </script>
 
 <style lang="less">
-	.button-box {
-		display: flex;
+	.printer_btn {
+		display: block;
 
-		button {
-			font-size: 28rpx;
-		}
 	}
+
+	// .button-box {
+	// 	display: flex;
+
+	// 	button {
+	// 		font-size: 28rpx;
+	// 	}
+	// }
 </style>

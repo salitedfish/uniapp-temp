@@ -8,7 +8,7 @@
 		modelValue : UploadMedia[],
 		maxCount ?: number
 	}>(), {
-		maxCount: 5
+		maxCount: 99
 	})
 
 	// 删除图片
@@ -39,12 +39,12 @@
 			// 上传完根据之前标记的位置更新状态
 			let oItem = props.modelValue[fileListLen];
 			// 根据result来判断上传成功还是失败
-			if (result) {
+			if (result && JSON.parse(result).data) {
 				props.modelValue.splice(fileListLen, 1, {
 					...oItem,
 					status: "success",
 					message: "",
-					url: JSON.parse(result).data,
+					url: JSON.parse(result).data + "?token2=fujianhuichuan",
 				});
 			} else {
 				props.modelValue.splice(fileListLen, 1, {

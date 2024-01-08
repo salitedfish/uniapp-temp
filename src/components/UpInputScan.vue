@@ -5,13 +5,18 @@
 		(event : "scanSuccess", result : string) : void;
 	}>()
 
+
 	const scanSuccess = (res : string) => {
+		emit("scanSuccess", res)
+	}
+
+	const changeSuccess = (res : string) => {
 		emit("scanSuccess", res)
 	}
 </script>
 
 <template>
-	<up-input>
+	<up-input @change="changeSuccess">
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess"></ScanCode>
 		</template>

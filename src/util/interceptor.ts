@@ -1,16 +1,5 @@
-import { routes } from "@/store/route"
+import { needLoginRoutes, routes } from "@/store/route"
 import { logged } from "@/util/common"
-import type { RouteName } from "@/type/route"
-
-const needLoginRoutes : string[] = []
-
-// 遍历生成需要登录的路径
-let key : RouteName
-for (key in routes) {
-	if (routes[key].needLogin) {
-		needLoginRoutes.push(routes[key].path)
-	}
-}
 
 // 需要添加拦截器的方法功能说明
 const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
@@ -32,6 +21,10 @@ export const initInterceptor = () => {
 					})
 					return false
 				}
+				// 如果是微信内嵌的浏览器
+				// if (Platform.isWeb()) {
+				// 	setWxConfig({ url })
+				// }
 				return true
 			},
 			fail(err) { // 失败回调拦截 

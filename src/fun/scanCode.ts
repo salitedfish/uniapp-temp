@@ -5,7 +5,7 @@ interface FunConfig { container : string }
 
 // 扫码，根据当前环境自动选择调用的方法
 export class ScanCode {
-	// 这个是专门给h5用的
+	// 这个是专门给h5用的（h5需要在https环境下）
 	private static html5Qrcode : Html5Qrcode
 	// 运行入口
 	static async run(runConfig : FunConfig) {
@@ -70,6 +70,23 @@ export class ScanCode {
 			})
 		})
 	}
+	// wx端
+	// private static async wxRun(runConfig : FunConfig) {
+	// 	return new Promise((resolve, reject) => {
+	// 		jWeixin.scanCode({
+	// 			onlyFromCamera: true,
+	// 			success: ({ resultStr }) => {
+	// 				resolve(resultStr);
+	// 			},
+	// 			error: function (res) {
+	// 				alert("失败")
+	// 				if (res.errMsg.indexOf("function_not_exist") > 0) {
+	// 					alert("版本过低请升级");
+	// 				}
+	// 			}
+	// 		});
+	// 	})
+	// }
 	// 停止
 	public static async stop() {
 		if (ScanCode.html5Qrcode) {

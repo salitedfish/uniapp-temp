@@ -11,6 +11,7 @@ export type ReturnList<T> = {
 	currentPage : number;
 	pageSize : number;
 	totalCount : number;
+	errMsg : string;
 };
 
 // 分页请求参数类型
@@ -26,3 +27,5 @@ export enum ProcessStatus {
 	SUCCESS,
 	FAIL
 }
+
+export type PageListApi = (params : Obj) => Promise<Return<ReturnList<Obj>>>

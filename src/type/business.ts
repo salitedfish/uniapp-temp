@@ -31,6 +31,7 @@ export type Business = {
 // 各种业务统一请求的参数
 export type BusinessParams = Paging & {
 	id : number,
+	code ?: string
 	condition ?: string,
 }
 

@@ -4,26 +4,41 @@
 		defineComponent,
 		ref,
 		computed,
-		onMounted
+		onMounted,
+		nextTick
 	} from 'vue';
+	import {
+		onShow
+	} from "@dcloudio/uni-app"
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	// 工具
 	import {
-		useTimeFormat,
-		useCheckEmptyInObj
+		useCheckEmptyInObj,
+		useDebounce
 	} from "@ultra-man/noa"
 	// 接口
 	import {
-		getProductInfo
+		getBusiness,
+		getPositionInfo
 	} from "@/api/business"
+	import {
+		pdStockroomSubmit
+	} from "@/api/purchaseArrival"
 	// 数据
 	import {
 		routes
 	} from "@/store/route"
+	import {
+		nowFormat,
+		batchFormat
+	} from "@/store/common"
 	// 类型
+	import {
+		PickerTypeId
+	} from "@/type/business"
 	export default defineComponent({
 		name: ''
 	});
@@ -36,54 +51,149 @@
 		})
 	}
 
-	onMounted(() => {
-		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
+	// -------------------------------------------------------------------------------------初始化
+	let config = ref < Obj > ({})
+	onShow(() => {
+		const configStr = uni.getStorageSync("prSDefaultSet")
+		config.value = configStr ? JSON.parse(configStr) : {}
 	})
-
+	onMounted(() => {
+		dateSelected.value = [nowFormat]
+	})
+	// 判断仓库是否开启货位管理，开启了才能选择货位
+	const shelfSelectEnable = computed(() => {
+		return config.value.stockroomSelected && config.value.stockroomSelected[0].bWhPos === "1"
+	})
+	// -------------------------------------------------------------------------------------表单操作
 	const initForm = () => {
 		return {
 			invCode: "",
 			invName: "",
-			quantity: null,
+			quantity: "",
+			count: "",
 			remark: "",
-			shelfCode: "",
-			shelfName: ""
+			position: "",
+			cwhCode: "",
+			shelfName: "",
+			bInvBatch: "",
+			batch: "",
+			date: nowFormat
 		}
 	}
-
 	// 表单
 	const form = ref(initForm())
-	// 日期
-	const dateSelected = ref < string[] > ([])
 	// 产品扫码
-	const codeText = ref("")
-	const procuctScanSuccess = async (code: string) => {
+	const procuctScanSuccess = useDebounce(async (code: string) => {
 		if (code) {
 			try {
-				codeText.value = code
-				const res = await getProductInfo({
-					code
+				const codeList = code.split("^")
+				if (codeList.length <= 1) {
+					uni.showToast({
+						title: "二维码扫描不正确",
+						icon: "none"
+					})
+					nextTick(() => {
+						form.value = initForm()
+					})
+					return
+				}
+				const pdCode = codeList[1].slice(0, -1)
+				nextTick(() => {
+					form.value.invCode = pdCode
 				})
-				console.log("产品", res.data)
-				// form.value.invCode = res.data
+				form.value.quantity = codeList[5] !== 'null' ? codeList[5] : "0"
+				form.value.count = form.value.quantity
+				const res = await getBusiness({
+					id: PickerTypeId.MATERIAL,
+					code: pdCode
+				})
+				if (res && res.data.list.length > 0) {
+					form.value.bInvBatch = res.data.list[0].bInvBatch
+					if (res.data.list[0].bInvBatch === '1') {
+						// 如果开启了批次管理
+						if (codeList[4] && codeList[4] !== 'null') {
+							// 如果码中有批次则用码中的批次，没有则生成批次
+							form.value.batch = codeList[4]
+						} else {
+							form.value.batch = batchFormat
+						}
+					}
+					form.value.invName = res.data.list[0].name
+				}
 			} catch (err) {
 				console.log(err)
 			}
 		}
-	}
+	})
 	// 货位扫码
-	const shelfScanSuccess = (code: string) => {
-		form.value.shelfCode = code
+
+	const shelfScanSuccess = useDebounce(async (code: string) => {
+		if (code) {
+			try {
+				const res = await getPositionInfo({
+					cPosCode: code
+				})
+				if (res && res.data) {
+					form.value.position = res.data.cPosCode
+					form.value.cwhCode = res.data.cWhCode
+					form.value.shelfName = res.data.cWhName + res.data.cPosName
+				} else {
+					nextTick(() => {
+						form.value.position = ""
+						form.value.cwhCode = ""
+						form.value.shelfName = ""
+					})
+					uni.showToast({
+						title: "未查询到货位",
+						icon: "none"
+					})
+				}
+			} catch (err) {
+				console.log(err)
+			}
+		}
+	})
+	// 日期
+	const dateSelected = ref < string[] > ([])
+	const dateSelect = (dates: string[]) => {
+		if (dates.length) {
+			form.value.date = dates[0]
+		}
 	}
 	// 表单数据加入表格
 	const add = () => {
 		tableData.value.push(form.value)
 		form.value = initForm()
 	}
+	// 加入按钮是否可用
+	const addDisabled = computed(() => {
+		if (shelfSelectEnable.value) {
+			return !form.value.invCode || !form.value.position || !form.value.quantity
+		} else {
+			return !form.value.invCode || !form.value.quantity
+		}
+	})
 
-	// 表格
+	// -------------------------------------------------------------------------------------表格操作
 	// table实际展示的数据, 表格由前端自己维护
 	const tableData = ref < Obj[] > ([])
+	// 表格操作
+	const showPopup = ref(false)
+	const editData = ref({
+		index: 0,
+		batch: "",
+		quantity: "",
+
+	})
+	const originData = ref < Obj > ({})
+
+	const open = (item: Obj, key: number) => {
+		originData.value = item
+		editData.value.index = key
+		editData.value.batch = item.batch
+		editData.value.quantity = item.count
+		showPopup.value = true
+	}
 	const deleteTable = (key: number) => {
 		uni.showModal({
 			content: "确定要删除吗？",
@@ -99,15 +209,65 @@
 			}
 		})
 	}
+	// 弹窗货位码扫描成功
+	const itemScanSuccess = useDebounce(async (code: string) => {
+		if (code) {
+			try {
+				const res = await getPositionInfo({
+					cPosCode: code
+				})
+				if (res && res.data) {
+					originData.value.position = res.data.cPosCode
+					originData.value.cwhCode = res.data.cWhCode
+					originData.value.shelfName = res.data.cWhName + res.data.cPosName
+				} else {
+					nextTick(() => {
+						originData.value.position = ""
+						originData.value.cwhCode = ""
+						originData.value.shelfName = ""
+					})
+					uni.showToast({
+						title: "未查询到货位",
+						icon: "none"
+					})
+				}
+			} catch (err) {
+				console.log(err)
+			}
+		}
+	})
+	// 表格编辑
+	const edit = () => {
+		const value = Number(editData.value.quantity)
+		const max = Number(originData.value.quantity)
+		const min = 0
+		if (value > max) {
+			uni.showToast({
+				icon: "none",
+				title: "入库数量不能大于应入库数量"
+			})
+			return
+		}
+		if (value <= min) {
+			uni.showToast({
+				icon: "none",
+				title: "入库数量不能小于0"
+			})
+			return
+		}
+		originData.value.batch = editData.value.batch
+		originData.value.count = editData.value.quantity
+		showPopup.value = false
+	}
 
-	// 提交
+	// -------------------------------------------------------------------------------------提交操作
 	const submiting = ref(false)
-	const submit = () => {
+	const submit = async () => {
 		try {
 			// 默认值检查
-			const configStr = uni.getStorageSync("prSDefaultSet")
-			const config: Obj = configStr ? JSON.parse(configStr) : {}
-			if (useCheckEmptyInObj([config.depSelected, config.stockroomSelected, config.stockroomSaveTypeSelected],
+			if (useCheckEmptyInObj([config.value.depSelected, config.value.stockroomSelected, config.value
+						.stockroomSaveTypeSelected
+					],
 					[])) {
 				uni.showToast({
 					title: "请填写完默认参数",
@@ -115,7 +275,28 @@
 				})
 				return
 			}
+			if (shelfSelectEnable.value) {
+				// 库位填写检查
+				for (const key in tableData.value) {
+					const item = tableData.value[key]
+					if (!item.position) {
+						uni.showToast({
+							icon: "none",
+							title: `第${Number(key)+1}行库位未填写`
+						})
+						return
+					}
+					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
+						uni.showToast({
+							icon: "none",
+							title: `第${Number(key)+1}行库位设置不正确`
+						})
+						return
+					}
+				}
+			}
 
+			// 开始提交
 			submiting.value = true
 			uni.showLoading({
 				title: "提交中",
@@ -124,8 +305,27 @@
 			})
 			// 参数赋值
 			const params = {
+				body: tableData.value.map(item => {
+					return {
+						...item,
+						quantity: item.count
+					}
+				}),
+				head: {
+					depcode: config.value.depSelected[0].code,
+					rdcode: config.value.stockroomSaveTypeSelected[0].code,
+					whcode: config.value.stockroomSelected[0].code,
+					ddate: tableData.value[0].date
+				}
 
 			}
+			await pdStockroomSubmit(params)
+
+			tableData.value = []
+			uni.showToast({
+				title: "入库成功",
+				icon: "none"
+			})
 		} catch (err) {
 			console.log(err)
 		} finally {
@@ -148,8 +348,8 @@
 			</view>
 			<up-form class="common-form" labelPosition="left" required>
 				<up-form-item class="common-form-item" label="产品编码:" borderBottom labelWidth="80" style="padding: 0">
-					<up-input-scan border="none" placeholder="扫码后,自动带出" clearable class="input-item"
-						@scanSuccess="procuctScanSuccess" readonly v-model="codeText"></up-input-scan>
+					<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
+						v-model="form.invCode" focus></up-input-scan>
 				</up-form-item>
 
 				<up-form-item class="common-form-item" label="产品名称:" borderBottom labelWidth="80" style="padding: 0">
@@ -158,7 +358,7 @@
 				</up-form-item>
 
 				<up-form-item class="common-form-item" label="入库数量:" borderBottom labelWidth="80" style="padding: 0" required>
-					<up-input placeholder="自动填充" clearable class="input-item" type="number" v-model="form.quantity">
+					<up-input placeholder="自动填充" clearable class="input-item" type="number" v-model="form.count">
 					</up-input>
 				</up-form-item>
 
@@ -167,24 +367,27 @@
 					</up-input>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="80" style="padding: 0" required>
-					<up-input-scan border="none" placeholder="请扫货位码" clearable class="input-item" @scanSuccess="shelfScanSuccess"
-						readonly v-model="form.shelfCode"></up-input-scan>
+				<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="80" style="padding: 0" required
+					v-if="shelfSelectEnable">
+					<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="shelfScanSuccess"
+						v-model="form.position"></up-input-scan>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="80" style="padding: 0"
+					v-if="shelfSelectEnable">
 					<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.shelfName">
 					</up-input>
 				</up-form-item>
 
 				<up-form-item class="common-form-item" label="入库日期:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputDatePicker border="none" placeholder="选择入库日期" clearable class="input-item" readonly
-						v-model:selected="dateSelected">
+						v-model:selected="dateSelected" @select="dateSelect" :maxDate="Date.now()">
 					</UpInputDatePicker>
 				</up-form-item>
 			</up-form>
 			<view class="btn-box">
-				<up-button type="primary" text="加入" class="bottom-button" shape="circle" @click="add"></up-button>
+				<up-button type="primary" text="加入" class="bottom-button" shape="circle" @click="add"
+					:disabled="addDisabled"></up-button>
 			</view>
 			<view class="common-section-title">
 				本次入库明细
@@ -196,24 +399,79 @@
 				<uni-table border stripe emptyText="暂无更多数据">
 					<!-- 表头行 -->
 					<uni-tr>
-						<uni-th align="left" width="60rpx">序号</uni-th>
-						<uni-th align="left" width="100rpx">产品编码</uni-th>
-						<uni-th align="left" width="100rpx">产品名称</uni-th>
-						<uni-th align="left" width="100rpx">入库数量</uni-th>
-						<uni-th align="left" width="100rpx">货位信息</uni-th>
-						<uni-th align="left" width="80rpx">操作</uni-th>
+						<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">产品编码</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">产品名称</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">入库数量</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
+						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 					</uni-tr>
 					<!-- 表格数据行 -->
-					<!-- <uni-tr v-for="item,key in resultData?.data" :key="key" @click="open(item)"> -->
-					<uni-tr v-for="item,key in tableData" :key="key">
-						<uni-td>{{ key + 1 }}</uni-td>
-						<uni-td>{{ item.invCode }}</uni-td>
-						<uni-td>{{ item.invName }}</uni-td>
-						<uni-td>{{ item.quantity }}</uni-td>
-						<uni-td>{{ item.shelfCode }}</uni-td>
-						<uni-td class="warning" @click.stop="deleteTable(key)">删除</uni-td>
+					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key+1)">
+						<uni-td class="nowrap">{{ key + 1 }}</uni-td>
+						<uni-td class="nowrap">{{ item.invCode }}</uni-td>
+						<uni-td class="nowrap">{{ item.invName }}</uni-td>
+						<uni-td class="nowrap">{{ item.count }}</uni-td>
+						<uni-td class="nowrap">{{ item.position }}</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>
+
+				<u-popup :show="showPopup" mode="right" @close="showPopup = false" safeAreaInsetTop>
+					<view class="popup-content common-page-container" style="width: 85vw">
+						<view class="common-section-title">
+							入库详情信息
+						</view>
+						<view class="popup-form common-page-largest">
+							<up-form class="common-form" labelPosition="left">
+								<up-form-item class="common-form-item" label="行号:" borderBottom labelWidth="100" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="editData.index" readonly>
+									</up-input>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="产品编码:" borderBottom labelWidth="100" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invCode"
+										readonly>
+									</up-input>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="产品名称:" borderBottom labelWidth="100" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invName"
+										readonly>
+									</up-input>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="入库数量:" borderBottom labelWidth="100" style="padding: 0">
+									<up-input placeholder="" clearable class="input-item" v-model="editData.quantity" type="number">
+									</up-input>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="100" style="padding: 0"
+									v-if="shelfSelectEnable">
+									<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="itemScanSuccess"
+										v-model="originData.position" focus></up-input-scan>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="100" style="padding: 0"
+									v-if="shelfSelectEnable">
+									<up-input border="none" placeholder="自动带出" clearable class="input-item" v-model="originData.shelfName"
+										readonly></up-input>
+								</up-form-item>
+
+								<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="100" style="padding: 0"
+									v-if="originData.bInvBatch === '1'">
+									<up-input placeholder="" clearable class="input-item" v-model="editData.batch">
+									</up-input>
+								</up-form-item>
+							</up-form>
+						</view>
+						<view class="btn-box">
+							<up-button type="info" text="退出" class="bottom-button" @click="showPopup = false"
+								shape="circle"></up-button>
+							<up-button type="primary" text="确定" class="bottom-button" @click="edit" shape="circle"></up-button>
+						</view>
+					</view>
+				</u-popup>
 			</view>
 		</view>
 
@@ -229,5 +487,16 @@
 <style scoped lang='less'>
 	.btn-box {
 		margin-top: 10px
+	}
+
+	.popup-content {
+		height: 95vh;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+
+		.btn-box {
+			display: flex;
+		}
 	}
 </style>

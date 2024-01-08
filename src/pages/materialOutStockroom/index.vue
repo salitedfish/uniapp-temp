@@ -1,10 +1,13 @@
-<script lang='ts'>
+<script lang='ts' setup>
 	// 框架
 	import {
-		defineComponent,
+		onMounted,
 		ref,
-		watch
+		onUnmounted
 	} from 'vue';
+	import {
+		onShow
+	} from "@dcloudio/uni-app"
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import ReferTypeCheck from "./components/ReferTypeCheck.vue"
@@ -14,148 +17,78 @@
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import PrintContent from "./components/PrintContent.vue"
 	// 工具
-	// import {
-	// 	useTable
-	// } from "@/hook/usePageTable"
 	import {
-		useDeepClone
+		useTimeFormat
 	} from "@ultra-man/noa"
 	// 接口
 	// 数据
 	import {
 		routes
 	} from "@/store/route"
-	// 类型
-	import type {
-		Materiel
-	} from "@/type/business"
-	export default defineComponent({
-		name: ''
-	});
-</script>
+	import {
+		resetAll,
+		typeSelect,
+		printTypeCheck,
+		showPrintContent,
+		processSendDocSelected,
+		materielApplyDocSelected,
+		dateSelected,
+		tableData,
+		originData,
+		operateData,
+		showPopup,
+		closePrintContent,
+		processSendDocSelect,
+		materielApplyDocSelect,
+		open,
+		edit,
+		deleteTable,
+		confirm,
+		config,
+		confirmDisabled,
+		submiting
+	} from "./index"
 
-<script lang='ts' setup>
 	const rightClick = () => {
 		uni.navigateTo({
 			url: routes.mOSDefaultSetPage.path
 		})
 	}
 
-	// tab切换
-	const typeSelect = ref(0)
-	watch(typeSelect, () => {
-		processSendDocSelected.value = []
-		materielApplyDocSelected.value = []
-		tableData.value = []
+	onMounted(() => {
+		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
 	})
-
-	// 是否打印
-	const printTypeCheck = ref(0)
-	const showPrintContent = ref(false)
-	const closePrintContent = () => {
-		showPrintContent.value = false
-	}
-
-	// 参照生产订单工序派工资料情况
-	const processSendDocSelected = ref([])
-	const processSendDocSelect = () => {
-		// todo请求列表
-	}
-
-	// 参照领料申请单情况
-	const materielApplyDocSelected = ref([])
-	const materielApplyDocSelect = () => {
-		// todo请求列表
-	}
-
-	// 日期
-	const dateSelected = ref < string[] > ([])
-
-	// 生成分页所需的数据
-	// const {
-	// 	searchList,
-	// 	searchParam,
-	// 	searching,
-	// 	resultData,
-	// 	reSetPage,
-	// } = useTable()
-
-	// 分页切换时
-	// const pageChange = () => {
-	// 	searchList()
-	// }
-
-	// table实际展示的数据, 表格由前端自己维护
-	const tableData = ref([{
-		code: "1",
-		name: "物料1",
-		num: 100
-	}])
-
-	// 表格操作
-	const operateData = ref < Materiel > ({})
-	const originData = ref < Materiel > ({})
-	const showPopup = ref(false)
-	const open = (item: Materiel) => {
-		originData.value = item
-		operateData.value = useDeepClone(item)({
-			complete: true
-		})
-		showPopup.value = true
-	}
-	// 弹窗内货位码扫描成功
-	const edit = () => {
-		originData.value.code = operateData.value.code
-		showPopup.value = false
-	}
-	const deleteTable = () => {
-		uni.showModal({
-			content: "确定要删除吗？",
-			showCancel: true,
-			success(res) {
-				if (res.confirm) {
-					uni.showToast({
-						icon: "none",
-						title: "删除成功"
-					})
-				}
-			}
-		})
-	}
-
-	// 确认出库
-	const confirm = () => {
-		if (printTypeCheck.value === 0) {
-			showPrintContent.value = true
-		}
-	}
+	onUnmounted(() => {
+		resetAll()
+	})
+	onShow(() => {
+		const configStr = uni.getStorageSync("mOSDefaultSet")
+		config.value = configStr ? JSON.parse(configStr) : {}
+	})
 </script>
 
 <template>
-	<view class="common-page-container common-page">
+	<view class="common-page-container">
 		<CustomNavBar :title="routes.materialOutStockroom.style.navigationBarTitleText" @rightClick="rightClick">
 		</CustomNavBar>
-
 
 		<view class="common-section-title">
 			基本信息
 		</view>
-
 		<view>
 			<ReferTypeCheck class="tab-box" v-model="typeSelect"></ReferTypeCheck>
 		</view>
-
 		<up-form class="common-form" labelPosition="left">
 			<up-form-item class="common-form-item" label="领料申请单:" borderBottom labelWidth="90" style="padding: 0"
 				v-if="typeSelect === 1">
 				<UpInputMaterielApplyDocPicker @select="materielApplyDocSelect" border="none" placeholder="选择领料申请单" readonly
-					clearable class="input-item" v-model:selected="materielApplyDocSelected" multiple>
+					clearable class="input-item" v-model:selected="materielApplyDocSelected">
 				</UpInputMaterielApplyDocPicker>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="派工资料:" borderBottom labelWidth="90" style="padding: 0"
 				v-if="typeSelect === 0">
 				<UnInputProcessSendDocPicker @select="processSendDocSelect" border="none" placeholder="选择生产订单工序派工资料" readonly
-					clearable class="input-item" v-model:selected="processSendDocSelected" multiple>
+					clearable class="input-item" v-model:selected="processSendDocSelected">
 				</UnInputProcessSendDocPicker>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="出库日期:" borderBottom labelWidth="90" style="padding: 0">
@@ -168,28 +101,26 @@
 		<view class="common-section-title">
 			本次出库明细
 		</view>
-
 		<view class="table-box common-page-largest">
 			<view class="common-table">
 				<uni-table border stripe emptyText="暂无更多数据">
 					<!-- 表头行 -->
 					<uni-tr>
-						<uni-th align="left" width="60rpx">序号</uni-th>
-						<uni-th align="left" width="100rpx">物料编码</uni-th>
-						<uni-th align="left" width="100rpx">物料名称</uni-th>
-						<uni-th align="left" width="100rpx">数量信息</uni-th>
-						<uni-th align="left" width="100rpx">货位信息</uni-th>
-						<uni-th align="left" width="80rpx">操作</uni-th>
+						<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">物料编码</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">物料名称</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">数量信息</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
+						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 					</uni-tr>
 					<!-- 表格数据行 -->
-					<!-- <uni-tr v-for="item,key in resultData?.data" :key="key" @click="open(item)"> -->
-					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item)">
-						<uni-td>{{ key + 1 }}</uni-td>
-						<uni-td>{{ item.code }}</uni-td>
-						<uni-td>{{ item.name }}</uni-td>
-						<uni-td>{{ item.num }}</uni-td>
-						<uni-td>{{ item.num }}</uni-td>
-						<uni-td class="warning" @click.stop="deleteTable">删除</uni-td>
+					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key + 1)">
+						<uni-td class="nowrap">{{ key + 1 }}</uni-td>
+						<uni-td class="nowrap">{{ item.cinvcode }}</uni-td>
+						<uni-td class="nowrap">{{ item.cinvname }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
+						<uni-td class="nowrap">{{ item.cposname }}</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable">删除</uni-td>
 					</uni-tr>
 				</uni-table>
 
@@ -201,48 +132,44 @@
 						<view class="popup-form common-page-largest">
 							<up-form class="common-form" labelPosition="left">
 								<up-form-item class="common-form-item" label="行号:" borderBottom labelWidth="80" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="operateData.name"
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="operateData.index"
 										readonly>
 									</up-input>
 								</up-form-item>
 								<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="operateData.code"
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cinvcode"
 										readonly>
 									</up-input>
 								</up-form-item>
 								<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="operateData.name"
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cinvname"
 										readonly>
 									</up-input>
 								</up-form-item>
-								<up-form-item class="common-form-item" label="规格:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-								<up-form-item class="common-form-item" label="计量单位:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-								<up-form-item class="common-form-item" label="应入库数量:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-								<up-form-item class="common-form-item" label="已入库数量:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-								<up-form-item class="common-form-item" label="未入库数量:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-								<up-form-item class="common-form-item" label="本次入库数量:" borderBottom labelWidth="80" style="padding: 0">
-
-								</up-form-item>
-
 								<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0">
-
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
+										readonly>
+									</up-input>
 								</up-form-item>
-
-								<up-form-item class="common-form-item" label="出库日期:" borderBottom labelWidth="80" style="padding: 0">
-									<UpInputDatePicker border="none" placeholder="选择出库日期" clearable class="input-item" readonly
-										v-model:selected="dateSelected">
-									</UpInputDatePicker>
+								<!-- 								<up-form-item class="common-form-item" label="现存总量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
+										readonly>
+									</up-input>
 								</up-form-item>
+								<up-form-item class="common-form-item" label="批次现存量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
+										readonly>
+									</up-input>
+								</up-form-item> -->
+								<up-form-item class="common-form-item" label="出库数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input placeholder="" clearable class="input-item" v-model="operateData.count">
+									</up-input>
+								</up-form-item>
+								<!-- 								<up-form-item class="common-form-item" label="计量单位:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
+										readonly>
+									</up-input>
+								</up-form-item> -->
 							</up-form>
 						</view>
 						<view class="btn-box">
@@ -255,21 +182,18 @@
 			</view>
 		</view>
 
-		<!-- 		<view class="page-box">
-			<uni-pagination title="分页" show-icon="true" :total="resultData?.totalSize" :current="searchParam.page"
-				:pageSize="searchParam.size" @change="pageChange"></uni-pagination>
-		</view> -->
+		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck" v-if="typeSelect === 0"></PrintTypeCheck>
 
-		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck"></PrintTypeCheck>
-
-		<PrintContent class="" :showPrintContent="showPrintContent" @closePrintContent="closePrintContent"></PrintContent>
+		<PrintContent class="" :printContent="tableData" :showPrintContent="showPrintContent"
+			@closePrintContent="closePrintContent">
+		</PrintContent>
 
 		<view class="btn-box">
-			<up-button type="primary" text="提交出库" class="bottom-button" shape="circle" @click="confirm"></up-button>
+			<up-button type="primary" text="提交出库" class="bottom-button" shape="circle" @click="confirm"
+				:disabled="confirmDisabled" :loading="submiting"></up-button>
 		</view>
 
 	</view>
-
 </template>
 
 <style scoped lang='scss'>
@@ -288,7 +212,13 @@
 		}
 	}
 
-	.print-check-box {
-		margin-bottom: 10px;
+	.common-page-container {
+		.print-check-box {
+			margin-top: 10px;
+		}
+
+		>.btn-box {
+			margin-top: 10px
+		}
 	}
 </style>

@@ -70,7 +70,6 @@
 		emit("update:selected", selected)
 	}
 
-
 	const colums = [{ label: "仓库编号", key: "code" }, { label: "仓库名称", key: "name" }]
 </script>
 

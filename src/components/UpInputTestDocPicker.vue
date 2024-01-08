@@ -2,8 +2,8 @@
 	import { ref, onMounted, watch } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
-	import { getDepartment } from "@/api/business"
-	import type { TestDoc, Business } from "@/type/business"
+	import { getTestDocList } from "@/api/business"
+	import type { Business } from "@/type/business"
 	import UpInputSupplierPicker from "@/components/UpInputSupplierPicker.vue"
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
@@ -13,24 +13,24 @@
 	const props = defineProps<
 		{
 			multiple ?: boolean,
-			selected ?: TestDoc[]
+			selected ?: Obj[]
 		}>()
 	const emit = defineEmits<{
-		(event : "select", result : TestDoc[]) : void;
-		(event : "update:selected", result : TestDoc[]) : void;
+		(event : "select", result : Obj[]) : void;
+		(event : "update:selected", result : Obj[]) : void;
 	}>()
 
 	onMounted(() => {
 		if (props.selected) {
 			emit("select", props.selected as Business[])
-			inputText.value = props.selected.map(item => item.name).join(", ")
+			inputText.value = props.selected.map(item => item.checkCode).join(", ")
 		}
 	})
 
 	watch(() => props.selected, () => {
 		if (props.selected) {
 			emit("select", props.selected as Business[])
-			inputText.value = props.selected.map(item => item.name).join(", ")
+			inputText.value = props.selected.map(item => item.checkCode).join(", ")
 		}
 	})
 
@@ -49,11 +49,16 @@
 	}
 
 	// 生成分页所需的数据和方法
-	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getDepartment)
+	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getTestDocList)
 
 	// 确认搜索
 	const search = () => {
 		reSetPage()
+		searchList()
+	}
+	// 分页搜索
+	const pageSearch = (page : { current : number }) => {
+		searchParam.value.currentPage = page.current
 		searchList()
 	}
 	// 重制搜索参数
@@ -64,26 +69,44 @@
 		reSetPage()
 		// reSetList()
 	}
-	const select = (selected : TestDoc[]) => {
+	const select = (selected : Obj[]) => {
 		// emit("select", selected)
 		close()
 	}
-	const updateSelected = (selected : TestDoc[]) => {
+	const updateSelected = (selected : Obj[]) => {
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "单号", key: "code" }, { label: "报检日期", key: "name" }, { label: "供应商", key: "name" }, { label: "物料编码", key: "name" }, { label: "物料名称", key: "name" }, { label: "数量", key: "name" }]
+	const colums = [{ label: "单号", key: "checkCode" }, { label: "报检日期", key: "ddate" }, { label: "供应商", key: "supplierName" }, { label: "物料编码", key: "invCode" }, { label: "物料名称", key: "invName" }, { label: "数量", key: "quantity" }]
 
 	//----------------------------下面是这个组件自身依赖的组件数据
 
 	// 供应商选择
 	const supplierSelected = ref<Business[]>([])
+	const supplierSelect = (res : Business[]) => {
+		if (res.length > 0) {
+			searchParam.value.supplierCode = res[0].code
+		} else {
+			searchParam.value.supplierCode = null
+		}
+	}
 
 	// 物料选择相关
 	const materialSelected = ref<Business[]>([])
+	const materialSelect = (res : Business[]) => {
+		if (res.length > 0) {
+			searchParam.value.invCode = res[0].code
+		} else {
+			searchParam.value.invCode = null
+		}
+	}
 
 	// 单据日期选择相关
 	const dateSelected = ref([])
+	const dateSelect = (dates : string[]) => {
+		searchParam.value.startDate = dates[0]
+		searchParam.value.finishDate = dates[1]
+	}
 </script>
 
 <template>
@@ -92,7 +115,7 @@
 			<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary"
 				@click="open"></uni-icons>
 			<u-popup :show="showPopup" @close="close" mode="bottom">
-				<view style="height: 80vh">
+				<view style="height: 90vh">
 					<view class="common-table common-page-container popup-content">
 						<view class="search-box">
 							<view class="common-section-title">
@@ -101,36 +124,39 @@
 							<up-form class="common-form" labelPosition="left">
 								<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">
 									<UpInputSupplierPicker border="none" placeholder="选择U8供应商" readonly clearable class="input-item"
-										v-model:selected="supplierSelected">
+										@select="supplierSelect" v-model:selected="supplierSelected">
 									</UpInputSupplierPicker>
 								</up-form-item>
 
 								<up-form-item class="common-form-item" label="物料:" borderBottom labelWidth="80" style="padding: 0">
 									<UpInputMaterielPicker border="none" placeholder="选择U8存货档案" readonly clearable class="input-item"
-										v-model:selected="materialSelected" search>
+										@select="materialSelect" search v-model:selected="materialSelected">
 									</UpInputMaterielPicker>
 								</up-form-item>
 
-								<up-form-item class="common-form-item" label="报检日期:" borderBottom labelWidth="100" style="padding: 0">
+								<up-form-item class="common-form-item" label="报检日期:" borderBottom labelWidth="80" style="padding: 0">
 									<UpInputDatePicker border="none" placeholder="选择报检日期" clearable class="input-item" readonly
-										v-model:selected="dateSelected" mode="range">
+										v-model:selected="dateSelected" @select="dateSelect" mode="range">
 									</UpInputDatePicker>
 								</up-form-item>
 							</up-form>
 							<view class="search-btn-box">
-								<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"></up-button>
-								<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
+								<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"
+									:disabled="searching"></up-button>
+								<up-button text="重置" class="bottom-button" @click="reset" shape="circle"
+									:disabled="searching"></up-button>
 							</view>
 						</view>
 
-						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="code" :searching="searching"
-							:tableData="resultData?.data" @select="select" :multiple="multiple" :colums="colums">
+						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="checkCode"
+							:searching="searching" :tableData="resultData?.list" @select="select" :multiple="multiple"
+							:colums="colums" withIndex>
 
 							<view class="page-box">
-								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalSize" :current="searchParam.page"
-									:pageSize="searchParam.size" @change="searchList()"></uni-pagination>
+								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
+									:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
+									@change="pageSearch"></uni-pagination>
 							</view>
-
 						</TablePicker>
 					</view>
 				</view>

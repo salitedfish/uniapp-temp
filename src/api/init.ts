@@ -59,6 +59,12 @@ export class URequest {
 				if (res.statusCode === 200) {
 					// 请求成功
 					if ((res.data as any).status === 200) {
+						if ((res.data as any).data.errMsg) {
+							uni.showToast({
+								icon: "none",
+								title: (res.data as any).data.errMsg
+							})
+						}
 						// 请求成功，数据也正常
 						resolve(res.data as unknown as T)
 					} else {
@@ -81,7 +87,7 @@ export class URequest {
 					// 请求失败
 					uni.showToast({
 						icon: "none",
-						title: (res as any).errMsg,
+						title: res.data ? (res.data as any).msg : (res as any).errMsg,
 					})
 					reject(res)
 				}

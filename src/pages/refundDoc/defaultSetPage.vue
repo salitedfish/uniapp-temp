@@ -85,7 +85,7 @@
 
 				<up-form-item class="common-form-item" label="仓库名称:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputStockroomPicker border="none" placeholder="选择仓库" clearable class="input-item" readonly
-						v-model:selected="stockroomSelected"></UpInputStockroomPicker>
+						v-model:selected="form.stockroomSelected"></UpInputStockroomPicker>
 				</up-form-item>
 
 			</up-form>

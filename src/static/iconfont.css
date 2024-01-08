@@ -12,6 +12,10 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-guanji:before {
+	content: "\e8d8";
+}
+
 .icon-mei-xuanze:before {
 	content: "\e6c1";
 }

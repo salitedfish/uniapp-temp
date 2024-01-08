@@ -17,14 +17,11 @@
 
 <script lang='ts' setup>
 	const types = ref([{
-		name: "直接扫码",
+		name: "参照物料编码",
 		value: 0
 	}, {
-		name: "参照到货单",
+		name: "参照货位编码",
 		value: 1
-	}, {
-		name: "参照检验单",
-		value: 2
 	}])
 </script>
 

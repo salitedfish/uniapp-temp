@@ -2,8 +2,8 @@
 	import { ref, onMounted, watch } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
-	import { } from "@/api/business"
-	import type { Process, Business, ProcessSendDoc } from "@/type/business"
+	import { getProductionOrderDispatchProcessInfos } from "@/api/business"
+	import type { Process, Business } from "@/type/business"
 	import UpInputProcessPicker from "@/components/UpInputProcessPicker.vue"
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
@@ -13,24 +13,24 @@
 	const props = defineProps<
 		{
 			multiple ?: boolean,
-			selected ?: ProcessSendDoc[]
+			selected ?: Obj[]
 		}>()
 	const emit = defineEmits<{
-		(event : "select", result : ProcessSendDoc[]) : void;
-		(event : "update:selected", result : ProcessSendDoc[]) : void;
+		(event : "select", result : Obj[]) : void;
+		(event : "update:selected", result : Obj[]) : void;
 	}>()
 
 	onMounted(() => {
 		if (props.selected) {
-			emit("select", props.selected as ProcessSendDoc[])
-			inputText.value = props.selected.map(item => item.name).join(", ")
+			emit("select", props.selected as Obj[])
+			inputText.value = props.selected.map(item => item.moCode).join(", ")
 		}
 	})
 
 	watch(() => props.selected, () => {
 		if (props.selected) {
-			emit("select", props.selected as ProcessSendDoc[])
-			inputText.value = props.selected.map(item => item.name).join(", ")
+			emit("select", props.selected as Obj[])
+			inputText.value = props.selected.map(item => item.moCode).join(", ")
 		}
 	})
 
@@ -49,11 +49,16 @@
 	}
 
 	// 生成分页所需的数据和方法
-	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable()
+	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getProductionOrderDispatchProcessInfos)
 
 	// 确认搜索
 	const search = () => {
 		reSetPage()
+		searchList()
+	}
+	// 分页搜索
+	const pageSearch = (page : { current : number }) => {
+		searchParam.value.currentPage = page.current
 		searchList()
 	}
 	// 重制搜索参数
@@ -64,26 +69,43 @@
 		reSetPage()
 		// reSetList()
 	}
-	const select = (selected : ProcessSendDoc[]) => {
-		// emit("select", selected)
+	const select = () => {
 		close()
 	}
-	const updateSelected = (selected : ProcessSendDoc[]) => {
+	const updateSelected = (selected : Obj[]) => {
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "单号", key: "code" }, { label: "工序", key: "name" }, { label: "生产订单", key: "name" }, { label: "生产物料", key: "name" }, { label: "生产数量", key: "name" }, { label: "开工日期", key: "name" }, { label: "完工日期", key: "name" }]
+	const colums = [{ label: "工序", key: "opseq" }, { label: "生产订单", key: "moCode" }, { label: "生产物料", key: "invName" }, { label: "生产数量", key: "quantity" }, { label: "开工日期", key: "startDate" }, { label: "完工日期", key: "finishDate" }]
 
 	//----------------------------下面是这个组件自身依赖的组件数据
 
-	// 供应商选择
-	const processSelected = ref<Process[]>([])
+	// 工序
+	const processSelected = ref<Obj[]>([])
+	const processSelect = (res : Obj[]) => {
+		if (res.length > 0) {
+			searchParam.value.wcId = res[0].id
+		} else {
+			searchParam.value.wcId = null
+		}
+	}
 
 	// 物料选择相关
 	const materialSelected = ref<Business[]>([])
+	const materialSelect = (res : Business[]) => {
+		if (res.length > 0) {
+			searchParam.value.invCode = res[0].code
+		} else {
+			searchParam.value.invCode = null
+		}
+	}
 
 	// 单据日期选择相关
 	const dateSelected = ref([])
+	const dateSelect = (dates : string[]) => {
+		searchParam.value.startDate = dates[0]
+		searchParam.value.finishDate = dates[1]
+	}
 </script>
 
 <template>
@@ -92,47 +114,49 @@
 			<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary"
 				@click="open"></uni-icons>
 			<u-popup :show="showPopup" @close="close" mode="bottom">
-				<view style="height: 80vh">
-					<view class="common-table common-page-container popup-content">
-						<view class="search-box">
-							<view class="common-section-title">
-								选择生产订单工序派工资料
-							</view>
-							<up-form class="common-form" labelPosition="left">
-								<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="80" style="padding: 0">
-									<UpInputProcessPicker border="none" placeholder="选择U8标准工序" readonly clearable class="input-item"
-										v-model:selected="processSelected">
-									</UpInputProcessPicker>
-								</up-form-item>
+				<view style="height: 90vh" class="common-table common-page-container popup-content">
+					<view class="search-box">
+						<view class="common-section-title">
+							选择生产订单工序派工资料
+						</view>
+						<up-form class="common-form" labelPosition="left">
+							<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="80" style="padding: 0">
+								<UpInputProcessPicker border="none" placeholder="选择U8标准工序" readonly clearable class="input-item"
+									v-model:selected="processSelected" @select="processSelect">
+								</UpInputProcessPicker>
+							</up-form-item>
 
-								<up-form-item class="common-form-item" label="物料:" borderBottom labelWidth="80" style="padding: 0">
-									<UpInputMaterielPicker border="none" placeholder="选择U8存货档案" readonly clearable class="input-item"
-										v-model:selected="materialSelected" search>
-									</UpInputMaterielPicker>
-								</up-form-item>
+							<up-form-item class="common-form-item" label="物料:" borderBottom labelWidth="80" style="padding: 0">
+								<UpInputMaterielPicker border="none" placeholder="选择U8存货档案" readonly clearable class="input-item"
+									v-model:selected="materialSelected" search @select="materialSelect">
+								</UpInputMaterielPicker>
+							</up-form-item>
 
-								<up-form-item class="common-form-item" label="开工日期:" borderBottom labelWidth="80" style="padding: 0">
-									<UpInputDatePicker border="none" placeholder="选择开工日期" clearable class="input-item" readonly
-										v-model:selected="dateSelected" mode="range">
-									</UpInputDatePicker>
-								</up-form-item>
-							</up-form>
-							<view class="search-btn-box">
-								<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"></up-button>
-								<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
-							</view>
+							<up-form-item class="common-form-item" label="开工日期:" borderBottom labelWidth="80" style="padding: 0">
+								<UpInputDatePicker border="none" placeholder="选择开工日期" clearable class="input-item" readonly
+									v-model:selected="dateSelected" mode="range" @select="dateSelect">
+								</UpInputDatePicker>
+							</up-form-item>
+						</up-form>
+						<view class="search-btn-box">
+							<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"
+								:disabled="searching"></up-button>
+							<up-button text="重置" class="bottom-button" @click="reset" shape="circle"
+								:disabled="searching"></up-button>
+						</view>
+					</view>
+
+					<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="rowNo" :searching="searching"
+						:tableData="resultData?.list.map(item => {return {...item, quantity: Number(item.quantity)}})"
+						@select="select" :multiple="multiple" :colums="colums" withIndex>
+
+						<view class="page-box">
+							<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
+								:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
+								@change="pageSearch"></uni-pagination>
 						</view>
 
-						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="code" :searching="searching"
-							:tableData="resultData?.data" @select="select" :multiple="multiple" :colums="colums">
-
-							<view class="page-box">
-								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalSize" :current="searchParam.page"
-									:pageSize="searchParam.size" @change="searchList()"></uni-pagination>
-							</view>
-
-						</TablePicker>
-					</view>
+					</TablePicker>
 				</view>
 			</u-popup>
 		</template>

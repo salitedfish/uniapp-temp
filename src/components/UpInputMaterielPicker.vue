@@ -2,11 +2,12 @@
 	import { ref, onMounted, watch } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
-	import { getBusiness } from "@/api/business"
+	import { getBusiness, listCurrentStock } from "@/api/business"
 	import type { Business } from "@/type/business"
 	import { PickerTypeId } from "@/type/business"
 	import ScanCode from "@/components/ScanCode.vue"
 	import TablePicker from "@/components/TablePicker.vue"
+	import { useDebounce } from "@ultra-man/noa"
 
 	// 基础数据
 	const props = defineProps<
@@ -17,7 +18,7 @@
 			scan ?: boolean,
 			multiple ?: boolean,
 			selected ?: Business[],
-			searchKey ?: unknown, // 根据实际接口情况修改
+			scanSearchParams ?: Obj
 			// modelValue : string,
 		}>()
 	const emit = defineEmits<{
@@ -62,19 +63,17 @@
 			autoSearch(code)
 		}
 	}
-	// 输入框确认
-	const inputConfirm = (e : string) => {
-		// 根据输入框内容获取数据
-		if (e) {
-			autoSearch(e)
+	// 输入框改变
+	const inputConfirm = useDebounce((code : string) => {
+		if (code && props.scan) {
+			autoSearch(code)
 		}
-	}
+	})
 	// 顶层输入框有可能输入物料编码，也有可能输入货位编码,自动打开弹窗并搜索，要根据searchKey来选择
 	const autoSearch = (keywords : string) => {
-		if (props.searchKey) {
+		if (props.scanSearchParams) {
 			// 先取消ts，根据实际接口情况修改
-			// @ts-ignore
-			searchParam.value[props.searchKey] = keywords
+			searchParam.value = { ...searchParam.value, ...props.scanSearchParams, [props.scanSearchParams.searchKey]: keywords }
 		}
 		open()
 		searchList()
@@ -92,7 +91,7 @@
 
 	// 生成分页所需的数据和方法
 	// 不同查找模式对应的接口不一样，search模式用的数据字典通用接口，scan模式涉及到物料批次号库位啥的，要一个独立接口
-	const requestApi = props.scan ? getBusiness : getBusiness
+	const requestApi = props.scan ? listCurrentStock : getBusiness
 	const { searching, searchParam, resultData, searchList, reSetPage } = useTable(requestApi, {
 		id: PickerTypeId.MATERIAL
 	})
@@ -107,12 +106,12 @@
 
 	// 不同查找模式对应的colums不一样，search模式用的数据字典通用colums，scan模式涉及到物料批次号库位啥的
 	const searchColums = [{ label: "物料编号", key: "code" }, { label: "物料名称", key: "name" }]
-	const scanColums = [{ label: "物料编号", key: "code" }, { label: "物料名称", key: "name" }, { label: "库位", key: "" }, { label: "批次号", key: "bInvBatch" }]
+	const scanColums = [{ label: "物料编号", key: "cInvCode" }, { label: "物料名称", key: "cInvName" }, { label: "库位", key: "cposname" }, { label: "批次号", key: "cbatch" }]
 	const colums = props.scan ? scanColums : searchColums
 </script>
 
 <template>
-	<up-input @confirm="inputConfirm" v-model="inputText">
+	<up-input @change="inputConfirm" v-model="inputText">
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess" v-if="props.scan"></ScanCode>
 			<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary" @click="open"
@@ -127,6 +126,7 @@
 						<view class="common-section-title" v-if="props.scan">
 							物料列表
 						</view>
+
 
 						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="code" :searching="searching"
 							:tableData="resultData?.list" @select="select" :multiple="multiple" :colums="colums" withIndex>
@@ -143,8 +143,6 @@
 			</u-popup>
 		</template>
 	</up-input>
-
-
 </template>
 
 <style lang="scss" scoped>

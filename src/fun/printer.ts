@@ -62,6 +62,7 @@ export class Printer {
 			return
 		}
 		uni.showLoading({
+			mask: true,
 			title: "打印中",
 		})
 		// 开始打印数据

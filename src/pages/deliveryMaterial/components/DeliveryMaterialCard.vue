@@ -283,8 +283,8 @@
 		await outSrDocVal(outSrDocDetail)
 		// 再提交
 		uni.showLoading({
+			mask: true,
 			title: "出库单生成中",
-			icon: "none"
 		})
 		await deliveryMaterialInsert(outSrDocDetail.value)
 		uni.hideLoading()
@@ -305,8 +305,18 @@
 			</view>
 		</view>
 		<view class="body">
-			<view></view>
-			<view></view>
+			<view v-if="deliveryMaterial.detailList">
+				<view>
+					物料编码：{{deliveryMaterial.detailList[0].cInvCode}}
+				</view>
+				<view>
+					物料名称：{{deliveryMaterial.detailList[0].cInvName}}
+				</view>
+				<view v-if="deliveryMaterial.detailList.length > 1">
+					...
+				</view>
+			</view>
+
 			<view>
 				客户名称：{{deliveryMaterial?.customerName}}
 			</view>

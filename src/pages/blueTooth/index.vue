@@ -302,6 +302,7 @@
 				transform: translateX(-50%);
 				width: 95%;
 				display: flex;
+				z-index: 999;
 
 				.search-btn {
 					margin-top: 12rpx;

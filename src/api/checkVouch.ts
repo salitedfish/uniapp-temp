@@ -18,3 +18,14 @@ export const getCheckVouchDetail = async (data : CheckVouchDetailParams) => {
 		data
 	})
 }
+
+// 提交盘点结果
+export const submitCheckVouch = async (data : Obj) => {
+	return await uRequest.post<Return<string>>({
+		url: "checkVouch/finishCheckVouch",
+		data,
+		header: {
+			"Content-Type": "application/json",
+		}
+	})
+}

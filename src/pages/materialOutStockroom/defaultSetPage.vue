@@ -1,31 +1,27 @@
-<script lang='ts'>
+<script lang='ts' setup>
 	// 框架
 	import {
-		defineComponent,
 		ref,
 		onMounted
 	} from 'vue';
 	// 组件
+	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
+	import UpInputStockroomPicker from "@/components/UpInputStockroomPicker.vue"
+	import UpInputOutSrTypePicker from "@/components/UpInputOutSrTypePicker.vue"
+	import CommonNavBar from "@/components/CommonNavBar.vue"
 	// 工具
 	// 接口
 	// 数据
 	import {
 		routes
 	} from "@/store/route"
+	import {
+		resetAll
+	} from "./index"
 	// 类型
 	import type {
 		Business
 	} from "@/type/business"
-	export default defineComponent({
-		name: ''
-	});
-</script>
-
-<script lang='ts' setup>
-	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
-	import UpInputStockroomPicker from "@/components/UpInputStockroomPicker.vue"
-	import UpInputOutSrTypePicker from "@/components/UpInputOutSrTypePicker.vue"
-	import CommonNavBar from "@/components/CommonNavBar.vue"
 
 	const form = ref < Obj < Business[] >> ({
 		depSelected: [],
@@ -34,8 +30,9 @@
 	})
 
 	// 初始化默认值
+	let configStr: string
 	onMounted(() => {
-		const configStr = uni.getStorageSync("mOSDefaultSet")
+		configStr = uni.getStorageSync("mOSDefaultSet")
 		if (configStr) {
 			const config = JSON.parse(configStr)
 			form.value = config
@@ -44,6 +41,9 @@
 
 	// 保存
 	const save = () => {
+		if (configStr !== JSON.stringify(form.value)) {
+			resetAll()
+		}
 		uni.setStorageSync("mOSDefaultSet", JSON.stringify(form.value))
 		uni.showToast({
 			icon: "none",

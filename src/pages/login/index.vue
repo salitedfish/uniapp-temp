@@ -35,6 +35,7 @@
 		try {
 			logging.value = true
 			uni.showLoading({
+				mask: true,
 				title: "登录中...",
 			})
 			await login(loginForm.value)
@@ -56,6 +57,14 @@
 </script>
 
 <template>
+	<u-navbar :fixed="true" placeholder :title="routes.login.style.navigationBarTitleText">
+		<template #left>
+			<view></view>
+		</template>
+		<template #right>
+		</template>
+	</u-navbar>
+
 	<view class="login-container">
 		<view class="logo_container">
 			<image src="../../static/yinlun_logo.jpg" class="login_logo"></image>
@@ -83,7 +92,7 @@
 <style scoped lang="scss">
 	.login-container {
 		position: fixed;
-		top: 45%;
+		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		padding: 40rpx 80rpx;

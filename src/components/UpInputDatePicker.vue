@@ -34,7 +34,9 @@
 
 	const props = withDefaults(defineProps < {
 		mode ? : "range" | "single",
-		selected: string[]
+		selected: string[],
+		maxDate ? : number,
+		minDate ? : number
 	} > (), {
 		mode: "single"
 	})
@@ -50,12 +52,16 @@
 	})
 	watch(() => props.selected, () => {
 		init()
+		emit("select", props.selected)
 	})
 	const init = () => {
 		const selected = props.selected
 		const length = props.selected.length
 		if (length == 0) {
 			dateValue.value = ""
+			date.value = Date.now()
+			dateStart.value = Date.now()
+			dateEnd.value = Date.now()
 		} else if (props.mode === 'single' && length === 1) {
 			dateValue.value = selected[0]
 			date.value = useGenTimeStamp(selected[0])
@@ -146,11 +152,13 @@
 			<uni-icons custom-prefix="custom-icon" type="icon-rili" size="18" :color="globalColor.primary"
 				@click="open"></uni-icons>
 			<u-datetime-picker :show="show" v-model="date" mode="date" title="选择日期" @confirm="confirm" @cancel="cancel"
-				@close="close"></u-datetime-picker>
+				@close="close" closeOnClickOverlay :maxDate="maxDate" :minDate="minDate"></u-datetime-picker>
 			<u-datetime-picker :show="showEnd" v-model="dateEnd" mode="date" title="选择结束日期" @confirm="confirmEnd"
-				@cancel="cancelEnd" @close="close"></u-datetime-picker>
+				@cancel="cancelEnd" @close="close" closeOnClickOverlay :maxDate="maxDate"
+				:minDate="minDate"></u-datetime-picker>
 			<u-datetime-picker :show="showStart" v-model="dateStart" mode="date" title="选择开始日期" @confirm="confirmStart"
-				@cancel="cancelStart" @close="close"></u-datetime-picker>
+				@cancel="cancelStart" @close="close" closeOnClickOverlay :maxDate="maxDate"
+				:minDate="minDate"></u-datetime-picker>
 		</template>
 	</up-input>
 </template>

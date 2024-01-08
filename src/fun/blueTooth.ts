@@ -67,12 +67,14 @@ export class BlueTooth {
 	// 连接蓝牙设备
 	public connect() {
 		uni.showLoading({
+			mask: true,
 			title: "正在连接设备",
 		})
 		uni.createBLEConnection({
 			deviceId: blueToothStore.deviceId,
 			success: (res) => {
 				uni.showLoading({
+					mask: true,
 					title: "蓝牙连接成功，开始获取服务",
 				})
 				blueToothStore.connected = true
@@ -103,6 +105,7 @@ export class BlueTooth {
 	// 关闭连接蓝牙
 	public closeConnect(deviceId ?: string) {
 		uni.showLoading({
+			mask: true,
 			title: "正在关闭连接"
 		})
 		return new Promise((resolve, reject) => {

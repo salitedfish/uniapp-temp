@@ -28,10 +28,10 @@ export const getBaseUrl = () => {
 	let baseUrl = ""
 	if (Platform.isApp()) {
 		if (process.env.NODE_ENV === Env.DEV) {
-			baseUrl = import.meta.env.VITE_BASE_API_URL_DEV
+			baseUrl = import.meta.env.VITE_BASE_API_URL_APP_DEV
 		}
 		if (process.env.NODE_ENV === Env.PROD) {
-			baseUrl = import.meta.env.VITE_BASE_API_URL_PROD
+			baseUrl = import.meta.env.VITE_BASE_API_URL_APP_PRO
 		}
 	}
 	if (Platform.isWeb()) {

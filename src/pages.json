@@ -1,6 +1,5 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
+	"pages": [{
 			"name": "blank",
 			"path": "pages/blank/index",
 			"style": {
@@ -12,6 +11,7 @@
 			"name": "login",
 			"path": "pages/login/index",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "登录"
 			},
 			"type": "nav"
@@ -20,6 +20,8 @@
 			"name": "home",
 			"path": "pages/home/index",
 			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "首页"
 			},
 			"type": "tab",
@@ -250,12 +252,11 @@
 			"name": "outSrDocFlieUpload",
 			"path": "pages/outSrDocFlieUpload/index",
 			"style": {
-				// "navigationStyle": "custom",
+				"navigationStyle": "custom",
 				// "backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "附件回传"
 			},
-			"type": "nav",
-			"needLogin": true
+			"type": "nav"
 		},
 		{
 			"name": "blueTooth",
@@ -319,23 +320,22 @@
 		"iconWidth": "24px",
 		"spacing": "3px",
 		"iconfontSrc": "static/iconfont.ttf", // app tabbar 字体.ttf文件路径 app 3.4.4+
-		// "list": [{
-		// 		"pagePath": "pages/blueTooth/index",
-		// 		"iconPath": "static/tabbar/blueTooth.png",
-		// 		"selectedIconPath": "static/tabbar/blueTooth_active.png",
-		// 		"text": "蓝牙"
-		// 	},
-		// 	{
-		// 		"pagePath": "pages/demo/index",
-		// 		"text": "测试"
-		// 	}, {
-		// 		"pagePath": "pages/home/index",
-		// 		"iconPath": "static/tabbar/home.png",
-		// 		"selectedIconPath": "static/tabbar/home_active.png",
-		// 		"text": "首页"
-		// 	}
-		// ],
-		"list": []
+		"list": [{
+				"pagePath": "pages/blueTooth/index",
+				"iconPath": "static/tabbar/blueTooth.png",
+				"selectedIconPath": "static/tabbar/blueTooth_active.png",
+				"text": "蓝牙"
+			},
+			{
+				"pagePath": "pages/demo/index",
+				"text": "测试"
+			}, {
+				"pagePath": "pages/home/index",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home_active.png",
+				"text": "首页"
+			}
+		]
 	},
 	"easycom": {
 		// 注意一定要放在custom里，否则无效，https://ask.dcloud.net.cn/question/131175

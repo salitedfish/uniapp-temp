@@ -57,6 +57,14 @@ export const deliveryMaterialInfo = async (data : { outboundCode : string }) => 
 	})
 }
 
+// 获取出库单附件列表
+export const deliveryMaterialFileList = async (data : { id : string }) => {
+	return await uRequest.post<Return<Obj[]>>({
+		url: "deliveryMaterial/listPlanAnnex",
+		data,
+	})
+}
+
 // 出库单新增附件 
 export const deliveryMaterialAddFile = async (data : { annexUrl : string, annexName : string, outboundCode : string }) => {
 	return await uRequest.post<Return<String>>({

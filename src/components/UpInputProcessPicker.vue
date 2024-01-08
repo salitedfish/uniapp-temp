@@ -83,7 +83,7 @@
 								@custom="search"></u-search>
 						</view>
 
-						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="code" :searching="searching"
+						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="id" :searching="searching"
 							:tableData="resultData?.list" @select="select" :multiple="multiple" :colums="colums" withIndex>
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"

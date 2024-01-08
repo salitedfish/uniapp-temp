@@ -3,6 +3,7 @@ import { reactive, ref } from "vue"
 
 // 全局色值变量，基本复制uview-plus的色值
 export const globalColor = ref({
+	background: "#fff",
 	border: "#dadbde",
 	default: "#909399",
 	default_background: "rgba(245,245,245,0.8)",

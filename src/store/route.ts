@@ -10,6 +10,16 @@ for (const item of pages) {
 	routes[item.name as RouteName] = item
 }
 
+// 遍历生成需要登录的路径
+const needLoginRoutes : string[] = []
+let key : RouteName
+for (key in routes) {
+	if (routes[key].needLogin) {
+		needLoginRoutes.push(routes[key].path)
+	}
+}
+
 export {
-	routes
+	routes,
+	needLoginRoutes
 }

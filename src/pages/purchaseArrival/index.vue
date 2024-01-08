@@ -5,6 +5,7 @@
 		ref,
 		computed,
 		onMounted,
+		nextTick,
 	} from 'vue';
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
@@ -13,8 +14,8 @@
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	// 工具
 	import {
-		useTimeFormat,
-		useCheckEmptyInObj
+		useCheckEmptyInObj,
+		useDebounce
 	} from "@ultra-man/noa"
 	import {
 		onShow
@@ -22,15 +23,22 @@
 	// 接口
 	import {
 		getPurchaseArrivalList,
-		confirmArrival
+		confirmArrival,
+		createQmInspectVoucher
 	} from "@/api/purchaseArrival"
 	// 数据
 	import {
 		routes
 	} from "@/store/route"
+	import {
+		nowFormat
+	} from "@/store/common"
+	import {
+		globalColor
+	} from "@/store/theme"
 	// 类型
 	import type {
-		Business,
+		Business
 	} from "@/type/business"
 	export default defineComponent({
 		name: ''
@@ -46,29 +54,50 @@
 	}
 
 	onShow(() => {
-		const configStr = uni.getStorageSync("pADefaultSet")
-		if (configStr) {
-			const config = JSON.parse(configStr)
-			if (depSelected.value.length <= 0) {
+		if (depSelected.value.length <= 0) {
+			const configStr = uni.getStorageSync("pADefaultSet")
+			if (configStr) {
+				const config = JSON.parse(configStr)
 				depSelected.value = config.depSelected
 			}
 		}
 	})
 
 	onMounted(() => {
-		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
+		dateSelected.value = [nowFormat]
 	})
 
 	// 扫描成功后如果有值则请求列表
 	const codeText = ref("")
 	const searching = ref(false)
-	const scanSuccess = async (res: string) => {
-		if (res) {
+	// 扫描带出供应商
+	const supplier = ref < Obj > ({})
+	// 选择的部门
+	const depSelected = ref < Business[] > ([])
+	// 日期
+	const dateSelected = ref < string[] > ([])
+	// 表格数据
+	const tableData = ref < Obj[] > ([])
+	// 表格操作
+	const index = ref(0)
+	const count = ref("")
+	const originData = ref < Obj > ({})
+	const showPopup = ref(false)
+	// 提交完的弹窗
+	const showCenterPopup = ref(false)
+	const centerPopupTableData = ref < Obj[] > ([])
+	// 确认到货
+	const submiting = ref(false)
+
+
+	// 扫码成功
+	const scanSuccess = useDebounce(async (code: string) => {
+		codeText.value = code
+		if (code) {
 			try {
-				codeText.value = res
 				searching.value = true
 				const result = await getPurchaseArrivalList({
-					code: res
+					code
 				})
 				if (result.data.list.length > 0) {
 					tableData.value = result.data.list
@@ -78,28 +107,16 @@
 					supplier.value = tableData.value[0]
 				}
 			} catch (err) {
+				nextTick(() => {
+					codeText.value = ""
+				})
 				console.log(err)
 			} finally {
 				searching.value = false
 			}
 		}
-	}
-	// 扫描带出供应商
-	const supplier = ref < Obj > ({})
-
-	// 选择的部门
-	const depSelected = ref < Business[] > ([])
-
-	// 日期
-	const dateSelected = ref < string[] > ([])
-
-	// 表格数据
-	const tableData = ref < Obj[] > ([])
-	// 表格操作
-	const index = ref(0)
-	const count = ref("")
-	const originData = ref < Obj > ({})
-	const showPopup = ref(false)
+	})
+	// 打开弹窗
 	const open = (item: Obj, key: number) => {
 		if (submiting.value) return
 		originData.value = item
@@ -115,7 +132,7 @@
 		if (value > max) {
 			uni.showToast({
 				icon: "none",
-				title: "到货数量不能大于订单数量"
+				title: "到货数量不能大于应到数量"
 			})
 			return
 		}
@@ -146,16 +163,13 @@
 			}
 		})
 	}
-
 	// 重置所有数据
 	const reset = () => {
 		codeText.value = ""
 		supplier.value = {}
 		tableData.value = []
 	}
-
-	// 确认到货
-	const submiting = ref(false)
+	// 提交数据
 	const submit = async () => {
 		try {
 			// 默认值检查
@@ -175,14 +189,13 @@
 				})
 				return
 			}
-			//
+			// 开始处理生成到货单
 			submiting.value = true
 			uni.showLoading({
-				title: "提交中",
+				title: "到货单生成中",
 				icon: "none",
 				mask: true
 			})
-
 			// 参数赋值
 			const params = {
 				billDate: dateSelected.value[0],
@@ -198,9 +211,22 @@
 				purchaseTypeCode: config.purTypeSelected[0].code,
 				purchaseTypeName: config.purTypeSelected[0].name,
 			}
-
-			// 请求
-			await confirmArrival(params)
+			// 请求生成到货单
+			const res = await confirmArrival(params)
+			// 开始处理生成来料报检单
+			uni.showLoading({
+				title: "报检单生成中",
+				icon: "none",
+				mask: true
+			})
+			const ree = await createQmInspectVoucher({
+				arrivalVouchId: res.data
+			})
+			// 如果报检单返回的有数据，则显示报检数据弹窗
+			if (ree && ree.data && ree.data.length > 0) {
+				centerPopupTableData.value = ree.data
+				showCenterPopup.value = true
+			}
 			reset()
 			uni.showToast({
 				title: "提交成功",
@@ -226,7 +252,7 @@
 </script>
 
 <template>
-	<view class="common-page common-page-container">
+	<view class="common-page-container">
 		<CustomNavBar :title="routes.purchaseArrival.style.navigationBarTitleText" @rightClick="rightClick"></CustomNavBar>
 
 		<view>
@@ -235,8 +261,8 @@
 			</view>
 			<up-form class="common-form" labelPosition="left">
 				<up-form-item class="common-form-item" label="箱/托/发货单码:" borderBottom labelWidth="120" style="padding: 0">
-					<up-input-scan v-model="codeText" border="none" placeholder="请扫箱/托/发货单码" clearable class="input-item"
-						@scanSuccess="scanSuccess" readonly></up-input-scan>
+					<up-input-scan v-model="codeText" placeholder="请扫箱/托/发货单码" clearable class="input-item"
+						@scanSuccess="scanSuccess" focus></up-input-scan>
 				</up-form-item>
 				<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">
 					<up-input border="none" placeholder="扫码后自动带出供应商" clearable class="input-item" v-model="supplier.supplierName"
@@ -250,7 +276,7 @@
 				</up-form-item>
 				<up-form-item class="common-form-item" label="制单日期:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputDatePicker border="none" placeholder="选择制单日期" clearable class="input-item" readonly
-						v-model:selected="dateSelected">
+						v-model:selected="dateSelected" :maxDate="Date.now()">
 					</UpInputDatePicker>
 				</up-form-item>
 			</up-form>
@@ -263,20 +289,19 @@
 				<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
 					<!-- 表头行 -->
 					<uni-tr>
-						<uni-th align="left" width="60rpx">序号</uni-th>
-						<uni-th align="left" width="100rpx">物料编码</uni-th>
-						<uni-th align="left" width="100rpx">物料名称</uni-th>
-						<uni-th align="left" width="100rpx">数量信息</uni-th>
-						<uni-th align="left" width="80rpx">操作</uni-th>
+						<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">物料编码</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">物料名称</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">数量信息</uni-th>
+						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 					</uni-tr>
 					<!-- 表格数据行 -->
-					<!-- <uni-tr v-for="item,key in resultData?.data" :key="key" @click="open(item)"> -->
 					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key)">
-						<uni-td>{{ key + 1 }}</uni-td>
-						<uni-td>{{ item.invCode}}</uni-td>
-						<uni-td>{{ item.invName }}</uni-td>
-						<uni-td>{{ item.quantity + item.invUnit }}</uni-td>
-						<uni-td class="warning" @click.stop="deleteTable(key)">删除</uni-td>
+						<uni-td class="nowrap">{{ key + 1 }}</uni-td>
+						<uni-td class="nowrap">{{ item.invCode}}</uni-td>
+						<uni-td class="nowrap">{{ item.invName }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.count + item.invUnit }}</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>
 
@@ -301,21 +326,27 @@
 										readonly>
 									</up-input>
 								</up-form-item>
-								<!-- 								<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="supplier.name" readonly>
-									</up-input>
-								</up-form-item> -->
 								<up-form-item class="common-form-item" label="订单数量:" borderBottom labelWidth="80" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.quantity"
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.poQuantity"
 										readonly type="number">
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="已到数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item"
+										v-model="originData.inStockQuantity" readonly type="number">
 									</up-input>
 								</up-form-item>
 								<up-form-item class="common-form-item" label="未到数量:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input border="none" placeholder="" clearable class="input-item"
-										:modelValue="count ? Number(originData.quantity) - Number(count) : 0" readonly type="number">
+										:modelValue="originData.poQuantity - originData.inStockQuantity" readonly type="number">
 									</up-input>
 								</up-form-item>
-								<up-form-item class="common-form-item" label="到货数量:" borderBottom labelWidth="80" style="padding: 0">
+								<up-form-item class="common-form-item" label="应到数量:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.quantity"
+										readonly type="number">
+									</up-input>
+								</up-form-item>
+								<up-form-item class="common-form-item" label="本次到货数量:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input placeholder="" clearable class="input-item" v-model="count" type="number">
 									</up-input>
 								</up-form-item>
@@ -339,11 +370,44 @@
 			<up-button type="primary" text="确认到货" class="bottom-button" shape="circle" @click="submit" :loading="submiting"
 				:disabled="submitDisabled"></up-button>
 		</view>
-
 	</view>
+
+	<u-popup :show="showCenterPopup" round="10" mode="center" @close="showCenterPopup = false">
+		<view style="width: 85vw" class="common-page-container center-popup">
+			<view class="common-section-title">
+				质检提示
+			</view>
+			<view class="tip">
+				到货操作已完成，以下物料会同步生成报检单，请及时跟进处理
+			</view>
+			<view class="common-page-largest">
+				<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
+					<uni-tr>
+						<uni-th align="left" width="60rpx">序号</uni-th>
+						<uni-th align="left" width="100rpx">物料编码</uni-th>
+						<uni-th align="left" width="100rpx">物料名称</uni-th>
+					</uni-tr>
+					<uni-tr v-for="item,key in centerPopupTableData" :key="key">
+						<uni-td>{{ key + 1 }}</uni-td>
+						<uni-td>{{ item.invCode}}</uni-td>
+						<uni-td>{{ item.invName }}</uni-td>
+					</uni-tr>
+				</uni-table>
+			</view>
+			<view class="btn-box">
+				<up-button type="primary" text="确认" class="bottom-button" shape="circle"
+					@click="showCenterPopup = false"></up-button>
+			</view>
+		</view>
+	</u-popup>
+
 </template>
 
 <style scoped lang='scss'>
+	.btn-box {
+		margin-top: 10px;
+	}
+
 	.popup-content {
 		height: 95vh;
 		display: flex;
@@ -352,6 +416,24 @@
 
 		.btn-box {
 			display: flex;
+		}
+	}
+
+	.center-popup {
+		padding-bottom: 10px;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+		max-height: 80vh;
+
+		.common-page-largest {
+			margin: 10px 0;
+		}
+
+		.tip {
+			color: v-bind("globalColor.primary");
+			font-size: 24rpx;
+			text-indent: 48rpx;
 		}
 	}
 </style>
