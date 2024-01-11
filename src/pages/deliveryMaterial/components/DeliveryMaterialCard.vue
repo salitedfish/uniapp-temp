@@ -27,6 +27,9 @@
 	import {
 		states
 	} from "../store"
+	import {
+		nowFormat
+	} from "@/store/common"
 	// 类型
 	import type {
 		DeliveryMaterial,
@@ -174,7 +177,7 @@
 		})
 		if (res) {
 			deliveryDocDetail.value = res.data
-			deliveryDateSelected.value = [deliveryDocDetail.value.planDate]
+			deliveryDateSelected.value = [nowFormat]
 			busTypeSelected.value = [{
 				code: deliveryDocDetail.value.busTypeCode,
 				name: deliveryDocDetail.value.busType

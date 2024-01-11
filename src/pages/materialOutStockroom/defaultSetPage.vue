@@ -50,6 +50,16 @@
 			title: "保存成功"
 		})
 	}
+
+	// 重置
+	const reset = () => {
+		form.value = {
+			depSelected: [],
+			stockroomSelected: [],
+			outStockroomTypeSelected: [],
+		}
+		uni.removeStorageSync("mOSDefaultSet")
+	}
 </script>
 
 <template>
@@ -63,18 +73,18 @@
 		<view class="common-content">
 			<up-form class="common-form" labelPosition="left">
 
-				<up-form-item class="common-form-item" label="仓库名称:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="仓库名称:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputStockroomPicker border="none" placeholder="选择仓库" clearable class="input-item" readonly
 						v-model:selected="form.stockroomSelected"></UpInputStockroomPicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputDepPicker border="none" placeholder="选择部门" clearable class="input-item" readonly
 						v-model:selected="form.depSelected">
 					</UpInputDepPicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="出库类别:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="出库类别:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputOutSrTypePicker border="none" placeholder="选择出库类别" clearable class="input-item" readonly
 						v-model:selected="form.outStockroomTypeSelected"></UpInputOutSrTypePicker>
 				</up-form-item>
@@ -83,6 +93,7 @@
 
 		<view class="btn-box">
 			<up-button type="primary" text="保存设置" class="bottom-button" @click="save" shape="circle"></up-button>
+			<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
 		</view>
 
 	</view>
@@ -92,5 +103,13 @@
 	.common-content {
 		flex: 1;
 		overflow-y: scroll;
+	}
+
+	.btn-box {
+		display: flex;
+
+		.bottom-button+.bottom-button {
+			margin-left: 5px;
+		}
 	}
 </style>

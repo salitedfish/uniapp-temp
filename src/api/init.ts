@@ -59,7 +59,7 @@ export class URequest {
 				if (res.statusCode === 200) {
 					// 请求成功
 					if ((res.data as any).status === 200) {
-						if ((res.data as any).data.errMsg) {
+						if ((res.data as any).data && (res.data as any).data.errMsg) {
 							uni.showToast({
 								icon: "none",
 								title: (res.data as any).data.errMsg

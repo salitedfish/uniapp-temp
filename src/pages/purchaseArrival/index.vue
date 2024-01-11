@@ -15,7 +15,7 @@
 	// 工具
 	import {
 		useCheckEmptyInObj,
-		useDebounce
+		useThrottle
 	} from "@ultra-man/noa"
 	import {
 		onShow
@@ -31,7 +31,8 @@
 		routes
 	} from "@/store/route"
 	import {
-		nowFormat
+		nowFormat,
+		batchFormat
 	} from "@/store/common"
 	import {
 		globalColor
@@ -91,7 +92,7 @@
 
 
 	// 扫码成功
-	const scanSuccess = useDebounce(async (code: string) => {
+	const scanSuccess = useThrottle(async (code: string) => {
 		codeText.value = code
 		if (code) {
 			try {
@@ -103,6 +104,10 @@
 					tableData.value = result.data.list
 					for (const item of tableData.value) {
 						item.count = item.quantity
+						// 如果开启了批次管理则生成批次号
+						if (item.bInvBatch === "1") {
+							item.batch = item.supplierCode ? `${item.supplierCode}-${batchFormat}` : batchFormat
+						}
 					}
 					supplier.value = tableData.value[0]
 				}
@@ -115,7 +120,7 @@
 				searching.value = false
 			}
 		}
-	})
+	}, 3000)
 	// 打开弹窗
 	const open = (item: Obj, key: number) => {
 		if (submiting.value) return

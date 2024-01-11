@@ -3,11 +3,12 @@
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getArrivalDocList } from "@/api/business"
-	import type { Business, Materiel } from "@/type/business"
+	import type { Business } from "@/type/business"
 	import UpInputSupplierPicker from "@/components/UpInputSupplierPicker.vue"
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import TablePicker from "@/components/TablePicker.vue"
+	import { nowFormat } from "@/store/common"
 
 	// 基础数据
 	const props = defineProps<
@@ -103,7 +104,7 @@
 	}
 
 	// 单据日期选择相关
-	const dateSelected = ref([])
+	const dateSelected = ref([nowFormat, nowFormat])
 	const dateSelect = (dates : string[]) => {
 		searchParam.value.startDate = dates[0]
 		searchParam.value.finishDate = dates[1]

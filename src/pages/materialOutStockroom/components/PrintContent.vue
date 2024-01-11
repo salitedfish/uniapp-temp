@@ -2,12 +2,8 @@
 	// 框架
 	import {
 		defineComponent,
-		ref,
-		reactive,
-		watch,
 	} from 'vue';
 	// 组件
-	import PrintTemp from "@/components/PrintTemp.vue"
 	// 工具
 	// 接口
 	// 数据

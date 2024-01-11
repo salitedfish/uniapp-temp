@@ -1,14 +1,14 @@
 import { defineConfig } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 import commonjs from 'vite-plugin-commonjs';
-// import basicSsl from '@vitejs/plugin-basic-ssl'
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [
 		uni(),
 		commonjs(),
-		// basicSsl()
+		basicSsl()
 	],
 	server: {
 		// https: true,

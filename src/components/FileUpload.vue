@@ -104,19 +104,13 @@
 			}
 		},
 		methods: {
-			/**
-			 * 某文件上传结束回调(成功失败都回调)
-			 * @param {Object} item 当前上传完成的文件
-			 */
+			// 某文件上传结束回调(成功失败都回调)
 			onuploadEnd(item) {
 				// 更新当前窗口状态变化的文件
 				this.files.set(item.name, item);
 				this.updateModelValue()
 			},
-			/**
-			 * 上传进度回调
-			 * @param {Object} item 当前正在上传的文件
-			 */
+			// 上传进度回调
 			onprogre(item) {
 				console.log("onprogre", item)
 				// 更新当前状态变化的文件
@@ -130,10 +124,7 @@
 				this.updateModelValue()
 
 			},
-			/**
-			 * 文件选择回调
-			 * @param {Object} files 已选择的所有文件Map集合
-			 */
+			// 文件选择回调
 			change(files) {
 				// H5端不知道为什么files获取的有时候不是Map
 				if (files instanceof Map) {
@@ -152,24 +143,16 @@
 				// name=指定文件名，不指定则上传所有type等于waiting和fail的文件
 				this.$refs['lsjUpload'].upload();
 			},
-			/**
-			 * 指定上传某个文件
-			 * @param {Object} name 带后缀名的文件名称
-			 */
+			// 指定上传某个文件
 			resetUpload(name) {
 				this.$refs['lsjUpload'].upload(name);
 			},
-			/**
-			 * 移除某个文件
-			 * @param {Object} name 带后缀名的文件名称
-			 */
+			// 移除某个文件
 			clear(name) {
 				// name=指定文件名，不传name默认移除所有文件
 				this.$refs['lsjUpload'].clear(name);
 			},
-			/**
-			 * 根据files更新外部的modelValue
-			 */
+			// 根据files更新外部的modelValue
 			updateModelValue() {
 				const files = []
 				for (const value of this.files.values()) {
@@ -186,9 +169,7 @@
 				this.$emit("update:modelValue", files)
 			},
 			// #ifdef H5
-			/**
-			 * 文件list展示
-			 */
+			// 文件list展示
 			updateList() {
 				this.filelist = this.files.values()
 			},

@@ -5,14 +5,14 @@
 		ref,
 		computed,
 		nextTick,
-		watch
 	} from 'vue';
 	// 组件
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import UpInputCheckDocPicker from "@/components/UpInputCheckDocPicker.vue"
 	// 工具
 	import {
-		useDebounce
+		useDebounce,
+		useThrottle
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -53,7 +53,7 @@
 	}
 	const editData = ref < Obj > (initEditData())
 	const popupTable = ref < Obj[] > ([])
-	const scanSuccess = useDebounce((code: string) => {
+	const scanSuccess = useThrottle((code: string) => {
 		if (code) {
 			editData.value.invCode = code
 			for (const item of tableData.value) {
@@ -72,7 +72,7 @@
 				title: "该物料不存在于该盘点单"
 			})
 		}
-	})
+	}, 3000)
 	const tableTdSelect = (item: Obj) => {
 		editData.value.invName = item.cInvName
 		editData.value.batch = item.cCVBatch
@@ -124,7 +124,7 @@
 		editData.value = initEditData()
 	}
 	const submitDisable = computed(() => {
-		return !editData.value.invCode || !editData.value.invName || !editData.value.batch
+		return !editData.value.invCode || !editData.value.invName
 	})
 	// 结束盘点
 	const finish = async () => {

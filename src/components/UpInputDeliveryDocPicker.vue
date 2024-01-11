@@ -7,6 +7,8 @@
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import TablePicker from "@/components/TablePicker.vue"
 	import UpInputCustomerPicker from "@/components/UpInputCustomerPicker.vue"
+	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
+	import { nowFormat, preMonthFormat } from "@/store/common"
 
 	// 基础数据
 	const props = defineProps<
@@ -56,10 +58,16 @@
 		reSetPage()
 		await searchList()
 	}
+	// 分页搜索
+	const pageSearch = (page : { current : number }) => {
+		searchParam.value.currentPage = page.current
+		searchList()
+	}
 	// 重制搜索参数
 	const reset = () => {
 		customerSelected.value = []
 		materialSelected.value = []
+		dateSelected.value = []
 		reSetPage()
 	}
 
@@ -95,6 +103,13 @@
 			searchParam.value.customerCode = null
 		}
 	}
+
+	// 单据日期选择相关
+	const dateSelected = ref([preMonthFormat, nowFormat])
+	const dateSelect = (dates : string[]) => {
+		searchParam.value.startDate = dates[0]
+		searchParam.value.finishDate = dates[1]
+	}
 </script>
 
 <template>
@@ -123,6 +138,12 @@
 									</UpInputCustomerPicker>
 								</up-form-item>
 
+								<up-form-item class="common-form-item" label="日期:" borderBottom labelWidth="60" style="padding: 0">
+									<UpInputDatePicker border="none" placeholder="选择日期" clearable class="input-item" readonly
+										v-model:selected="dateSelected" mode="range" @select="dateSelect">
+									</UpInputDatePicker>
+								</up-form-item>
+
 							</up-form>
 							<view class="search-btn-box">
 								<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"></up-button>
@@ -135,8 +156,9 @@
 							:colums="colums" withIndex>
 
 							<view class="page-box">
-								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount" :current="searchParam.page"
-									:pageSize="searchParam.size" @change="searchList()"></uni-pagination>
+								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
+									:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
+									@change="pageSearch"></uni-pagination>
 							</view>
 
 						</TablePicker>

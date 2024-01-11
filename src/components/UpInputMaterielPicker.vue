@@ -64,8 +64,10 @@
 		}
 	}
 	// 输入框改变
+	let lock = false
 	const inputConfirm = useDebounce((code : string) => {
-		if (code && props.scan) {
+		// 加个锁是因为如果通过扫码选择完后会触发值改变，值改变又会触发change，为防止多次触发，每次通过扫码选择后先关锁，一断时间后再打开
+		if (code && props.scan && !lock) {
 			autoSearch(code)
 		}
 	})
@@ -101,6 +103,11 @@
 		close()
 	}
 	const updateSelected = (selected : Business[]) => {
+		// 选择完之后关锁，防止值改变再触发显示popup
+		lock = true
+		setTimeout(() => {
+			lock = false
+		}, 2000)
 		emit("update:selected", selected)
 	}
 
@@ -128,8 +135,9 @@
 						</view>
 
 
-						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="code" :searching="searching"
-							:tableData="resultData?.list" @select="select" :multiple="multiple" :colums="colums" withIndex>
+						<TablePicker :selected="selected" @update:selected="updateSelected" :selectKey="scan ? 'id': 'code'"
+							:searching="searching" :tableData="resultData?.list" @select="select" :multiple="multiple"
+							:colums="colums" withIndex>
 
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"

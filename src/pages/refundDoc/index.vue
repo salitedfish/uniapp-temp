@@ -6,7 +6,6 @@
 		watch,
 		onMounted,
 		computed,
-		nextTick
 	} from 'vue';
 	import {
 		onShow
@@ -18,16 +17,12 @@
 	import UpInputDeliveryDocPicker from "@/components/UpInputDeliveryDocPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import RefundTypeCheck from "./components/RefundTypeCheck.vue"
-	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
 	// 工具
-	// import {
-	// 	useTable
-	// } from "@/hook/usePageTable"
 	import {
 		useTimeFormat,
 		useCheckEmptyInObj,
-		useDebounce
+		useThrottle
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -38,9 +33,6 @@
 	import {
 		routes
 	} from "@/store/route"
-	import {
-		batchFormat
-	} from "@/store/common"
 	// 类型
 	import {
 		PickerTypeId
@@ -97,7 +89,7 @@
 
 	// 物料扫码
 	const form = ref < Obj > ({})
-	const procuctScanSuccess = useDebounce(async (code: string) => {
+	const procuctScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
 				const res = await getBusiness({
@@ -121,7 +113,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	// 查找参数
 	// const scanSearchParams = ref < Obj > ({
 	// 	searchKey: "code",
@@ -169,15 +161,15 @@
 
 	const edit = () => {
 		const value = Number(operateData.value.count)
-		// const max = Number(originData.value.iquantity)
+		const max = Number(originData.value.iquantity)
 		const min = 0
-		// if (value > max) {
-		// 	uni.showToast({
-		// 		icon: "none",
-		// 		title: "退货数量不能大于应退货数量"
-		// 	})
-		// 	return
-		// }
+		if (value > max) {
+			uni.showToast({
+				icon: "none",
+				title: "退货数量不能大于可退货数量"
+			})
+			return
+		}
 		if (value <= min) {
 			uni.showToast({
 				icon: "none",

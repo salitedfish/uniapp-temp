@@ -208,6 +208,7 @@
 
 		<!-- 修改自定义打印配置 -->
 		<view class="uni-common-mt">
+
 			<view class="uni-form-item uni-column">
 				<view class="title">
 					<up-text class="title" text="打印纸类型" type="info"></up-text>
@@ -217,7 +218,6 @@
 						:label="item.name" :name="item.value">
 					</u-radio>
 				</u-radio-group>
-				<!-- <up-input border="surround" v-model="printPage.gap" placeholder="输入打印纸间隙" clearable type="number"></up-input> -->
 			</view>
 
 			<view class="uni-form-item uni-column">
@@ -278,8 +278,6 @@
 				<up-input border="surround" v-model="printPage.QRCodeLevel" placeholder="输入二维码大小等级" clearable
 					type="number"></up-input>
 			</view>
-
-
 
 		</view>
 	</view>

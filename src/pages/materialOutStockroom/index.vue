@@ -2,7 +2,6 @@
 	// 框架
 	import {
 		onMounted,
-		ref,
 		onUnmounted
 	} from 'vue';
 	import {
@@ -119,7 +118,7 @@
 						<uni-td class="nowrap">{{ item.cinvcode }}</uni-td>
 						<uni-td class="nowrap">{{ item.cinvname }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
-						<uni-td class="nowrap">{{ item.cposname }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.cposname }}</uni-td>
 						<uni-td class="warning nowrap" @click.stop="deleteTable">删除</uni-td>
 					</uni-tr>
 				</uni-table>
@@ -151,7 +150,7 @@
 										readonly>
 									</up-input>
 								</up-form-item>
-								<!-- 								<up-form-item class="common-form-item" label="现存总量:" borderBottom labelWidth="80" style="padding: 0">
+								<!-- <up-form-item class="common-form-item" label="现存总量:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
 										readonly>
 									</up-input>
@@ -165,7 +164,7 @@
 									<up-input placeholder="" clearable class="input-item" v-model="operateData.count">
 									</up-input>
 								</up-form-item>
-								<!-- 								<up-form-item class="common-form-item" label="计量单位:" borderBottom labelWidth="80" style="padding: 0">
+								<!-- <up-form-item class="common-form-item" label="计量单位:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.cbatch"
 										readonly>
 									</up-input>

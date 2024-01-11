@@ -50,6 +50,16 @@
 			title: "保存成功"
 		})
 	}
+
+	// 重置
+	const reset = () => {
+		form.value = {
+			depSelected: [],
+			busTypeSelected: [],
+			purTypeSelected: []
+		}
+		uni.removeStorageSync("pADefaultSet")
+	}
 </script>
 
 <template>
@@ -62,17 +72,19 @@
 
 		<view class="common-content">
 			<up-form class="common-form" labelPosition="left">
-				<up-form-item class="common-form-item" label="业务类型:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="业务类型:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputBusTypePicker border="none" placeholder="选择业务类型" clearable class="input-item" readonly
 						v-model:selected="form.busTypeSelected">
 					</UpInputBusTypePicker>
 				</up-form-item>
-				<up-form-item class="common-form-item" label="采购类型:" borderBottom labelWidth="80" style="padding: 0">
+
+				<up-form-item class="common-form-item" label="采购类型:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputPurTypePicker border="none" placeholder="选择采购类型" clearable class="input-item" readonly
 						v-model:selected="form.purTypeSelected">
 					</UpInputPurTypePicker>
 				</up-form-item>
-				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0">
+
+				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputDepPicker border="none" placeholder="选择部门" clearable class="input-item" readonly
 						v-model:selected="form.depSelected">
 					</UpInputDepPicker>
@@ -82,6 +94,7 @@
 
 		<view class="btn-box">
 			<up-button type="primary" text="保存设置" class="bottom-button" @click="save" shape="circle"></up-button>
+			<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
 		</view>
 
 	</view>
@@ -91,5 +104,13 @@
 	.common-content {
 		flex: 1;
 		overflow-y: scroll;
+	}
+
+	.btn-box {
+		display: flex;
+
+		.bottom-button+.bottom-button {
+			margin-left: 5px;
+		}
 	}
 </style>

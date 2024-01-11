@@ -54,6 +54,19 @@
 			title: "保存成功"
 		})
 	}
+
+	// 重置
+	const reset = () => {
+		form.value = {
+			outStockroomSelected: [],
+			inStockroomSelected: [],
+			outDepSelected: [],
+			inDepSelected: [],
+			outStTypeSelected: [],
+			inStTypeSelected: []
+		}
+		uni.removeStorageSync("srCDefaultSet")
+	}
 </script>
 
 <template>
@@ -67,12 +80,13 @@
 		<view class="common-content">
 			<up-form class="common-form" labelPosition="left">
 
-				<up-form-item class="common-form-item" label="转出仓库:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="转出仓库:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputStockroomPicker border="none" placeholder="选择仓库" clearable class="input-item" readonly
 						v-model:selected="form.outStockroomSelected">
 					</UpInputStockroomPicker>
 				</up-form-item>
-				<up-form-item class="common-form-item" label="转入仓库:" borderBottom labelWidth="80" style="padding: 0">
+
+				<up-form-item class="common-form-item" label="转入仓库:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputStockroomPicker border="none" placeholder="选择仓库" clearable class="input-item" readonly
 						v-model:selected="form.inStockroomSelected">
 					</UpInputStockroomPicker>
@@ -83,6 +97,7 @@
 						v-model:selected="form.outDepSelected">
 					</UpInputDepPicker>
 				</up-form-item>
+
 				<up-form-item class="common-form-item" label="转入部门:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputDepPicker border="none" placeholder="选择部门" clearable class="input-item" readonly
 						v-model:selected="form.inDepSelected">
@@ -94,6 +109,7 @@
 						v-model:selected="form.outStTypeSelected">
 					</UpInputOutSrTypePicker>
 				</up-form-item>
+
 				<up-form-item class="common-form-item" label="入库类别:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputSrSaveTypePicker border="none" placeholder="选择入库类别" clearable class="input-item" readonly
 						v-model:selected="form.inStTypeSelected">
@@ -104,6 +120,7 @@
 
 		<view class="btn-box">
 			<up-button type="primary" text="保存设置" class="bottom-button" @click="save" shape="circle"></up-button>
+			<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
 		</view>
 
 	</view>
@@ -113,5 +130,13 @@
 	.common-content {
 		flex: 1;
 		overflow-y: scroll;
+	}
+
+	.btn-box {
+		display: flex;
+
+		.bottom-button+.bottom-button {
+			margin-left: 5px;
+		}
 	}
 </style>

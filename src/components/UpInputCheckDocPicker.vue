@@ -80,7 +80,7 @@
 						</view>
 						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="cCVCode"
 							:searching="searching" :tableData="resultData?.list" @select="select" :multiple="multiple"
-							:colums="colums">
+							:colums="colums" withIndex>
 
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"

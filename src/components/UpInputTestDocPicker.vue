@@ -8,6 +8,7 @@
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import TablePicker from "@/components/TablePicker.vue"
+	import { nowFormat } from "@/store/common"
 
 	// 基础数据
 	const props = defineProps<
@@ -102,7 +103,7 @@
 	}
 
 	// 单据日期选择相关
-	const dateSelected = ref([])
+	const dateSelected = ref([nowFormat, nowFormat])
 	const dateSelect = (dates : string[]) => {
 		searchParam.value.startDate = dates[0]
 		searchParam.value.finishDate = dates[1]
@@ -140,6 +141,7 @@
 									</UpInputDatePicker>
 								</up-form-item>
 							</up-form>
+
 							<view class="search-btn-box">
 								<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"
 									:disabled="searching"></up-button>

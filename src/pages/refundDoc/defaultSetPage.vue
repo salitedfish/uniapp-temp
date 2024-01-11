@@ -53,6 +53,17 @@
 			title: "保存成功"
 		})
 	}
+
+	// 重置
+	const reset = () => {
+		form.value = {
+			busTypeSelected: [],
+			saleTypeSelected: [],
+			stockroomSelected: [],
+			depSelected: [],
+		}
+		uni.removeStorageSync("rDDefaultSet")
+	}
 </script>
 
 <template>
@@ -65,34 +76,34 @@
 
 		<view class="common-content">
 			<up-form class="common-form" labelPosition="left">
-				<up-form-item class="common-form-item" label="业务类型:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="业务类型:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputBusTypePicker border="none" placeholder="选择业务类型" clearable class="input-item" readonly
 						v-model:selected="form.busTypeSelected">
 					</UpInputBusTypePicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="销售类型:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="销售类型:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputSaleTypePicker border="none" placeholder="选择销售类型" clearable class="input-item" readonly
 						v-model:selected="form.saleTypeSelected">
 					</UpInputSaleTypePicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="销售部门:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="销售部门:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputDepPicker border="none" placeholder="选择销售部门" clearable class="input-item" readonly
 						v-model:selected="form.depSelected">
 					</UpInputDepPicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="仓库名称:" borderBottom labelWidth="80" style="padding: 0">
+				<up-form-item class="common-form-item" label="仓库名称:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputStockroomPicker border="none" placeholder="选择仓库" clearable class="input-item" readonly
 						v-model:selected="form.stockroomSelected"></UpInputStockroomPicker>
 				</up-form-item>
-
 			</up-form>
 		</view>
 
 		<view class="btn-box">
 			<up-button type="primary" text="保存设置" class="bottom-button" @click="save" shape="circle"></up-button>
+			<up-button text="重置" class="bottom-button" @click="reset" shape="circle"></up-button>
 		</view>
 
 	</view>
@@ -102,5 +113,13 @@
 	.common-content {
 		flex: 1;
 		overflow-y: scroll;
+	}
+
+	.btn-box {
+		display: flex;
+
+		.bottom-button+.bottom-button {
+			margin-left: 5px;
+		}
 	}
 </style>

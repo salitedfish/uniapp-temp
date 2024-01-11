@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, computed } from "vue"
+	import { computed } from "vue"
 	import { routes } from "@/store/route"
 	import { globalColor } from "@/store/theme"
 	import { RouteType, type Route } from "@/type/route"

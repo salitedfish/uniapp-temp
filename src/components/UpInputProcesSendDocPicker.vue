@@ -3,11 +3,12 @@
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getProductionOrderDispatchProcessInfos } from "@/api/business"
-	import type { Process, Business } from "@/type/business"
+	import type { Business } from "@/type/business"
 	import UpInputProcessPicker from "@/components/UpInputProcessPicker.vue"
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import TablePicker from "@/components/TablePicker.vue"
+	import { nextDayFormat } from "@/store/common"
 
 	// 基础数据
 	const props = defineProps<
@@ -101,7 +102,7 @@
 	}
 
 	// 单据日期选择相关
-	const dateSelected = ref([])
+	const dateSelected = ref([nextDayFormat, nextDayFormat])
 	const dateSelect = (dates : string[]) => {
 		searchParam.value.startDate = dates[0]
 		searchParam.value.finishDate = dates[1]
@@ -120,6 +121,7 @@
 							选择生产订单工序派工资料
 						</view>
 						<up-form class="common-form" labelPosition="left">
+
 							<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="80" style="padding: 0">
 								<UpInputProcessPicker border="none" placeholder="选择U8标准工序" readonly clearable class="input-item"
 									v-model:selected="processSelected" @select="processSelect">
@@ -137,13 +139,17 @@
 									v-model:selected="dateSelected" mode="range" @select="dateSelect">
 								</UpInputDatePicker>
 							</up-form-item>
+
 						</up-form>
+
 						<view class="search-btn-box">
 							<up-button type="primary" text="查询" class="bottom-button" @click="search" shape="circle"
-								:disabled="searching"></up-button>
-							<up-button text="重置" class="bottom-button" @click="reset" shape="circle"
-								:disabled="searching"></up-button>
+								:disabled="searching">
+							</up-button>
+							<up-button text="重置" class="bottom-button" @click="reset" shape="circle" :disabled="searching">
+							</up-button>
 						</view>
+
 					</view>
 
 					<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="rowNo" :searching="searching"

@@ -146,8 +146,7 @@ export const submiting = ref(false)
 export const confirm = async () => {
 	try {
 		// 默认值检查
-		if (useCheckEmptyInObj([config.value.depSelected, config.value.stockroomSelected, config.value
-			.outStockroomTypeSelected],
+		if (useCheckEmptyInObj([config.value.depSelected, config.value.stockroomSelected, config.value.outStockroomTypeSelected],
 			[])) {
 			uni.showToast({
 				title: "请填写完默认参数",

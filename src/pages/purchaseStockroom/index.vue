@@ -21,7 +21,7 @@
 	// 工具
 	import {
 		useCheckEmptyInObj,
-		useDebounce
+		useThrottle
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -116,14 +116,14 @@
 		}
 	}
 	// 箱/托/发货单码
-	const scanAnySuccess = useDebounce(async (code: string) => {
+	const scanAnySuccess = useThrottle(async (code: string) => {
 		if (code) {
 			scanAnyText.value = code
 			loadData({
 				code
 			}, getPurchaseArrivalList)
 		}
-	})
+	}, 3000)
 	// 扫货单情况
 	const arrivalDocSelect = (res: Obj[]) => {
 		if (res && res.length) {
@@ -188,7 +188,7 @@
 	const originData = ref < Obj > ({})
 	const showPopup = ref(false)
 	let timer: number = 0
-	const itemScanSuccess = useDebounce(async (code: string) => {
+	const itemScanSuccess = useThrottle(async (code: string) => {
 		originData.value.position = code
 		if (!timer && code) {
 			timer = setTimeout(async () => {
@@ -216,7 +216,7 @@
 				}
 			}, 500)
 		}
-	})
+	}, 3000)
 	// 编辑行
 	const edit = () => {
 		const value = Number(count.value)
@@ -249,9 +249,7 @@
 	const submit = async () => {
 		try {
 			// 默认值检查
-			if (useCheckEmptyInObj([config.value.stockroomSaveTypeSelected, config.value.stockroomSelected, config.value
-					.depSelected
-				], [])) {
+			if (useCheckEmptyInObj([config.value.stockroomSaveTypeSelected, config.value.stockroomSelected], [])) {
 				uni.showToast({
 					title: "请填写完默认参数",
 					icon: "none"
@@ -265,14 +263,14 @@
 					if (!item.position) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行库位未填写`
+							title: `第${Number(key)+1}行货位未填写`
 						})
 						return
 					}
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行库位设置不正确`
+							title: `第${Number(key)+1}行货位设置不正确`
 						})
 						return
 					}
@@ -295,7 +293,7 @@
 				}),
 				type: getTypeText(),
 				head: {
-					cdepcode: config.value.depSelected[0].code,
+					cdepcode: config.value.depSelected.length > 0 ? config.value.depSelected[0].code : "",
 					crdcode: config.value.stockroomSaveTypeSelected[0].code,
 					ddate: dateSelected.value[0],
 					cwhcode: config.value.stockroomSelected[0].code

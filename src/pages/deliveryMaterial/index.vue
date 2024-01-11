@@ -3,7 +3,6 @@
 	import {
 		defineComponent,
 		ref,
-		onMounted
 	} from 'vue';
 	// 组件
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
@@ -58,6 +57,14 @@
 
 	// 发货状态
 	const types = ref(states)
+
+	// 分页搜索
+	const pageSearch = (page: {
+		current: number
+	}) => {
+		searchParam.value.currentPage = page.current
+		searchList()
+	}
 
 	// 分页重置并搜索
 	const search = () => {
@@ -127,7 +134,7 @@
 
 		<view class="page-box">
 			<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount" :current="searchParam.currentPage"
-				:pageSize="searchParam.pageSize" @change="searchList"></uni-pagination>
+				:pageSize="searchParam.pageSize" @change="pageSearch"></uni-pagination>
 		</view>
 	</view>
 </template>

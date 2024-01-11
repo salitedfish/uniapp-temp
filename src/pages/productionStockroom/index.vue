@@ -17,7 +17,7 @@
 	// 工具
 	import {
 		useCheckEmptyInObj,
-		useDebounce
+		useThrottle
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -83,7 +83,7 @@
 	// 表单
 	const form = ref(initForm())
 	// 产品扫码
-	const procuctScanSuccess = useDebounce(async (code: string) => {
+	const procuctScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
 				const codeList = code.split("^")
@@ -124,10 +124,9 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	// 货位扫码
-
-	const shelfScanSuccess = useDebounce(async (code: string) => {
+	const shelfScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
 				const res = await getPositionInfo({
@@ -152,7 +151,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -210,7 +209,7 @@
 		})
 	}
 	// 弹窗货位码扫描成功
-	const itemScanSuccess = useDebounce(async (code: string) => {
+	const itemScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
 				const res = await getPositionInfo({
@@ -235,19 +234,19 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	// 表格编辑
 	const edit = () => {
 		const value = Number(editData.value.quantity)
-		const max = Number(originData.value.quantity)
+		// const max = Number(originData.value.quantity)
 		const min = 0
-		if (value > max) {
-			uni.showToast({
-				icon: "none",
-				title: "入库数量不能大于应入库数量"
-			})
-			return
-		}
+		// if (value > max) {
+		// 	uni.showToast({
+		// 		icon: "none",
+		// 		title: "入库数量不能大于应入库数量"
+		// 	})
+		// 	return
+		// }
 		if (value <= min) {
 			uni.showToast({
 				icon: "none",
@@ -265,9 +264,7 @@
 	const submit = async () => {
 		try {
 			// 默认值检查
-			if (useCheckEmptyInObj([config.value.depSelected, config.value.stockroomSelected, config.value
-						.stockroomSaveTypeSelected
-					],
+			if (useCheckEmptyInObj([config.value.stockroomSelected, config.value.stockroomSaveTypeSelected],
 					[])) {
 				uni.showToast({
 					title: "请填写完默认参数",
@@ -282,14 +279,14 @@
 					if (!item.position) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行库位未填写`
+							title: `第${Number(key)+1}行货位未填写`
 						})
 						return
 					}
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行库位设置不正确`
+							title: `第${Number(key)+1}行货位设置不正确`
 						})
 						return
 					}
@@ -312,7 +309,7 @@
 					}
 				}),
 				head: {
-					depcode: config.value.depSelected[0].code,
+					depcode: config.value.depSelected.length > 0 ? config.value.depSelected[0].code : "",
 					rdcode: config.value.stockroomSaveTypeSelected[0].code,
 					whcode: config.value.stockroomSelected[0].code,
 					ddate: tableData.value[0].date
@@ -411,8 +408,8 @@
 						<uni-td class="nowrap">{{ key + 1 }}</uni-td>
 						<uni-td class="nowrap">{{ item.invCode }}</uni-td>
 						<uni-td class="nowrap">{{ item.invName }}</uni-td>
-						<uni-td class="nowrap">{{ item.count }}</uni-td>
-						<uni-td class="nowrap">{{ item.position }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.position }}</uni-td>
 						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>

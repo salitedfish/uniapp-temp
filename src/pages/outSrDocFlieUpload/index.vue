@@ -3,17 +3,14 @@
 	import {
 		defineComponent,
 		ref,
-		onMounted
 	} from 'vue';
 	// 组件
-	import UpInputScan from "@/components/UpInputScan.vue"
 	import MediaUpload from "@/components/MediaUpload.vue"
 	// 工具
 	// 接口
 	import {
 		deliveryMaterialInfo,
 		deliveryMaterialAddFile,
-		deliveryMaterialFileList
 	} from "@/api/deliveryMaterial"
 	// 数据
 	// 类型
@@ -114,9 +111,6 @@
 				<up-form-item class="common-form-item" label="出库单号:" borderBottom labelWidth="100" style="padding: 0">
 					<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.outboundCode">
 					</up-input>
-					<!-- 					<UpInputScan border="none" placeholder="扫出库单码" clearable class="input-item" readonly
-						v-model="form.outboundCode" @scanSuccess="scanSuccess">
-					</UpInputScan> -->
 				</up-form-item>
 
 				<up-form-item class="common-form-item" label="出库时间:" borderBottom labelWidth="100" style="padding: 0">

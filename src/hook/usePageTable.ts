@@ -9,7 +9,7 @@ export function useTable<P, R>(
 	getListRequest : (searchParams : P) => Promise<Return<R>>,
 	options : Partial<P> = {}
 ) {
-	// 筛选的参数(不管需不需要分页都给他加上分页参数，反正不用也无所谓)
+	// 筛选的参数(不管需不需要分页都给他加上分页参数，不用也无所谓)
 	const searchParam = <Ref<P>>ref({
 		currentPage: 1,
 		pageSize: 10,

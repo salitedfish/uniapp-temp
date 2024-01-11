@@ -120,8 +120,9 @@
 							:tableData="resultData?.data" @select="select" :multiple="multiple" :colums="colums">
 
 							<view class="page-box">
-								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalSize" :current="searchParam.page"
-									:pageSize="searchParam.size" @change="searchList()"></uni-pagination>
+								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
+									:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
+									@change="searchList()"></uni-pagination>
 							</view>
 
 						</TablePicker>

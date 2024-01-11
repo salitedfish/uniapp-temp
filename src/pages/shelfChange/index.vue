@@ -23,7 +23,7 @@
 	} from "@/store/common"
 	import {
 		useCheckEmptyInObj,
-		useDebounce
+		useThrottle
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -35,9 +35,6 @@
 		routes
 	} from "@/store/route"
 	// 类型
-	import type {
-		Materiel
-	} from "@/type/business"
 	export default defineComponent({
 		name: ''
 	});
@@ -127,7 +124,7 @@
 			form.value.shelfName = ""
 		})
 	}
-	const scanSuccess = useDebounce(async (code: string) => {
+	const scanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			if (!config.value.stockroomSelected) {
 				uni.showToast({
@@ -163,7 +160,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 
 	// 添加到明细
 	const add = () => {
@@ -179,12 +176,13 @@
 	// -------------------------------------------------------------------------------------表格
 	// table实际展示的数据, 表格由前端自己维护
 	const tableData = ref < Obj[] > ([])
-	const deleteTable = () => {
+	const deleteTable = (key: number) => {
 		uni.showModal({
 			content: "确定要删除吗？",
 			showCancel: true,
 			success(res) {
 				if (res.confirm) {
+					tableData.value.splice(key, 1)
 					uni.showToast({
 						icon: "none",
 						title: "删除成功"
@@ -214,7 +212,7 @@
 			originData.value.shelfName = ""
 		})
 	}
-	const itemScanSuccess = useDebounce(async (code: string) => {
+	const itemScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
 				const res = await getPositionInfo({
@@ -243,7 +241,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	const edit = () => {
 		const value = Number(editData.value.count)
 		const max = Number(originData.value.quantity)
@@ -270,7 +268,7 @@
 	const submit = async () => {
 		try {
 			// 默认值检查
-			if (useCheckEmptyInObj([config.value.stockroomSelected, config.value.depSelected], [])) {
+			if (useCheckEmptyInObj([config.value.stockroomSelected], [])) {
 				uni.showToast({
 					title: "请填写完默认参数",
 					icon: "none"
@@ -283,14 +281,14 @@
 				if (!item.position) {
 					uni.showToast({
 						icon: "none",
-						title: `第${Number(key)+1}行库位未填写`
+						title: `第${Number(key)+1}行货位未填写`
 					})
 					return
 				}
 				if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 					uni.showToast({
 						icon: "none",
-						title: `第${Number(key)+1}行库位设置不正确`
+						title: `第${Number(key)+1}行货位设置不正确`
 					})
 					return
 				}
@@ -313,7 +311,7 @@
 					}
 				}),
 				head: {
-					depcode: config.value.depSelected[0].code,
+					depcode: config.value.depSelected.length > 0 ? config.value.depSelected[0].code : "",
 					ddate: dateSelected.value[0],
 					whcode: config.value.stockroomSelected[0].code
 				}
@@ -440,10 +438,10 @@
 						<uni-td class="nowrap">{{ item.invCode }}</uni-td>
 						<uni-td class="nowrap">{{ item.invName }}</uni-td>
 						<uni-td class="nowrap">{{ item.batch }}</uni-td>
-						<uni-td class="nowrap">{{ item.count }}</uni-td>
+						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
 						<uni-td class="nowrap">{{ item.oriShelfName }}</uni-td>
-						<uni-td class="nowrap">{{ item.shelfName }}</uni-td>
-						<uni-td class="warning nowrap" @click.stop="deleteTable">删除</uni-td>
+						<uni-td class="nowrap primary">{{ item.shelfName }}</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>
 

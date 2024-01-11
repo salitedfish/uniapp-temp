@@ -25,7 +25,8 @@ export type Business = {
 	bInvBatch : string,
 	parentId : number,
 	preset : string,
-	createTime : string
+	createTime : string,
+	bWhPos : string
 }
 
 // 各种业务统一请求的参数
