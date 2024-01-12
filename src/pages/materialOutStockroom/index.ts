@@ -50,16 +50,16 @@ export const closePrintContent = () => {
 }
 // 获取出库明细
 const getOutSrList = async (api : PageListApi, param : Obj) => {
-	const configStr = uni.getStorageSync("mOSDefaultSet")
-	const config = configStr ? JSON.parse(configStr) : {}
-	if (!config.stockroomSelected) {
-		uni.showToast({
-			icon: "none",
-			title: "请先选择仓库"
-		})
-		return
-	}
 	try {
+		const configStr = uni.getStorageSync("mOSDefaultSet")
+		const config = configStr ? JSON.parse(configStr) : {}
+		if (!config.stockroomSelected || !config.stockroomSelected[0]) {
+			uni.showToast({
+				icon: "none",
+				title: "请先选择仓库"
+			})
+			return
+		}
 		const params = { ...param, warehouseCode: config.stockroomSelected[0].code }
 		const res = await api(params)
 		if (res) {

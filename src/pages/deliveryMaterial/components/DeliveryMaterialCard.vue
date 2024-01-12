@@ -590,6 +590,8 @@
 						</up-form-item>
 
 						<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="100" style="padding: 0">
+							<up-input placeholder="填写备注" clearable class="input-item" v-model="outSrDocDetail.cmaker">
+							</up-input>
 						</up-form-item>
 					</up-form>
 

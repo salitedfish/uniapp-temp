@@ -62,7 +62,7 @@
 	})
 	// 判断仓库是否开启货位管理，开启了才能选择货位
 	const shelfSelectEnable = computed(() => {
-		return config.value.stockroomSelected && config.value.stockroomSelected[0].bWhPos === "1"
+		return config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos === "1"
 	})
 	// -------------------------------------------------------------------------------------表单操作
 	const initForm = () => {

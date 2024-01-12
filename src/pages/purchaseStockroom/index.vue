@@ -71,7 +71,7 @@
 	})
 	// 判断仓库是否开启货位管理，开启了才能选择货位
 	const shelfSelectEnable = computed(() => {
-		return config.value.stockroomSelected && config.value.stockroomSelected[0].bWhPos === "1"
+		return config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos === "1"
 	})
 	// -------------------------------------------------------------------------------------表单操作
 	const typeSelect = ref(0)
@@ -150,9 +150,14 @@
 		tableData.value = []
 	}
 	const getTypeText = () => {
-		if (typeSelect.value === 0) return "采购订单"
-		if (typeSelect.value === 1) return "到货单"
-		if (typeSelect.value === 2) return "检验单"
+		switch (typeSelect.value) {
+			case 0:
+				return "采购订单"
+			case 1:
+				return "到货单"
+			case 2:
+				return "检验单"
+		}
 	}
 	// -------------------------------------------------------------------------------------表格操作
 	const tableData = ref < Obj[] > ([])
@@ -336,9 +341,9 @@
 		<StockTypeCheck v-model="typeSelect" class="tab-box"></StockTypeCheck>
 
 		<up-form class="common-form" labelPosition="left">
-			<up-form-item class="common-form-item" label="箱/托/发货单码:" borderBottom labelWidth="120" style="padding: 0"
+			<up-form-item class="common-form-item" label="箱/发货单码:" borderBottom labelWidth="120" style="padding: 0"
 				v-if="typeSelect === 0">
-				<up-input-scan v-model="scanAnyText" placeholder="请扫箱/托/发货单码" clearable class="input-item"
+				<up-input-scan v-model="scanAnyText" placeholder="请扫箱/发货单码" clearable class="input-item"
 					@scanSuccess="scanAnySuccess" focus></up-input-scan>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="到货单:" borderBottom labelWidth="80" style="padding: 0"

@@ -54,7 +54,7 @@
 	onShow(() => {
 		const configStr = uni.getStorageSync("sfCDefaultSet")
 		config.value = configStr ? JSON.parse(configStr) : {}
-		if (config.value.stockroomSelected) {
+		if (config.value.stockroomSelected && config.value.stockroomSelected[0]) {
 			scanSearchParams.value.whCode = config.value.stockroomSelected[0].code
 		}
 	})

@@ -14,6 +14,9 @@
 		useDebounce,
 		useThrottle
 	} from "@ultra-man/noa"
+	import {
+		splitCodes
+	} from "@/util/common"
 	// 接口
 	import {
 		getCheckVouchDetail,
@@ -55,9 +58,10 @@
 	const popupTable = ref < Obj[] > ([])
 	const scanSuccess = useThrottle((code: string) => {
 		if (code) {
-			editData.value.invCode = code
+			const res = splitCodes(code)
 			for (const item of tableData.value) {
-				if (editData.value.invCode === item.cInvCode) {
+				if (res.code === item.cInvCode) {
+					editData.value.invCode = res.code
 					popupTable.value = tableData.value.filter(item => item.cInvCode === editData.value.invCode)
 					showPopup.value = true
 					return
@@ -72,7 +76,7 @@
 				title: "该物料不存在于该盘点单"
 			})
 		}
-	}, 3000)
+	}, 1000)
 	const tableTdSelect = (item: Obj) => {
 		editData.value.invName = item.cInvName
 		editData.value.batch = item.cCVBatch

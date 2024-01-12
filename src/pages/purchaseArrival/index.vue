@@ -265,8 +265,8 @@
 				基本信息
 			</view>
 			<up-form class="common-form" labelPosition="left">
-				<up-form-item class="common-form-item" label="箱/托/发货单码:" borderBottom labelWidth="120" style="padding: 0">
-					<up-input-scan v-model="codeText" placeholder="请扫箱/托/发货单码" clearable class="input-item"
+				<up-form-item class="common-form-item" label="箱/发货单码:" borderBottom labelWidth="120" style="padding: 0">
+					<up-input-scan v-model="codeText" placeholder="请扫箱/发货单码" clearable class="input-item"
 						@scanSuccess="scanSuccess" focus></up-input-scan>
 				</up-form-item>
 				<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">

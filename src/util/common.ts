@@ -1,5 +1,6 @@
 import { Platform } from "@/util/env"
 import { Env } from "@/type/env"
+import { batchFormat } from "@/store/common"
 /**
  * 判断登录信息是否齐全
  */
@@ -40,12 +41,26 @@ export const getBaseUrl = () => {
 	return baseUrl
 }
 
-// 分隔扫码后的数据
-export const splitCodeInfo = (code : string) => {
+// 解析扫码后的数据
+export const splitCodes = (code : string) => {
 	const codes = code.split("^")
-	return {
-		default: codes[0],
-		supplierCode: codes[6]
+	if (codes.length > 1) {
+		// 扫的是长码
+		// 供应商编码
+		const supplierCode = codes[6] && codes[6] !== 'null' ? codes[6] : ""
+		// 批次号
+		const batch = codes[4] && codes[4] !== 'null' ? codes[4] : batchFormat
+		return {
+			code: codes[0] === '1' ? codes[1].slice(0, -1) : codes[1],
+			quantity: codes[5] !== 'null' ? codes[5] : "0",
+			batch: supplierCode ? supplierCode + "-" + batch : batch
+		}
+	} else {
+		// 扫的是物料编码
+		return {
+			code,
+			quantity: '',
+			batch: batchFormat
+		}
 	}
-
 }

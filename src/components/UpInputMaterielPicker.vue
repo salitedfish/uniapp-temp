@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 	import { ref, onMounted, watch } from "vue"
+	import ScanCode from "@/components/ScanCode.vue"
+	import TablePicker from "@/components/TablePicker.vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getBusiness, listCurrentStock } from "@/api/business"
 	import type { Business } from "@/type/business"
 	import { PickerTypeId } from "@/type/business"
-	import ScanCode from "@/components/ScanCode.vue"
-	import TablePicker from "@/components/TablePicker.vue"
 	import { useDebounce } from "@ultra-man/noa"
+	import { splitCodes } from "@/util/common"
 
 	// 基础数据
 	const props = defineProps<
@@ -59,8 +60,9 @@
 	const scanSuccess = (code : string) => {
 		// 根据二维码获取数据
 		if (code) {
-			emit("scanSuccess", code)
-			autoSearch(code)
+			const res = splitCodes(code)
+			emit("scanSuccess", res.code)
+			autoSearch(res.code)
 		}
 	}
 	// 输入框改变
@@ -68,13 +70,13 @@
 	const inputConfirm = useDebounce((code : string) => {
 		// 加个锁是因为如果通过扫码选择完后会触发值改变，值改变又会触发change，为防止多次触发，每次通过扫码选择后先关锁，一断时间后再打开
 		if (code && props.scan && !lock) {
-			autoSearch(code)
+			const res = splitCodes(code)
+			autoSearch(res.code)
 		}
 	})
-	// 顶层输入框有可能输入物料编码，也有可能输入货位编码,自动打开弹窗并搜索，要根据searchKey来选择
+	// 顶层输入框有可能输入物料编码，也有可能输入货位编码，自动打开弹窗并搜索，要根据searchKey来选择
 	const autoSearch = (keywords : string) => {
 		if (props.scanSearchParams) {
-			// 先取消ts，根据实际接口情况修改
 			searchParam.value = { ...searchParam.value, ...props.scanSearchParams, [props.scanSearchParams.searchKey]: keywords }
 		}
 		open()
