@@ -154,7 +154,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -170,9 +170,9 @@
 	// 加入按钮是否可用
 	const addDisabled = computed(() => {
 		if (shelfSelectEnable.value) {
-			return !form.value.invCode || !form.value.position || !form.value.quantity
+			return !form.value.invCode || !form.value.position || !form.value.count
 		} else {
-			return !form.value.invCode || !form.value.quantity
+			return !form.value.invCode || !form.value.count
 		}
 	})
 
@@ -249,7 +249,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 	// 表格编辑
 	const edit = () => {
 		const value = Number(editData.value.quantity)
@@ -301,7 +301,7 @@
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行货位设置不正确`
+							title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
 						})
 						return
 					}

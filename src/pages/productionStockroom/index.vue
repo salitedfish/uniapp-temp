@@ -19,6 +19,9 @@
 		useCheckEmptyInObj,
 		useThrottle
 	} from "@ultra-man/noa"
+	import {
+		splitCodes
+	} from "@/util/common"
 	// 接口
 	import {
 		getBusiness,
@@ -59,6 +62,9 @@
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
+		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11") {
+			shelfScanSuccess("11000001")
+		}
 	})
 	// 判断仓库是否开启货位管理，开启了才能选择货位
 	const shelfSelectEnable = computed(() => {
@@ -86,39 +92,29 @@
 	const procuctScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			try {
-				const codeList = code.split("^")
-				if (codeList.length <= 1) {
-					uni.showToast({
-						title: "二维码扫描不正确",
-						icon: "none"
-					})
-					nextTick(() => {
-						form.value = initForm()
-					})
-					return
-				}
-				const pdCode = codeList[1].slice(0, -1)
+				const codeInfo = splitCodes(code)
 				nextTick(() => {
-					form.value.invCode = pdCode
+					form.value.invCode = codeInfo.code
 				})
-				form.value.quantity = codeList[5] !== 'null' ? codeList[5] : "0"
-				form.value.count = form.value.quantity
 				const res = await getBusiness({
 					id: PickerTypeId.MATERIAL,
-					code: pdCode
+					code: codeInfo.code
 				})
 				if (res && res.data.list.length > 0) {
 					form.value.bInvBatch = res.data.list[0].bInvBatch
 					if (res.data.list[0].bInvBatch === '1') {
 						// 如果开启了批次管理
-						if (codeList[4] && codeList[4] !== 'null') {
-							// 如果码中有批次则用码中的批次，没有则生成批次
-							form.value.batch = codeList[4]
-						} else {
-							form.value.batch = batchFormat
-						}
+						form.value.batch = codeInfo.batch
 					}
+					form.value.quantity = codeInfo.quantity
+					form.value.count = form.value.quantity
 					form.value.invName = res.data.list[0].name
+				} else {
+					uni.showToast({
+						title: "未查询到产品",
+						icon: "none"
+					})
+					form.value = initForm()
 				}
 			} catch (err) {
 				console.log(err)
@@ -151,7 +147,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -167,9 +163,9 @@
 	// 加入按钮是否可用
 	const addDisabled = computed(() => {
 		if (shelfSelectEnable.value) {
-			return !form.value.invCode || !form.value.position || !form.value.quantity
+			return !form.value.invCode || !form.value.position || !form.value.count
 		} else {
-			return !form.value.invCode || !form.value.quantity
+			return !form.value.invCode || !form.value.count
 		}
 	})
 
@@ -234,7 +230,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 	// 表格编辑
 	const edit = () => {
 		const value = Number(editData.value.quantity)
@@ -286,7 +282,7 @@
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行货位设置不正确`
+							title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
 						})
 						return
 					}

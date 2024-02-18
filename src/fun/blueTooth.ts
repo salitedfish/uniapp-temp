@@ -1,4 +1,6 @@
 import { blueToothStore } from "@/store/blueTooth"
+// import type { BlueToothDevice } from "@/type/blueTooth"
+import { useDebounce } from "@ultra-man/noa"
 
 export class BlueTooth {
 	// 开启蓝牙
@@ -22,7 +24,7 @@ export class BlueTooth {
 		})
 	}
 	// 开始搜寻附近的蓝牙外围设备,获取设备列表
-	public discoveryPrinter() {
+	public discoveryPrinter(cb ?: Function) {
 		// 搜之前先关闭之前的连接，否则搜不到原来的设备
 		if (blueToothStore.connected) {
 			this.closeConnect()
@@ -42,7 +44,7 @@ export class BlueTooth {
 					!blueToothStore.startFound
 				) {
 					blueToothStore.startFound = true
-					this.printerFound()
+					this.printerFound(cb)
 				}
 			},
 		})
@@ -54,13 +56,16 @@ export class BlueTooth {
 		blueToothStore.searching = false
 	}
 	// 发现蓝牙设备就推入列表
-	public printerFound() {
+	public printerFound(cb ?: Function) {
 		// ArrayBuffer转16进度字符串示例
 		uni.onBluetoothDeviceFound((devices) => {
 			console.log(devices)
 			// 很多没有名字的蓝牙不知道啥东西，直接忽略
 			if (devices.devices[0].name) {
 				blueToothStore.devices.push(devices.devices[0])
+				if (cb) {
+					cb()
+				}
 			}
 		})
 	}
@@ -78,6 +83,9 @@ export class BlueTooth {
 					title: "蓝牙连接成功，开始获取服务",
 				})
 				blueToothStore.connected = true
+				// 如果连接成功了，则保存连接的设备id
+				uni.setStorageSync("blueToothDeviceId", blueToothStore.deviceId)
+				// 获取服务列表
 				setTimeout(() => {
 					this.getBLEDeviceServices()
 				}, 2000)
@@ -212,6 +220,38 @@ export class BlueTooth {
 				blueToothStore.characteristicId = item.uuid
 				break
 			}
+		}
+	}
+
+	// 自动连接
+	public autoConnect(deviceId : string) {
+		//@ts-ignore
+		if (uni.openBluetoothAdapter) {
+			blueToothStore.hasBlueTooth = true
+			// 开启蓝牙
+			this.openBluetoothAdapter()
+			setTimeout(() => {
+				// 开始查找蓝牙设备
+				this.discoveryPrinter()
+				// 每秒查看搜寻到的设备，看是否和保存的设备id匹配
+				let interval = 0
+				interval = setInterval(() => {
+					for (const item of blueToothStore.devices) {
+						if (item.deviceId === deviceId) {
+							clearInterval(interval)
+							blueToothStore.deviceId = deviceId
+							this.connect()
+							this.stopDiscoveryPrinter()
+						}
+					}
+				}, 1000)
+			}, 2000)
+		} else {
+			blueToothStore.hasBlueTooth = false
+			uni.showToast({
+				icon: "none",
+				title: "未找到蓝牙模块",
+			})
 		}
 	}
 }

@@ -160,7 +160,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 
 	// 添加到明细
 	const add = () => {
@@ -241,7 +241,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	})
 	const edit = () => {
 		const value = Number(editData.value.count)
 		const max = Number(originData.value.quantity)
@@ -288,7 +288,7 @@
 				if (item.cwhCode !== config.value.inStockroomSelected[0].code) {
 					uni.showToast({
 						icon: "none",
-						title: `第${Number(key)+1}行货位设置不正确`
+						title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
 					})
 					return
 				}

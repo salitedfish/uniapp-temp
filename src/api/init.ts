@@ -62,7 +62,8 @@ export class URequest {
 						if ((res.data as any).data && (res.data as any).data.errMsg) {
 							uni.showToast({
 								icon: "none",
-								title: (res.data as any).data.errMsg
+								title: (res.data as any).data.errMsg,
+								duration: 3000,
 							})
 						}
 						// 请求成功，数据也正常
@@ -80,6 +81,7 @@ export class URequest {
 						uni.showToast({
 							icon: "none",
 							title: (res.data as any).msg,
+							duration: 3000,
 						})
 						reject(res)
 					}
@@ -88,6 +90,7 @@ export class URequest {
 					uni.showToast({
 						icon: "none",
 						title: res.data ? (res.data as any).msg : (res as any).errMsg,
+						duration: 3000,
 					})
 					reject(res)
 				}
@@ -96,7 +99,8 @@ export class URequest {
 				console.log("请求返回err：", err)
 				uni.showToast({
 					icon: "none",
-					title: err.errMsg
+					title: err.errMsg,
+					duration: 3000,
 				})
 				reject(err)
 			}

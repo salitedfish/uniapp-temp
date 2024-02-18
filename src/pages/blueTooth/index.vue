@@ -1,13 +1,11 @@
 <script setup lang="ts">
 	import { onMounted, ref, } from "vue"
 	import { useThrottle } from "@ultra-man/noa"
-	import { BlueTooth } from "@/fun/blueTooth"
-	import { blueToothStore } from "@/store/blueTooth"
+	import { blueToothStore, blueTooth } from "@/store/blueTooth"
 	import { printPage } from "@/store/print"
 	import { globalColor } from "@/store/theme"
 
-	const show = ref(false)
-	const blueTooth = new BlueTooth()
+	const show = ref(true)
 
 	// 打印纸类型(打印机指令中并没有纸张类型这个参数，但是设置纸张间隙，打印机会自动识别纸张类型，value的实际意义是纸张间隙mm)
 	const printPaperTypes = [
@@ -22,7 +20,8 @@
 	]
 
 	// 分段器数据
-	const subList = ["设备", "服务", "特征"]
+	// const subList = ["设备", "服务", "特征"]
+	const subList = ["设备"]
 	const subSelect = ref(0)
 	const subChange = (index : number) => {
 		subSelect.value = index
@@ -49,7 +48,7 @@
 	}
 
 	// 保存之前连接的设备信息
-	let deviceId = ""
+	let deviceId = blueToothStore.deviceId
 
 	// 重新连接
 	const reConnect = useThrottle(() => {
@@ -207,7 +206,7 @@
 		</u-popup>
 
 		<!-- 修改自定义打印配置 -->
-		<view class="uni-common-mt">
+		<view class="uni-common-mt" v-if="false">
 
 			<view class="uni-form-item uni-column">
 				<view class="title">
@@ -314,7 +313,7 @@
 			.options-box {
 				height: 90vh;
 				overflow-y: scroll;
-				padding: 0 24rpx 24rpx;
+				padding: 0 24rpx 20px;
 
 				.title {
 					margin-bottom: 16rpx;

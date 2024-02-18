@@ -423,8 +423,8 @@
 								<uni-td>{{ item.cInvName }}</uni-td>
 								<uni-td>{{ item.planNum }}</uni-td>
 								<uni-td>{{ item.warehouseName }}</uni-td>
-								<uni-td>{{ item.createName }}</uni-td>
-								<uni-td>{{ item.createTime }}</uni-td>
+								<uni-td>{{ deliveryMaterial.createName }}</uni-td>
+								<uni-td>{{ deliveryMaterial.createTime }}</uni-td>
 							</uni-tr>
 						</uni-table>
 					</view>

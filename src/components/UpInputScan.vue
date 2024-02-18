@@ -8,12 +8,17 @@
 
 	// 摄像头扫码
 	const scanSuccess = (res : string) => {
-		emit("scanSuccess", res)
+		if (res) {
+			emit("scanSuccess", res)
+		}
 	}
 
 	// 扫码枪或者手动输入
 	const changeSuccess = useDebounce((res : string) => {
-		emit("scanSuccess", res)
+		console.log("扫码结果", res)
+		if (res) {
+			emit("scanSuccess", res)
+		}
 	})
 </script>
 

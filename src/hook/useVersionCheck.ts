@@ -17,9 +17,7 @@ export const useVersionCheck = (p : { title ?: string, content ?: string, cancel
 			// 如果一样就不需要更新
 			if (widgetInfo.versionCode === res.data.versionCode) {
 				return;
-			}
-			// 否则就提示是否更新
-			if (res.status == 200) {
+			} else if (res.data.versionCode) {
 				// android进行如下操作
 				uni.showModal({
 					title: param.title,
@@ -31,7 +29,6 @@ export const useVersionCheck = (p : { title ?: string, content ?: string, cancel
 						// 如果点了确认就开始更新
 						if (result.confirm) {
 							startUpdate(res.data.versionUrl)
-							// plus.runtime.quit();
 						}
 					}
 				})

@@ -6,6 +6,7 @@
 	import { Env } from "@/type/env"
 	import { Platform } from "@/util/env"
 	import { authList, setUserInfo } from "@/store/auth"
+	import { blueTooth } from "@/store/blueTooth"
 	import type { RouteName } from "./type/route"
 
 	onLaunch(async () => {
@@ -22,28 +23,41 @@
 
 			// web
 			if (Platform.isWeb()) {
-				const path = location.hash.slice(1)
+				const path = location.pathname.slice(3)
+
+				// 判断页面是否存在
+				let name : string = ""
+				let key : RouteName
+				let exit = false
+				for (key in routes) {
+					if (routes[key].path === path) {
+						exit = true
+						name = key
+						break
+					}
+				}
+				// 页面不存在则跳到登录页（结束）
+				if (!exit) {
+					uni.redirectTo({
+						url: routes.login.path
+					})
+					return
+				}
+
+				// 页面存在，并且是需要登录的
 				if (needLoginRoutes.includes(path)) {
-					// 如果是需要登录的
+					// 如果已经登录
 					if (logged()) {
 						// 登录了获取用户信息
 						await setUserInfo()
-						let name : string = ""
-						let key : RouteName
-						for (key in routes) {
-							if (routes[key].path === path) {
-								name = key
-								break
-							}
-						}
 						if (!authList.value.includes(name)) {
 							// 如果没权限就跳到首页
 							uni.switchTab({
 								url: routes.home.path
 							})
 						}
-					} else {
 						// 没登录就去登录
+					} else {
 						uni.redirectTo({
 							url: routes.login.path
 						})
@@ -67,8 +81,25 @@
 			}
 		} catch (err) {
 			console.log(err)
+			// 这里的错误一般是已经登录了，但是获取用户信息的时候，网络异常啥的
+			uni.switchTab({
+				url: routes.home.path
+			})
+			uni.showToast({
+				title: "网络异常",
+				icon: "none",
+				duration: 3000
+			})
 		} finally {
 			console.log("App Launch")
+			// app
+			if (Platform.isApp()) {
+				//如果之前有连接过蓝牙，则自动连接蓝牙
+				const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
+				if (blueToothDeviceId) {
+					blueTooth.autoConnect(blueToothDeviceId)
+				}
+			}
 		}
 	})
 	onShow(() => {

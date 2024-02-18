@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, onMounted, watch } from "vue"
+	import { ref, onMounted, watch, nextTick } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getProductionOrderDispatchProcessInfos } from "@/api/business"
@@ -43,6 +43,9 @@
 	// 打开弹窗
 	const open = () => {
 		showPopup.value = true
+		nextTick(() => {
+			searchList()
+		})
 	}
 	// 关闭弹窗
 	const close = () => {
@@ -77,7 +80,7 @@
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "工序", key: "opseq" }, { label: "生产订单", key: "moCode" }, { label: "生产物料", key: "invName" }, { label: "生产数量", key: "quantity" }, { label: "开工日期", key: "startDate" }, { label: "完工日期", key: "finishDate" }]
+	const colums = [{ label: "工序", key: "opseqName" }, { label: "生产订单", key: "moCode" }, { label: "生产物料", key: "invName" }, { label: "生产数量", key: "quantity" }, { label: "开工日期", key: "startDate" }, { label: "完工日期", key: "finishDate" }]
 
 	//----------------------------下面是这个组件自身依赖的组件数据
 
@@ -122,8 +125,8 @@
 						</view>
 						<up-form class="common-form" labelPosition="left">
 
-							<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="80" style="padding: 0">
-								<UpInputProcessPicker border="none" placeholder="选择U8标准工序" readonly clearable class="input-item"
+							<up-form-item class="common-form-item" label="工作中心:" borderBottom labelWidth="80" style="padding: 0">
+								<UpInputProcessPicker border="none" placeholder="选择U8工作中心" readonly clearable class="input-item"
 									v-model:selected="processSelected" @select="processSelect">
 								</UpInputProcessPicker>
 							</up-form-item>

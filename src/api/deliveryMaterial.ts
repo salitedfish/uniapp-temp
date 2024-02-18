@@ -49,18 +49,20 @@ export const deliveryMaterialInsert = async (data : OutSrDocDetail) => {
 	})
 }
 
-// 获取出库单信息
-export const deliveryMaterialInfo = async (data : { outboundCode : string }) => {
-	return await uRequest.post<Return<DeliveryMaterialInfo>>({
-		url: "deliveryMaterial/getOutbound",
-		data,
-	})
-}
-
 // 获取出库单附件列表
 export const deliveryMaterialFileList = async (data : { id : string }) => {
 	return await uRequest.post<Return<Obj[]>>({
 		url: "deliveryMaterial/listPlanAnnex",
+		data,
+	})
+}
+
+// h5页面司机附件回传
+
+// 获取出库单信息
+export const deliveryMaterialInfo = async (data : { outboundCode : string }) => {
+	return await uRequest.post<Return<DeliveryMaterialInfo>>({
+		url: "deliveryMaterial/getOutbound",
 		data,
 	})
 }

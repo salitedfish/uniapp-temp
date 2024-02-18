@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, onMounted, watch } from "vue"
+	import { ref, onMounted, watch, nextTick } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getBusiness } from "@/api/business"
@@ -40,6 +40,9 @@
 	// 打开弹窗
 	const open = () => {
 		showPopup.value = true
+		nextTick(() => {
+			searchList()
+		})
 	}
 	// 关闭弹窗
 	const close = () => {

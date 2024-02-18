@@ -3,7 +3,7 @@ import { ref } from "vue"
 export const printPage = ref({
 	width: null,
 	height: null,
-	gap: null,
+	gap: "3",
 	QRCodeLevel: null,
 	QRCodeLeftOffset: null,
 	QRCodeTopOffset: null,

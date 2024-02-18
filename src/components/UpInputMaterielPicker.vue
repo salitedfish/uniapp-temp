@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, onMounted, watch } from "vue"
+	import { ref, onMounted, watch, nextTick } from "vue"
 	import ScanCode from "@/components/ScanCode.vue"
 	import TablePicker from "@/components/TablePicker.vue"
 	import { globalColor } from "@/store/theme"
@@ -50,6 +50,9 @@
 	// 打开弹窗
 	const open = () => {
 		showPopup.value = true
+		nextTick(() => {
+			searchList()
+		})
 	}
 	// 关闭弹窗
 	const close = () => {

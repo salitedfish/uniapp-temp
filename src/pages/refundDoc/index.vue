@@ -113,7 +113,7 @@
 				console.log(err)
 			}
 		}
-	}, 3000)
+	}, 2000)
 	// 查找参数
 	// const scanSearchParams = ref < Obj > ({
 	// 	searchKey: "code",

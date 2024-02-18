@@ -15,6 +15,7 @@
 	import UpInputMaterielApplyDocPicker from "@/components/UpInputMaterielApplyDocPicker"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import PrintContent from "./components/PrintContent.vue"
+	import RePrintContent from "./components/RePrintContent"
 	// 工具
 	import {
 		useTimeFormat
@@ -97,10 +98,10 @@
 			</up-form-item>
 		</up-form>
 
-		<view class="common-section-title">
+		<view class="common-section-title" v-if="typeSelect !== 2">
 			本次出库明细
 		</view>
-		<view class="table-box common-page-largest">
+		<view class="table-box common-page-largest" v-if="typeSelect !== 2">
 			<view class="common-table">
 				<uni-table border stripe emptyText="暂无更多数据">
 					<!-- 表头行 -->
@@ -119,7 +120,7 @@
 						<uni-td class="nowrap">{{ item.cinvname }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.cposname }}</uni-td>
-						<uni-td class="warning nowrap" @click.stop="deleteTable">删除</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>
 
@@ -181,16 +182,20 @@
 			</view>
 		</view>
 
-		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck" v-if="typeSelect === 0"></PrintTypeCheck>
+		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck" v-if="typeSelect === 0 && typeSelect !== 2">
+		</PrintTypeCheck>
 
 		<PrintContent class="" :printContent="tableData" :showPrintContent="showPrintContent"
 			@closePrintContent="closePrintContent">
 		</PrintContent>
 
-		<view class="btn-box">
+		<view class="btn-box" v-if="typeSelect !== 2">
 			<up-button type="primary" text="提交出库" class="bottom-button" shape="circle" @click="confirm"
 				:disabled="confirmDisabled" :loading="submiting"></up-button>
 		</view>
+
+		<!-- 重打印内容 -->
+		<RePrintContent v-if="typeSelect === 2"></RePrintContent>
 
 	</view>
 </template>

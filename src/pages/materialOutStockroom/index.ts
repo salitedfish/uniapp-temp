@@ -11,9 +11,9 @@ export const typeSelect = ref(0)
 export const printTypeCheck = ref(0)
 export const showPrintContent = ref(false)
 // 参照生产订单工序派工资料情况
-export const processSendDocSelected = ref([])
+export const processSendDocSelected = ref<Obj[]>([])
 // 参照领料申请单情况
-export const materielApplyDocSelected = ref([])
+export const materielApplyDocSelected = ref<Obj[]>([])
 // 日期
 export const dateSelected = ref<string[]>([])
 // table实际展示的数据, 表格由前端自己维护
@@ -63,10 +63,12 @@ const getOutSrList = async (api : PageListApi, param : Obj) => {
 		const params = { ...param, warehouseCode: config.stockroomSelected[0].code }
 		const res = await api(params)
 		if (res) {
+			console.log(tableData.value)
 			tableData.value = res.data.list.map(item => {
 				return {
 					...item,
-					count: Number(item.iquantity)
+					count: Number(item.iquantity),
+					ddate: processSendDocSelected.value[0] ? processSendDocSelected.value[0].startDate : ""
 				}
 			})
 		}
@@ -82,7 +84,8 @@ export const processSendDocSelect = (res : Obj[]) => {
 			type: "productOrder",
 			wcCode: res[0].wcCode,
 			productionOrderDetailId: res[0].productionOrderDetailId,
-			moCode: res[0].moCode
+			moCode: res[0].moCode,
+			opseq: res[0].opseq
 		})
 	}
 
@@ -127,12 +130,13 @@ export const edit = () => {
 	originData.value.count = value
 	showPopup.value = false
 }
-export const deleteTable = () => {
+export const deleteTable = (key : number) => {
 	uni.showModal({
 		content: "确定要删除吗？",
 		showCancel: true,
 		success(res) {
 			if (res.confirm) {
+				tableData.value.splice(key, 1)
 				uni.showToast({
 					icon: "none",
 					title: "删除成功"

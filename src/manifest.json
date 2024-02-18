@@ -85,6 +85,9 @@
                     }
                 }
             }
+        },
+        "compatible" : {
+            "ignoreVersion" : true
         }
     },
     /* 快应用特有相关 */
@@ -116,5 +119,10 @@
     "orientation" : [
         //竖屏正方向
         "portrait-primary"
-    ]
+    ],
+    "h5" : {
+        "router" : {
+            "mode" : "history"
+        }
+    }
 }

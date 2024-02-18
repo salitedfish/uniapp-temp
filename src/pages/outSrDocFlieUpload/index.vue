@@ -7,6 +7,8 @@
 	// 组件
 	import MediaUpload from "@/components/MediaUpload.vue"
 	// 工具
+	// @ts-ignore
+	import base64 from "base-64"
 	// 接口
 	import {
 		deliveryMaterialInfo,
@@ -33,7 +35,7 @@
 
 	onLoad((options) => {
 		if (options && options.code) {
-			scanSuccess(options.code)
+			scanSuccess(base64.decode(options.code))
 		}
 	})
 
@@ -60,7 +62,6 @@
 						})
 					}
 				}
-				console.log(111, medias.value)
 			} catch (err) {
 				console.log(err)
 			} finally {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, onMounted, watch } from "vue"
+	import { ref, onMounted, watch, nextTick } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getLdProcessList } from "@/api/business"
@@ -39,6 +39,9 @@
 	// 打开弹窗
 	const open = () => {
 		showPopup.value = true
+		nextTick(() => {
+			searchList()
+		})
 	}
 	// 关闭弹窗
 	const close = () => {
@@ -67,7 +70,7 @@
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "工序代号", key: "code" }, { label: "工序说明", key: "name" }]
+	const colums = [{ label: "工作中心代号", key: "code" }, { label: "工作中心", key: "name" }]
 </script>
 
 <template>

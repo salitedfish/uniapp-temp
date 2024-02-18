@@ -3,6 +3,7 @@
 	import {
 		defineComponent,
 		ref,
+		nextTick
 	} from 'vue';
 	// 组件
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
@@ -14,7 +15,16 @@
 	import {
 		useTable
 	} from "@/hook/usePageTable"
+	import {
+		useThrottle
+	} from "@ultra-man/noa"
+	import {
+		splitCodes
+	} from "@/util/common"
 	// 接口
+	import {
+		getBusiness
+	} from "@/api/business"
 	import {
 		getDeliveryMaterialList
 	} from "@/api/deliveryMaterial"
@@ -22,6 +32,9 @@
 	import {
 		states
 	} from "./store"
+	import {
+		PickerTypeId
+	} from "@/type/business"
 	// 类型
 	import type {
 		Business
@@ -51,9 +64,29 @@
 	const customerSelected = ref < Business[] > ([])
 
 	// 物料编码扫码成功
-	const scanSuccess = (code: string) => {
-		searchParam.value.cInvCode = code
-	}
+	const scanSuccess = useThrottle(async (code: string) => {
+		if (code) {
+			try {
+				const codeInfo = splitCodes(code)
+				nextTick(() => {
+					searchParam.value.cInvCode = codeInfo.code
+				})
+				const res = await getBusiness({
+					id: PickerTypeId.MATERIAL,
+					code: codeInfo.code
+				})
+				if (!res || res.data.list.length <= 0) {
+					uni.showToast({
+						title: "未查询到物料",
+						icon: "none"
+					})
+					searchParam.value.cInvCode = ""
+				}
+			} catch (err) {
+				console.log(err)
+			}
+		}
+	}, 2000)
 
 	// 发货状态
 	const types = ref(states)

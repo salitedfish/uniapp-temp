@@ -74,7 +74,7 @@
 		return config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos === "1"
 	})
 	// -------------------------------------------------------------------------------------表单操作
-	const typeSelect = ref(0)
+	const typeSelect = ref(2)
 	const searching = ref(false)
 	const scanAnyText = ref("")
 	const arrivalDocSelected = ref < Obj[] > ([])
@@ -90,6 +90,7 @@
 				for (const item of result.data.list) {
 					item.quantity = Number(item.quantity)
 					item.inStockQuantity = Number(item.inStockQuantity)
+					item.rdQuantity = Number(item.rdQuantity)
 					item.poQuantity = Number(item.poQuantity)
 					item.count = item.quantity
 					if (item.binvBatch === '1') {
@@ -119,8 +120,9 @@
 	const scanAnySuccess = useThrottle(async (code: string) => {
 		if (code) {
 			scanAnyText.value = code
-			loadData({
-				code
+			await loadData({
+				code,
+				type: "rd"
 			}, getPurchaseArrivalList)
 		}
 	}, 3000)
@@ -192,36 +194,30 @@
 	const bInvBatch = ref("")
 	const originData = ref < Obj > ({})
 	const showPopup = ref(false)
-	let timer: number = 0
 	const itemScanSuccess = useThrottle(async (code: string) => {
-		originData.value.position = code
-		if (!timer && code) {
-			timer = setTimeout(async () => {
-				try {
-					const res = await getPositionInfo({
-						cPosCode: originData.value.position
+		if (code) {
+			try {
+				const res = await getPositionInfo({
+					cPosCode: originData.value.position
+				})
+				if (res && res.data) {
+					originData.value.position = res.data.cPosCode
+					originData.value.cwhCode = res.data.cWhCode
+				} else {
+					nextTick(() => {
+						originData.value.position = ""
+						originData.value.cwhCode = ""
 					})
-					if (res && res.data) {
-						originData.value.position = res.data.cPosCode
-						originData.value.cwhCode = res.data.cWhCode
-					} else {
-						nextTick(() => {
-							originData.value.position = ""
-							originData.value.cwhCode = ""
-						})
-						uni.showToast({
-							title: "未查询到货位",
-							icon: "none"
-						})
-					}
-				} catch (err) {
-					console.log(err)
-				} finally {
-					timer = 0
+					uni.showToast({
+						title: "未查询到货位",
+						icon: "none"
+					})
 				}
-			}, 500)
+			} catch (err) {
+				console.log(err)
+			}
 		}
-	}, 3000)
+	})
 	// 编辑行
 	const edit = () => {
 		const value = Number(count.value)
@@ -275,7 +271,7 @@
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
 						uni.showToast({
 							icon: "none",
-							title: `第${Number(key)+1}行货位设置不正确`
+							title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
 						})
 						return
 					}
@@ -437,13 +433,13 @@
 
 								<up-form-item class="common-form-item" label="已入库数量:" borderBottom labelWidth="100" style="padding: 0">
 									<up-input border="none" placeholder="" clearable class="input-item"
-										v-model="originData.inStockQuantity" readonly type="number">
+										:modelValue="originData.inStockQuantity || originData.rdQuantity" readonly type="number">
 									</up-input>
 								</up-form-item>
 
 								<up-form-item class="common-form-item" label="未入库数量:" borderBottom labelWidth="100" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item"
-										:modelValue="originData.poQuantity - originData.inStockQuantity" readonly type="number">
+									<up-input border="none" placeholder="" clearable class="input-item" :modelValue="originData.quantity"
+										readonly type="number">
 									</up-input>
 								</up-form-item>
 

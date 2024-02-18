@@ -98,7 +98,8 @@
 			try {
 				searching.value = true
 				const result = await getPurchaseArrivalList({
-					code
+					code,
+					type: "arr"
 				})
 				if (result.data.list.length > 0) {
 					tableData.value = result.data.list
@@ -346,11 +347,11 @@
 										:modelValue="originData.poQuantity - originData.inStockQuantity" readonly type="number">
 									</up-input>
 								</up-form-item>
-								<up-form-item class="common-form-item" label="应到数量:" borderBottom labelWidth="80" style="padding: 0">
+								<!-- 								<up-form-item class="common-form-item" label="应到数量:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.quantity"
 										readonly type="number">
 									</up-input>
-								</up-form-item>
+								</up-form-item> -->
 								<up-form-item class="common-form-item" label="本次到货数量:" borderBottom labelWidth="80" style="padding: 0">
 									<up-input placeholder="" clearable class="input-item" v-model="count" type="number">
 									</up-input>
