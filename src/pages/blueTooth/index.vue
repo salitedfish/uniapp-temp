@@ -36,15 +36,16 @@
 
 	// 搜索按钮点击
 	const searchClick = () => {
-		if (blueToothStore.hasBlueTooth) {
-			deviceId = ""
-			blueTooth.discoveryPrinter()
-		} else {
+		if (!blueToothStore.hasBlueTooth) {
 			uni.showToast({
 				icon: "none",
 				title: "不支持蓝牙搜索"
 			})
+		} else {
+			deviceId = ""
+			blueTooth.discoveryPrinter()
 		}
+
 	}
 
 	// 保存之前连接的设备信息

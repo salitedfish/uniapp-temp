@@ -7,12 +7,14 @@ export class BlueTooth {
 	public openBluetoothAdapter() {
 		uni.openBluetoothAdapter({
 			complete: (e) => {
-				if (!e.errCode) {
+				if (!e.code) {
 					console.log("蓝牙初始化完成")
-				} else if (e.errCode == 10001) {
+					blueToothStore.openBlueTooth = true
+				} else if (e.code == 10001) {
 					uni.showToast({
 						icon: "none",
 						title: "请打开手机蓝牙",
+						duration: 3000
 					})
 				} else {
 					uni.showToast({
@@ -34,6 +36,10 @@ export class BlueTooth {
 			this.stopDiscoveryPrinter()
 		}
 		if (!blueToothStore.hasBlueTooth) return
+		if (!blueToothStore.openBlueTooth) {
+			this.openBluetoothAdapter()
+			return
+		}
 		blueToothStore.deviceId = ""
 		blueToothStore.devices = []
 		blueToothStore.searching = true
@@ -229,23 +235,42 @@ export class BlueTooth {
 		if (uni.openBluetoothAdapter) {
 			blueToothStore.hasBlueTooth = true
 			// 开启蓝牙
-			this.openBluetoothAdapter()
-			setTimeout(() => {
-				// 开始查找蓝牙设备
-				this.discoveryPrinter()
-				// 每秒查看搜寻到的设备，看是否和保存的设备id匹配
-				let interval = 0
-				interval = setInterval(() => {
-					for (const item of blueToothStore.devices) {
-						if (item.deviceId === deviceId) {
-							clearInterval(interval)
-							blueToothStore.deviceId = deviceId
-							this.connect()
-							this.stopDiscoveryPrinter()
-						}
+			uni.openBluetoothAdapter({
+				complete: (e) => {
+					if (!e.code) {
+						console.log("蓝牙初始化完成")
+						setTimeout(() => {
+							// 开始查找蓝牙设备
+							this.discoveryPrinter()
+							// 每秒查看搜寻到的设备，看是否和保存的设备id匹配
+							let interval = 0
+							interval = setInterval(() => {
+								for (const item of blueToothStore.devices) {
+									if (item.deviceId === deviceId) {
+										clearInterval(interval)
+										blueToothStore.deviceId = deviceId
+										this.connect()
+										setTimeout(() => {
+											this.stopDiscoveryPrinter()
+										}, 1000)
+									}
+								}
+							}, 1000)
+						}, 2000)
+					} else if (e.code == 10001) {
+						uni.showToast({
+							icon: "none",
+							title: "请打开手机蓝牙",
+							duration: 3000
+						})
+					} else {
+						uni.showToast({
+							icon: "none",
+							title: e.errMsg,
+						})
 					}
-				}, 1000)
-			}, 2000)
+				},
+			})
 		} else {
 			blueToothStore.hasBlueTooth = false
 			uni.showToast({

@@ -145,6 +145,11 @@ export const deleteTable = (key : number) => {
 		}
 	})
 }
+// 保存打印内容
+// const savePrintInfo = () => {
+// 	console.log(tableData.value);
+// 	console.log(processSendDocSelected.value);
+// }
 // 确认出库
 export const submiting = ref(false)
 export const confirm = async () => {
@@ -164,7 +169,8 @@ export const confirm = async () => {
 			mask: true
 		})
 
-		const params = {
+		// 构建出库信息
+		const params : Obj = {
 			body: tableData.value.map(item => {
 				return {
 					...item,
@@ -176,14 +182,25 @@ export const confirm = async () => {
 				crdcode: config.value.outStockroomTypeSelected[0].code,
 				cwhcode: config.value.stockroomSelected[0].code,
 				ddate: dateSelected.value[0]
-			}
+			},
+			printList: []
 		}
+		// 如果是参照订单工序派工资料，则需要保存打印信息
+		if (typeSelect.value === 0) {
+			params.printList = tableData.value
+		}
+		// 新增出库单
 		await addRdRecord11(params)
 		uni.showToast({
 			icon: "none",
 			title: "出库成功"
 		})
 
+		// // 如果是参照订单工序派工资料，无论选择了打印还是不打印都要保存打印信息
+		// if (typeSelect.value === 0) {
+		// 	savePrintInfo()
+		// }
+		// 如果需要打印
 		if (printTypeCheck.value === 0 && typeSelect.value === 0) {
 			showPrintContent.value = true
 		} else {

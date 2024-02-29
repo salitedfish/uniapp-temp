@@ -322,7 +322,8 @@
 						invCode: item.invCode,
 						quantity: item.count,
 						posCode: item.position,
-						batch: item.batch
+						batch: item.batch,
+						cbMemo: item.remark
 					}
 				}),
 				head: {

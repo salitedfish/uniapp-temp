@@ -58,13 +58,21 @@
 	let config = ref < Obj > ({})
 	onShow(() => {
 		const configStr = uni.getStorageSync("prSDefaultSet")
-		config.value = configStr ? JSON.parse(configStr) : {}
+		config.value = configStr ? JSON.parse(configStr) : {};
+		// 每次页面显示时判断如果是成品库，并且没有选择货位，则默认选择一个货位
+		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11" && !form.value.position) {
+			shelfScanSuccess("11000001")
+		}
+		// 如果没开启货位管理，则清除货位信息
+		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos !== "1") {
+			form.value.position = ""
+			form.value.cwhCode = ""
+			form.value.shelfName = ""
+		}
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
-		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11") {
-			shelfScanSuccess("11000001")
-		}
+
 	})
 	// 判断仓库是否开启货位管理，开启了才能选择货位
 	const shelfSelectEnable = computed(() => {
@@ -85,6 +93,15 @@
 			batch: "",
 			date: nowFormat
 		}
+	}
+	const resetForm = () => {
+		form.value.invCode = ""
+		form.value.invName = ""
+		form.value.quantity = ""
+		form.value.count = ""
+		form.value.remark = ""
+		form.value.bInvBatch = ""
+		form.value.batch = ""
 	}
 	// 表单
 	const form = ref(initForm())
@@ -114,7 +131,7 @@
 						title: "未查询到产品",
 						icon: "none"
 					})
-					form.value = initForm()
+					resetForm()
 				}
 			} catch (err) {
 				console.log(err)
@@ -147,7 +164,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 3000)
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -158,7 +175,7 @@
 	// 表单数据加入表格
 	const add = () => {
 		tableData.value.push(form.value)
-		form.value = initForm()
+		resetForm()
 	}
 	// 加入按钮是否可用
 	const addDisabled = computed(() => {

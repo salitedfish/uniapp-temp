@@ -78,7 +78,7 @@
 		<view>
 			<ReferTypeCheck class="tab-box" v-model="typeSelect"></ReferTypeCheck>
 		</view>
-		<up-form class="common-form" labelPosition="left">
+		<up-form class="common-form" labelPosition="left" v-if="typeSelect !== 2">
 			<up-form-item class="common-form-item" label="领料申请单:" borderBottom labelWidth="90" style="padding: 0"
 				v-if="typeSelect === 1">
 				<UpInputMaterielApplyDocPicker @select="materielApplyDocSelect" border="none" placeholder="选择领料申请单" readonly

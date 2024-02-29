@@ -6,6 +6,7 @@ export const blueTooth = new BlueTooth()
 
 export const blueToothStore = reactive({
 	hasBlueTooth: false,
+	openBlueTooth: false,
 
 	startFound: false,
 

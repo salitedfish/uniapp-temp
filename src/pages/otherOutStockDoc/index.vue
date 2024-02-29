@@ -14,6 +14,7 @@
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
+	import MediaUpload from "@/components/MediaUpload.vue"
 	// 工具
 	import {
 		useCheckEmptyInObj,
@@ -37,6 +38,9 @@
 		batchFormat
 	} from "@/store/common"
 	// 类型
+	import type {
+		UploadMedia
+	} from "@/type/file"
 	import {
 		PickerTypeId
 	} from "@/type/business"
@@ -273,6 +277,9 @@
 		originData.value.count = editData.value.quantity
 		showPopup.value = false
 	}
+	// -------------------------------------------------------------------------------------附件信息
+	// 文件列表
+	const medias = ref < UploadMedia[] > ([])
 
 	// -------------------------------------------------------------------------------------提交操作
 	const submiting = ref(false)
@@ -322,7 +329,8 @@
 						invCode: item.invCode,
 						quantity: item.count,
 						posCode: item.position,
-						batch: item.batch
+						batch: item.batch,
+						cbMemo: item.remark
 					}
 				}),
 				head: {
@@ -332,12 +340,19 @@
 					cwhcode: config.value.stockroomSelected[0].code,
 					ddate: tableData.value[0].date,
 					depcode: config.value.depSelected.length > 0 ? config.value.depSelected[0].code : "",
-				}
+				},
+				attachmentList: medias.value.filter(item => item.status === "success").map(item => {
+					return {
+						attachmentName: item.name,
+						attachmentUrl: item.url,
+					}
+				})
 
 			}
 			await addRdRecord09(params)
 
 			tableData.value = []
+			medias.value = []
 			uni.showToast({
 				title: "出库成功",
 				icon: "none"
@@ -358,152 +373,158 @@
 		<CustomNavBar :title="routes.otherOutStockDoc.style.navigationBarTitleText" @rightClick="rightClick">
 		</CustomNavBar>
 
-		<view>
-			<view class="common-section-title">
-				基本信息
-			</view>
-			<up-form class="common-form" labelPosition="left" required>
-				<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
-					<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
-						v-model="form.invCode" focus></up-input-scan>
-				</up-form-item>
+		<view class="common-section-title">
+			基本信息
+		</view>
+		<up-form class="common-form" labelPosition="left" required>
+			<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
+					v-model="form.invCode" focus></up-input-scan>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">
-					<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.invName">
-					</up-input>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.invName">
+				</up-input>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0"
-					v-if="form.bInvBatch === '1'">
-					<up-input placeholder="" clearable class="input-item" v-model="form.batch">
-					</up-input>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0"
+				v-if="form.bInvBatch === '1'">
+				<up-input placeholder="" clearable class="input-item" v-model="form.batch">
+				</up-input>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="出库数量:" borderBottom labelWidth="80" style="padding: 0" required>
-					<up-input placeholder="自动填充" clearable class="input-item" type="number" v-model="form.count">
-					</up-input>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="出库数量:" borderBottom labelWidth="80" style="padding: 0" required>
+				<up-input placeholder="自动填充" clearable class="input-item" type="number" v-model="form.count">
+				</up-input>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
-					<up-input placeholder="请输入备注" clearable class="input-item" v-model="form.remark">
-					</up-input>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input placeholder="请输入备注" clearable class="input-item" v-model="form.remark">
+				</up-input>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="80" style="padding: 0" required
-					v-if="shelfSelectEnable">
-					<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="shelfScanSuccess"
-						v-model="form.position"></up-input-scan>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="80" style="padding: 0" required
+				v-if="shelfSelectEnable">
+				<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="shelfScanSuccess"
+					v-model="form.position"></up-input-scan>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="80" style="padding: 0"
-					v-if="shelfSelectEnable">
-					<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.shelfName">
-					</up-input>
-				</up-form-item>
+			<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="80" style="padding: 0"
+				v-if="shelfSelectEnable">
+				<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.shelfName">
+				</up-input>
+			</up-form-item>
 
-				<up-form-item class="common-form-item" label="出库日期:" borderBottom labelWidth="80" style="padding: 0">
-					<UpInputDatePicker border="none" placeholder="选择出库日期" clearable class="input-item" readonly
-						v-model:selected="dateSelected" @select="dateSelect" :maxDate="Date.now()">
-					</UpInputDatePicker>
-				</up-form-item>
-			</up-form>
-			<view class="btn-box">
-				<up-button type="primary" text="加入" class="bottom-button" shape="circle" @click="add"
-					:disabled="addDisabled"></up-button>
-			</view>
-			<view class="common-section-title">
-				本次出库明细
-			</view>
+			<up-form-item class="common-form-item" label="出库日期:" borderBottom labelWidth="80" style="padding: 0">
+				<UpInputDatePicker border="none" placeholder="选择出库日期" clearable class="input-item" readonly
+					v-model:selected="dateSelected" @select="dateSelect" :maxDate="Date.now()">
+				</UpInputDatePicker>
+			</up-form-item>
+		</up-form>
+		<view class="btn-box">
+			<up-button type="primary" text="加入" class="bottom-button" shape="circle" @click="add"
+				:disabled="addDisabled"></up-button>
 		</view>
 
-		<view class="table-box common-page-largest">
-			<view class="common-table">
-				<uni-table border stripe emptyText="暂无更多数据">
-					<!-- 表头行 -->
-					<uni-tr>
-						<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
-						<uni-th class="nowrap" align="left" width="100rpx">物料编码</uni-th>
-						<uni-th class="nowrap" align="left" width="100rpx">物料名称</uni-th>
-						<uni-th class="nowrap" align="left" width="100rpx">出库数量</uni-th>
-						<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
-						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
-					</uni-tr>
-					<!-- 表格数据行 -->
-					<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key+1)">
-						<uni-td class="nowrap">{{ key + 1 }}</uni-td>
-						<uni-td class="nowrap">{{ item.invCode }}</uni-td>
-						<uni-td class="nowrap">{{ item.invName }}</uni-td>
-						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
-						<uni-td class="nowrap primary">{{ item.position }}</uni-td>
-						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
-					</uni-tr>
-				</uni-table>
+		<view class="common-section-title">
+			本次出库明细
+		</view>
+		<view class="common-table">
+			<uni-table border stripe emptyText="暂无更多数据">
+				<!-- 表头行 -->
+				<uni-tr>
+					<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">物料编码</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">物料名称</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">出库数量</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
+				</uni-tr>
+				<!-- 表格数据行 -->
+				<uni-tr v-for="item,key in tableData" :key="key" @click="open(item, key+1)">
+					<uni-td class="nowrap">{{ key + 1 }}</uni-td>
+					<uni-td class="nowrap">{{ item.invCode }}</uni-td>
+					<uni-td class="nowrap">{{ item.invName }}</uni-td>
+					<uni-td class="nowrap primary">{{ item.count }}</uni-td>
+					<uni-td class="nowrap primary">{{ item.position }}</uni-td>
+					<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
+				</uni-tr>
+			</uni-table>
 
-				<u-popup :show="showPopup" mode="right" @close="showPopup = false" safeAreaInsetTop>
-					<view class="popup-content common-page-container" style="width: 85vw">
-						<view class="common-section-title">
-							出库详情信息
-						</view>
-						<view class="popup-form common-page-largest">
-							<up-form class="common-form" labelPosition="left">
-								<up-form-item class="common-form-item" label="行号:" borderBottom labelWidth="100" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="editData.index" readonly>
-									</up-input>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="100" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invCode"
-										readonly>
-									</up-input>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="100" style="padding: 0">
-									<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invName"
-										readonly>
-									</up-input>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="出库数量:" borderBottom labelWidth="100" style="padding: 0">
-									<up-input placeholder="" clearable class="input-item" v-model="editData.quantity" type="number">
-									</up-input>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="100" style="padding: 0"
-									v-if="shelfSelectEnable">
-									<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="itemScanSuccess"
-										v-model="originData.position" focus></up-input-scan>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="100" style="padding: 0"
-									v-if="shelfSelectEnable">
-									<up-input border="none" placeholder="自动带出" clearable class="input-item" v-model="originData.shelfName"
-										readonly></up-input>
-								</up-form-item>
-
-								<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="100" style="padding: 0"
-									v-if="originData.bInvBatch === '1'">
-									<up-input placeholder="" clearable class="input-item" v-model="editData.batch">
-									</up-input>
-								</up-form-item>
-							</up-form>
-						</view>
-						<view class="btn-box">
-							<up-button type="info" text="退出" class="bottom-button" @click="showPopup = false"
-								shape="circle"></up-button>
-							<up-button type="primary" text="确定" class="bottom-button" @click="edit" shape="circle"></up-button>
-						</view>
+			<u-popup :show="showPopup" mode="right" @close="showPopup = false" safeAreaInsetTop>
+				<view class="popup-content common-page-container" style="width: 85vw">
+					<view class="common-section-title">
+						出库详情信息
 					</view>
-				</u-popup>
-			</view>
+					<view class="popup-form common-page-largest">
+						<up-form class="common-form" labelPosition="left">
+							<up-form-item class="common-form-item" label="行号:" borderBottom labelWidth="100" style="padding: 0">
+								<up-input border="none" placeholder="" clearable class="input-item" v-model="editData.index" readonly>
+								</up-input>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="100" style="padding: 0">
+								<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invCode"
+									readonly>
+								</up-input>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="100" style="padding: 0">
+								<up-input border="none" placeholder="" clearable class="input-item" v-model="originData.invName"
+									readonly>
+								</up-input>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="出库数量:" borderBottom labelWidth="100" style="padding: 0">
+								<up-input placeholder="" clearable class="input-item" v-model="editData.quantity" type="number">
+								</up-input>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="100" style="padding: 0"
+								v-if="shelfSelectEnable">
+								<up-input-scan placeholder="请扫货位码" clearable class="input-item" @scanSuccess="itemScanSuccess"
+									v-model="originData.position" focus></up-input-scan>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="100" style="padding: 0"
+								v-if="shelfSelectEnable">
+								<up-input border="none" placeholder="自动带出" clearable class="input-item" v-model="originData.shelfName"
+									readonly></up-input>
+							</up-form-item>
+
+							<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="100" style="padding: 0"
+								v-if="originData.bInvBatch === '1'">
+								<up-input placeholder="" clearable class="input-item" v-model="editData.batch">
+								</up-input>
+							</up-form-item>
+						</up-form>
+					</view>
+					<view class="btn-box">
+						<up-button type="info" text="退出" class="bottom-button" @click="showPopup = false"
+							shape="circle"></up-button>
+						<up-button type="primary" text="确定" class="bottom-button" @click="edit" shape="circle"></up-button>
+					</view>
+				</view>
+			</u-popup>
 		</view>
+
+		<view class="common-section-title">
+			附件上传
+		</view>
+		<up-form class="common-form" labelPosition="left" required>
+			<up-form-item class="common-form-item" label="附件信息:" borderBottom labelWidth="100" style="padding: 0">
+				<media-upload v-model="medias" accept="image" :maxCount="8">
+				</media-upload>
+			</up-form-item>
+		</up-form>
 
 		<view class="btn-box">
 			<up-button type="primary" text="提交出库" class="bottom-button" shape="circle" @click="submit"
-				:disabled="submitDisabled" :loading="submiting"></up-button>
+				:disabled="submitDisabled" :loading="submiting">
+			</up-button>
 		</view>
 
 	</view>
-
 </template>
 
 <style scoped lang='less'>

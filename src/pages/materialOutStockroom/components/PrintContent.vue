@@ -36,7 +36,6 @@
 	}
 
 	const print = () => {
-		console.log('打印数据', props.printContent)
 		// 获取打印机并设置相关参数
 		const printer = new Printer()
 		printer.setPrinterParams(blueToothStore)
@@ -52,13 +51,13 @@
 			tsplTemplate = tsplTemplate + `TEXT ${10},${250},"TSS24.BF2",0,1,1,"${'出库物料编码:' + item.cinvcode}"\n `
 			tsplTemplate = tsplTemplate + `TEXT ${10},${290},"TSS24.BF2",0,1,1,"${'出库物料名称:' + item.cinvname}"\n `
 			tsplTemplate = tsplTemplate + `TEXT ${10},${330},"TSS24.BF2",0,1,1,"${'出库物料数量:' + item.count}"\n `
-			tsplTemplate = tsplTemplate + `TEXT ${10},${370},"TSS24.BF2",0,1,1,"${'配送工位:' + item.copdesc}"\n `
+			tsplTemplate = tsplTemplate + `TEXT ${10},${370},"TSS24.BF2",0,1,1,"${'出库物料货位:' + item.cposname}"\n `
+			tsplTemplate = tsplTemplate + `TEXT ${10},${410},"TSS24.BF2",0,1,1,"${'配送工位:' + item.copdesc}"\n `
 			tsplTemplate = tsplTemplate + `PRINT 1\n `
 		}
 		console.log("打印指令", tsplTemplate)
 		// 开始打印
 		printer.print([tsplTemplate])
-		// emit("closePrintContent")
 
 	}
 </script>
@@ -81,6 +80,7 @@
 						<view class="text">出库物料编码：{{item.cinvcode}}</view>
 						<view class="text">出库物料名称：{{item.cinvname}}</view>
 						<view class="text">出库物料数量：{{item.count}}</view>
+						<view class="text">出库物料货位：{{item.cposname}}</view>
 						<view class="text">配送工位：{{item.copdesc}}</view>
 					</view>
 				</view>

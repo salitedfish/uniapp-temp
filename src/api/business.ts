@@ -183,6 +183,16 @@ export const addRdRecord11 = async (data : Obj) => {
 	})
 }
 
+// 获取重打印列表
+export const getRePrintList = async (data : Obj) => {
+	return await uRequest.post<Return<ReturnList<Obj>>>({
+		url: "/erp/listRdRecord11RePrint",
+		data,
+		header: {
+			"Content-Type": "application/json",
+		}
+	})
+}
 // //----------------------------------------------------------------------------------------
 
 
