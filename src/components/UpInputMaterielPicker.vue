@@ -21,6 +21,7 @@
 			selected ?: Business[],
 			scanSearchParams ?: Obj
 			// modelValue : string,
+			manInput ?: boolean
 		}>()
 	const emit = defineEmits<{
 		(event : "select", result : Business[]) : void;
@@ -68,22 +69,33 @@
 			autoSearch(res.code)
 		}
 	}
-	// 输入框改变
+	// 输入框改变,如果是扫描抢则用这个，每次数据改变时就执行
 	let lock = false
-	const inputConfirm = useDebounce((code : string) => {
-		// 加个锁是因为如果通过扫码选择完后会触发值改变，值改变又会触发change，为防止多次触发，每次通过扫码选择后先关锁，一断时间后再打开
-		if (code && props.scan && !lock) {
-			const res = splitCodes(code)
-			autoSearch(res.code)
+	const inputChange = useDebounce((code : string) => {
+		if (!props.manInput) {
+			// 加个锁是因为如果通过扫码选择完后会触发值改变，值改变又会触发change，为防止多次触发，每次通过扫码选择后先关锁，一断时间后再打开
+			if (code && props.scan && !lock) {
+				const res = splitCodes(code)
+				autoSearch(res.code)
+			}
 		}
 	})
+	// 如果是人手动输入则用这个，每次输入完，人员得按页面其他地方，输入框失去焦点才执行
+	const inputConfirm = (code : string) => {
+		if (props.manInput) {
+			if (code && props.scan && !lock) {
+				const res = splitCodes(code)
+				autoSearch(res.code)
+			}
+		}
+	}
 	// 顶层输入框有可能输入物料编码，也有可能输入货位编码，自动打开弹窗并搜索，要根据searchKey来选择
 	const autoSearch = (keywords : string) => {
 		if (props.scanSearchParams) {
 			searchParam.value = { ...searchParam.value, ...props.scanSearchParams, [props.scanSearchParams.searchKey]: keywords }
 		}
 		open()
-		searchList()
+		// searchList()
 	}
 	// 弹窗内输入框，确认搜索
 	const search = () => {
@@ -123,7 +135,7 @@
 </script>
 
 <template>
-	<up-input @change="inputConfirm" v-model="inputText">
+	<up-input @change="inputChange" @blur="inputConfirm" v-model="inputText">
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess" v-if="props.scan"></ScanCode>
 			<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary" @click="open"

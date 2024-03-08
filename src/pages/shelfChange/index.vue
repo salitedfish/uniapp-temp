@@ -49,6 +49,8 @@
 	// -------------------------------------------------------------------------------------初始化
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
+		manInput.value = uni.getStorageSync("mainInput") || false
+
 	})
 	let config = ref < Obj > ({})
 	onShow(() => {
@@ -57,7 +59,12 @@
 		if (config.value.stockroomSelected && config.value.stockroomSelected[0]) {
 			scanSearchParams.value.whCode = config.value.stockroomSelected[0].code
 		}
+
 	})
+	const manInputChange = (value: boolean) => {
+		uni.setStorageSync("mainInput", value)
+	}
+	const manInput = ref(false)
 	// -------------------------------------------------------------------------------------表单
 	// 表单
 	const initForm = (): Obj => {
@@ -339,6 +346,8 @@
 		<CustomNavBar :title="routes.shelfChange.style.navigationBarTitleText" @rightClick="rightClick"></CustomNavBar>
 
 		<view>
+
+
 			<view class="common-section-title">
 				基本信息
 			</view>
@@ -346,10 +355,17 @@
 			<ScanTypeSelect v-model="typeSelect" class="tab-box"></ScanTypeSelect>
 
 			<up-form class="common-form" labelPosition="left">
+				<up-form-item class="common-form-item" label="手动输码:" borderBottom labelWidth="100" style="padding: 0">
+					<u-switch v-model="manInput" @change="manInputChange" size="20"></u-switch>
+				</up-form-item>
+			</up-form>
+
+			<up-form class="common-form" labelPosition="left">
+
 				<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="100" style="padding: 0">
 					<UpInputMaterielPicker @select="materialSelect" placeholder="扫码/手输物料编码" clearable class="input-item"
 						v-model:selected="materialSelected" v-model="form.invCode" scan :scanSearchParams="scanSearchParams"
-						v-if="typeSelect === 0" focus>
+						v-if="typeSelect === 0" focus :manInput="manInput">
 					</UpInputMaterielPicker>
 					<up-input border="none" placeholder="自动填充" clearable class="input-item" v-model="form.invCode" readonly
 						v-if="typeSelect === 1">
@@ -375,7 +391,7 @@
 				<up-form-item class="common-form-item" label="原货位编码:" borderBottom labelWidth="100" style="padding: 0">
 					<UpInputMaterielPicker @select="materialSelect" placeholder="扫码/手输货位码" clearable class="input-item"
 						v-model:selected="materialSelected" v-model="form.oriPosition" scan :scanSearchParams="scanSearchParams"
-						v-if="typeSelect === 1" focus>
+						v-if="typeSelect === 1" focus :manInput="manInput">
 					</UpInputMaterielPicker>
 
 					<up-input border="none" placeholder="自动填充" clearable class="input-item" v-model="form.oriPosition" readonly

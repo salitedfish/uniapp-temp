@@ -85,7 +85,7 @@
 					clearable class="input-item" v-model:selected="materielApplyDocSelected">
 				</UpInputMaterielApplyDocPicker>
 			</up-form-item>
-			<up-form-item class="common-form-item" label="派工资料:" borderBottom labelWidth="90" style="padding: 0"
+			<up-form-item class="common-form-item" label="生产订单派工资料:" borderBottom labelWidth="130" style="padding: 0"
 				v-if="typeSelect === 0">
 				<UnInputProcessSendDocPicker @select="processSendDocSelect" border="none" placeholder="选择生产订单工序派工资料" readonly
 					clearable class="input-item" v-model:selected="processSendDocSelected">
@@ -110,6 +110,7 @@
 						<uni-th class="nowrap" align="left" width="100rpx">物料编码</uni-th>
 						<uni-th class="nowrap" align="left" width="100rpx">物料名称</uni-th>
 						<uni-th class="nowrap" align="left" width="100rpx">数量信息</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">批次号</uni-th>
 						<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
 						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 					</uni-tr>
@@ -119,7 +120,8 @@
 						<uni-td class="nowrap">{{ item.cinvcode }}</uni-td>
 						<uni-td class="nowrap">{{ item.cinvname }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
-						<uni-td class="nowrap primary">{{ item.cposname }}</uni-td>
+						<uni-td class="nowrap">{{ item.cbatch}}</uni-td>
+						<uni-td class="nowrap">{{ item.cposname }}</uni-td>
 						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>

@@ -95,6 +95,9 @@
 		}
 	}
 	const resetForm = () => {
+		form.value = {
+			...form.value
+		}
 		form.value.invCode = ""
 		form.value.invName = ""
 		form.value.quantity = ""
