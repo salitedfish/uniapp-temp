@@ -140,10 +140,14 @@
 			printer.print([tsplTemplate])
 			// emit("closePrintContent")
 		} else {
-			uni.showToast({
-				icon: "none",
-				title: "请选择要打印的标签"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "请选择要打印的标签"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "请选择要打印的标签",
+			});
 		}
 
 

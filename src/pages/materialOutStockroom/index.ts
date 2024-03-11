@@ -54,10 +54,14 @@ const getOutSrList = async (api : PageListApi, param : Obj) => {
 		const configStr = uni.getStorageSync("mOSDefaultSet")
 		const config = configStr ? JSON.parse(configStr) : {}
 		if (!config.stockroomSelected || !config.stockroomSelected[0]) {
-			uni.showToast({
-				icon: "none",
-				title: "请先选择仓库"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "请先选择仓库"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "请先选择仓库",
+			});
 			return
 		}
 		const params = { ...param, warehouseCode: config.stockroomSelected[0].code }
@@ -114,17 +118,25 @@ export const edit = () => {
 	const max = Number(originData.value.iquantity)
 	const min = 0
 	if (value > max) {
-		uni.showToast({
-			icon: "none",
-			title: "出库数量不能大于应出库数量"
-		})
+		// uni.showToast({
+		// 	icon: "none",
+		// 	title: "出库数量不能大于应出库数量"
+		// })
+		uni.showModal({
+			title: '提示',
+			content: "出库数量不能大于应出库数量",
+		});
 		return
 	}
 	if (value <= min) {
-		uni.showToast({
-			icon: "none",
-			title: "出库数量不能小于0"
-		})
+		// uni.showToast({
+		// 	icon: "none",
+		// 	title: "出库数量不能小于0"
+		// })
+		uni.showModal({
+			title: '提示',
+			content: "出库数量不能小于0",
+		});
 		return
 	}
 	originData.value.count = value
@@ -157,10 +169,14 @@ export const confirm = async () => {
 		// 默认值检查
 		if (useCheckEmptyInObj([config.value.depSelected, config.value.stockroomSelected, config.value.outStockroomTypeSelected],
 			[])) {
-			uni.showToast({
-				title: "请填写完默认参数",
-				icon: "none"
-			})
+			// uni.showToast({
+			// 	title: "请填写完默认参数",
+			// 	icon: "none"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "请填写完默认参数",
+			});
 			return
 		}
 		submiting.value = true

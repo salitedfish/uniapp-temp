@@ -127,10 +127,14 @@
 	const scanSuccess = useThrottle(async (code: string) => {
 		if (code) {
 			if (!config.value.inStockroomSelected) {
-				uni.showToast({
-					title: "请先选择转入仓库",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请先选择转入仓库",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请先选择转入仓库",
+				});
 				return
 			}
 			try {
@@ -140,10 +144,14 @@
 				if (res && res.data) {
 					if (res.data.cWhCode !== config.value.inStockroomSelected[0].code) {
 						resetFormShelf()
-						uni.showToast({
-							title: "所选转入仓库不存在此货位",
-							icon: "none"
-						})
+						// uni.showToast({
+						// 	title: "所选转入仓库不存在此货位",
+						// 	icon: "none"
+						// })
+						uni.showModal({
+							title: '提示',
+							content: "所选转入仓库不存在此货位",
+						});
 					} else {
 						form.value.position = res.data.cPosCode
 						form.value.cwhCode = res.data.cWhCode
@@ -151,10 +159,14 @@
 					}
 				} else {
 					resetFormShelf()
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位",
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -221,10 +233,14 @@
 				if (res && res.data) {
 					if (res.data.cWhCode !== config.value.inStockroomSelected[0].code) {
 						resetOriginDataShelf()
-						uni.showToast({
-							title: "所选转入仓库不存在此货位",
-							icon: "none"
-						})
+						// uni.showToast({
+						// 	title: "所选转入仓库不存在此货位",
+						// 	icon: "none"
+						// })
+						uni.showModal({
+							title: '提示',
+							content: "所选转入仓库不存在此货位",
+						});
 					} else {
 						originData.value.position = res.data.cPosCode
 						originData.value.cwhCode = res.data.cWhCode
@@ -232,10 +248,14 @@
 					}
 				} else {
 					resetOriginDataShelf()
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位",
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -247,17 +267,25 @@
 		const max = Number(originData.value.quantity)
 		const min = 0
 		if (value > max) {
-			uni.showToast({
-				icon: "none",
-				title: "调拨数量不能大于库存数量"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "调拨数量不能大于库存数量"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "调拨数量不能大于库存数量",
+			});
 			return
 		}
 		if (value <= min) {
-			uni.showToast({
-				icon: "none",
-				title: "调拨数量不能小于0"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "调拨数量不能小于0"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "调拨数量不能小于0",
+			});
 			return
 		}
 		originData.value.count = editData.value.count
@@ -269,27 +297,39 @@
 		try {
 			// 默认值检查
 			if (useCheckEmptyInObj([config.value.outStockroomSelected, config.value.inStockroomSelected], [])) {
-				uni.showToast({
-					title: "请填写完默认参数",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请填写完默认参数",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请填写完默认参数",
+				});
 				return
 			}
 			// 库位填写检查
 			for (const key in tableData.value) {
 				const item = tableData.value[key]
 				if (!item.position) {
-					uni.showToast({
-						icon: "none",
-						title: `第${Number(key)+1}行货位未填写`
-					})
+					// uni.showToast({
+					// 	icon: "none",
+					// 	title: `第${Number(key)+1}行货位未填写`
+					// })
+					uni.showModal({
+						title: '提示',
+						content: `第${Number(key)+1}行货位未填写`,
+					});
 					return
 				}
 				if (item.cwhCode !== config.value.inStockroomSelected[0].code) {
-					uni.showToast({
-						icon: "none",
-						title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
-					})
+					// uni.showToast({
+					// 	icon: "none",
+					// 	title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
+					// })
+					uni.showModal({
+						title: '提示',
+						content: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`,
+					});
 					return
 				}
 			}

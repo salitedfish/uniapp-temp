@@ -12,10 +12,14 @@ export const initInterceptor = () => {
 				let url = e.url.split('?')[0]
 				// 判断要打开的页面是否需要验证登录
 				if (needLoginRoutes.includes(url) && !logged()) {
-					uni.showToast({
-						title: '该页面需要登录才能访问，请先登录',
-						icon: 'none'
-					})
+					// uni.showToast({
+					// 	title: '该页面需要登录才能访问，请先登录',
+					// 	icon: 'none'
+					// })
+					uni.showModal({
+						title: '提示',
+						content: '该页面需要登录才能访问，请先登录',
+					});
 					uni.navigateTo({
 						url: routes.login.path
 					})

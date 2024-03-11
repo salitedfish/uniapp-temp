@@ -130,10 +130,14 @@
 					form.value.count = form.value.quantity
 					form.value.invName = res.data.list[0].name
 				} else {
-					uni.showToast({
-						title: "未查询到产品",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到产品",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到产品"
+					});
 					resetForm()
 				}
 			} catch (err) {
@@ -158,10 +162,14 @@
 						form.value.cwhCode = ""
 						form.value.shelfName = ""
 					})
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位"
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -241,10 +249,14 @@
 						originData.value.cwhCode = ""
 						originData.value.shelfName = ""
 					})
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位"
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -282,10 +294,14 @@
 			// 默认值检查
 			if (useCheckEmptyInObj([config.value.stockroomSelected, config.value.stockroomSaveTypeSelected],
 					[])) {
-				uni.showToast({
-					title: "请填写完默认参数",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请填写完默认参数",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请填写完默认参数"
+				});
 				return
 			}
 			if (shelfSelectEnable.value) {
@@ -293,17 +309,25 @@
 				for (const key in tableData.value) {
 					const item = tableData.value[key]
 					if (!item.position) {
-						uni.showToast({
-							icon: "none",
-							title: `第${Number(key)+1}行货位未填写`
-						})
+						// uni.showToast({
+						// 	icon: "none",
+						// 	title: `第${Number(key)+1}行货位未填写`
+						// })
+						uni.showModal({
+							title: '提示',
+							content: `第${Number(key)+1}行货位未填写`
+						});
 						return
 					}
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
-						uni.showToast({
-							icon: "none",
-							title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
-						})
+						// uni.showToast({
+						// 	icon: "none",
+						// 	title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
+						// })
+						uni.showModal({
+							title: '提示',
+							content: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
+						});
 						return
 					}
 				}

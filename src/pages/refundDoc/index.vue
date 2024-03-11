@@ -102,10 +102,14 @@
 					// 表单数据推入到待提交数据中
 					tableData.value = [form.value]
 				} else {
-					uni.showToast({
-						title: "未查询到物料",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到物料",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到物料",
+					});
 					form.value = {}
 					tableData.value = []
 				}
@@ -164,17 +168,25 @@
 		const max = Number(originData.value.iquantity)
 		const min = 0
 		if (value > max) {
-			uni.showToast({
-				icon: "none",
-				title: "退货数量不能大于可退货数量"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "退货数量不能大于可退货数量"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "退货数量不能大于可退货数量",
+			});
 			return
 		}
 		if (value <= min) {
-			uni.showToast({
-				icon: "none",
-				title: "退货数量不能小于0"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "退货数量不能小于0"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "退货数量不能小于0",
+			});
 			return
 		}
 		originData.value.count = value
@@ -203,25 +215,37 @@
 			if (useCheckEmptyInObj([config.value.busTypeSelected, config.value.saleTypeSelected, config.value
 					.stockroomSelected, config.value.depSelected
 				], [])) {
-				uni.showToast({
-					title: "请填写完默认参数",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请填写完默认参数",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请填写完默认参数",
+				});
 				return
 			}
 			if (useCheckEmptyInObj([customerSelected.value], [])) {
-				uni.showToast({
-					title: "请选择客户",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请选择客户",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请选择客户",
+				});
 				return
 			}
 			for (const item of tableData.value) {
 				if (Number(item.count) <= 0) {
-					uni.showToast({
-						title: "退货数量必须大于0",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "退货数量必须大于0",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "退货数量必须大于0",
+					});
 					return
 				}
 			}

@@ -71,10 +71,14 @@
 			nextTick(() => {
 				editData.value = initEditData()
 			})
-			uni.showToast({
-				icon: "none",
-				title: "该物料不存在于该盘点单"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "该物料不存在于该盘点单"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "该物料不存在于该盘点单"
+			});
 		}
 	}, 1000)
 	const tableTdSelect = (item: Obj) => {
@@ -110,10 +114,14 @@
 	// 提交
 	const submit = () => {
 		if (editData.value.count < 0) {
-			uni.showToast({
-				icon: "none",
-				title: "实盘数量不能小于0"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "实盘数量不能小于0"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "实盘数量不能小于0"
+			});
 			return
 		}
 		const origin = editData.value.invCode + editData.value.batch

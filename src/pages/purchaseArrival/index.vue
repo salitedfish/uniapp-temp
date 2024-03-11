@@ -136,17 +136,25 @@
 		const max = Number(originData.value.quantity)
 		const min = 0
 		if (value > max) {
-			uni.showToast({
-				icon: "none",
-				title: "到货数量不能大于应到数量"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "到货数量不能大于应到数量"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "到货数量不能大于应到数量"
+			});
 			return
 		}
 		if (value <= min) {
-			uni.showToast({
-				icon: "none",
-				title: "到货数量不能小于0"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "到货数量不能小于0"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "到货数量不能小于0"
+			});
 			return
 		}
 		originData.value.count = count.value
@@ -182,17 +190,25 @@
 			const configStr = uni.getStorageSync("pADefaultSet")
 			const config: Obj = configStr ? JSON.parse(configStr) : {}
 			if (useCheckEmptyInObj([config.busTypeSelected, config.purTypeSelected], [])) {
-				uni.showToast({
-					title: "请填写完默认参数",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请填写完默认参数",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请填写完默认参数"
+				});
 				return
 			}
 			if (depSelected.value.length <= 0) {
-				uni.showToast({
-					title: "请选择部门",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请选择部门",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请选择部门"
+				});
 				return
 			}
 			// 开始处理生成到货单

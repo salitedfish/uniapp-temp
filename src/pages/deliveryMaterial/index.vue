@@ -76,10 +76,14 @@
 					code: codeInfo.code
 				})
 				if (!res || res.data.list.length <= 0) {
-					uni.showToast({
-						title: "未查询到物料",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到物料",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到物料"
+					});
 					searchParam.value.cInvCode = ""
 				}
 			} catch (err) {

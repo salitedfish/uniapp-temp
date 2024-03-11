@@ -129,10 +129,14 @@
 		const formatDateStart = format(dateStart.value as number).format
 		const formatDateEnd = format(date.value).format
 		if (useIsEarly(Number(dateEnd.value), Number(dateStart.value))) {
-			uni.showToast({
-				title: "结束日期不能早于开始日期",
-				icon: "none",
-			})
+			// uni.showToast({
+			// 	title: "结束日期不能早于开始日期",
+			// 	icon: "none",
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "结束日期不能早于开始日期"
+			});
 			return
 
 		}

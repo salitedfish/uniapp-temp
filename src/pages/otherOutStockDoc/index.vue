@@ -109,10 +109,14 @@
 					form.value.invName = res.data.list[0].name
 					form.value.bInvBatch = res.data.list[0].bInvBatch
 				} else {
-					uni.showToast({
-						title: "未查询到物料",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到物料",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到物料",
+					});
 					form.value = initForm()
 				}
 			} catch (err) {
@@ -134,10 +138,14 @@
 							form.value.cwhCode = ""
 							form.value.shelfName = ""
 						})
-						uni.showToast({
-							title: "所选转出仓库不存在此货位",
-							icon: "none"
-						})
+						// uni.showToast({
+						// 	title: "所选转出仓库不存在此货位",
+						// 	icon: "none"
+						// })
+						uni.showModal({
+							title: '提示',
+							content: "所选转出仓库不存在此货位",
+						});
 					} else {
 						form.value.position = res.data.cPosCode
 						form.value.cwhCode = res.data.cWhCode
@@ -149,10 +157,14 @@
 						form.value.cwhCode = ""
 						form.value.shelfName = ""
 					})
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位",
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -229,10 +241,14 @@
 							originData.value.cwhCode = ""
 							originData.value.shelfName = ""
 						})
-						uni.showToast({
-							title: "所选转出仓库不存在此货位",
-							icon: "none"
-						})
+						// uni.showToast({
+						// 	title: "所选转出仓库不存在此货位",
+						// 	icon: "none"
+						// })
+						uni.showModal({
+							title: '提示',
+							content: "所选转出仓库不存在此货位",
+						});
 					} else {
 						originData.value.position = res.data.cPosCode
 						originData.value.cwhCode = res.data.cWhCode
@@ -244,10 +260,14 @@
 						originData.value.cwhCode = ""
 						originData.value.shelfName = ""
 					})
-					uni.showToast({
-						title: "未查询到货位",
-						icon: "none"
-					})
+					// uni.showToast({
+					// 	title: "未查询到货位",
+					// 	icon: "none"
+					// })
+					uni.showModal({
+						title: '提示',
+						content: "未查询到货位",
+					});
 				}
 			} catch (err) {
 				console.log(err)
@@ -260,17 +280,25 @@
 		const max = Number(originData.value.quantity)
 		const min = 0
 		if (value > max) {
-			uni.showToast({
-				icon: "none",
-				title: "出库数量不能大于应出库数量"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "出库数量不能大于应出库数量"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "出库数量不能大于应出库数量",
+			});
 			return
 		}
 		if (value <= min) {
-			uni.showToast({
-				icon: "none",
-				title: "出库数量不能小于0"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "出库数量不能小于0"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "出库数量不能小于0",
+			});
 			return
 		}
 		originData.value.batch = editData.value.batch
@@ -288,10 +316,14 @@
 			// 默认值检查
 			if (useCheckEmptyInObj([config.value.stockroomSelected],
 					[])) {
-				uni.showToast({
-					title: "请填写完默认参数",
-					icon: "none"
-				})
+				// uni.showToast({
+				// 	title: "请填写完默认参数",
+				// 	icon: "none"
+				// })
+				uni.showModal({
+					title: '提示',
+					content: "请填写完默认参数",
+				});
 				return
 			}
 			if (shelfSelectEnable.value) {
@@ -299,17 +331,25 @@
 				for (const key in tableData.value) {
 					const item = tableData.value[key]
 					if (!item.position) {
-						uni.showToast({
-							icon: "none",
-							title: `第${Number(key)+1}行货位未填写`
-						})
+						// uni.showToast({
+						// 	icon: "none",
+						// 	title: `第${Number(key)+1}行货位未填写`
+						// })
+						uni.showModal({
+							title: '提示',
+							content: `第${Number(key)+1}行货位未填写`,
+						});
 						return
 					}
 					if (item.cwhCode !== config.value.stockroomSelected[0].code) {
-						uni.showToast({
-							icon: "none",
-							title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
-						})
+						// uni.showToast({
+						// 	icon: "none",
+						// 	title: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`
+						// })
+						uni.showModal({
+							title: '提示',
+							content: `第${Number(key)+1}行，默认仓库没有该货位，请确认后再试`,
+						});
 						return
 					}
 				}

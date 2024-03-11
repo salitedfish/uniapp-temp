@@ -17,15 +17,23 @@
 	const initLogin = useThrottle(() => {
 
 		if (!loginForm.value.jobNo) {
-			uni.showToast({
-				icon: "none",
-				title: "请填写账号"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "请填写账号"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "请填写账号",
+			});
 		} else if (!loginForm.value.password) {
-			uni.showToast({
-				icon: "none",
-				title: "请填写密码"
-			})
+			// uni.showToast({
+			// 	icon: "none",
+			// 	title: "请填写密码"
+			// })
+			uni.showModal({
+				title: '提示',
+				content: "请填写密码",
+			});
 		} else {
 			startLogin()
 		}
