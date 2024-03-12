@@ -225,7 +225,13 @@
 	// 编辑行
 	const edit = () => {
 		const value = Number(count.value)
-		const max = Number(originData.value.quantity)
+		// 计算max值
+		let max = Number(originData.value.quantity)
+		for (const key in tableData.value) {
+			if ((1 + Number(key)) !== index.value && tableData.value[key].invCode === originData.value.invCode) {
+				max = max - tableData.value[key].count
+			}
+		}
 		const min = 0
 		if (value > max) {
 			// uni.showToast({
@@ -252,6 +258,29 @@
 		originData.value.batch = bInvBatch.value
 		originData.value.count = count.value
 		showPopup.value = false
+	}
+	// 复制行
+	const copyTable = (index: number) => {
+		const originRow = tableData.value[index]
+		const newRow = {
+			...originRow
+		}
+		newRow.position = ""
+		// 复制的数据的count值是应入库数量减去其他数据的count值
+		newRow.count = newRow.quantity
+		for (const item of tableData.value) {
+			if (newRow.invCode === item.invCode) {
+				newRow.count = newRow.count - item.count
+			}
+		}
+		if (newRow.count > 0) {
+			tableData.value.splice(index + 1, 0, newRow)
+		} else {
+			uni.showModal({
+				title: '提示',
+				content: "已超过最大可分割数量"
+			});
+		}
 	}
 	// -------------------------------------------------------------------------------------检验提示弹窗
 	const showCenterPopup = ref(false)
@@ -409,7 +438,10 @@
 						<uni-td class="nowrap">{{ item.invName }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.count + item.invUnit }}</uni-td>
 						<uni-td class="nowrap">{{ item.position }}</uni-td>
-						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
+						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">
+							<span style="margin-right: 5px" @click.stop="deleteTable(key)">删除</span>
+							<span @click.stop="copyTable(key)">复制</span>
+						</uni-td>
 					</uni-tr>
 				</uni-table>
 
