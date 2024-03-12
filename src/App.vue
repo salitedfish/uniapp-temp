@@ -119,4 +119,8 @@
 	* {
 		box-sizing: border-box;
 	}
+
+	uni-modal {
+		z-index: 999999 !important;
+	}
 </style>
