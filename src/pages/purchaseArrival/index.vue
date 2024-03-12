@@ -241,14 +241,21 @@
 				icon: "none",
 				mask: true
 			})
-			const ree = await createQmInspectVoucher({
-				arrivalVouchId: res.data
-			})
-			// 如果报检单返回的有数据，则显示报检数据弹窗
-			if (ree && ree.data && ree.data.length > 0) {
-				centerPopupTableData.value = ree.data
-				showCenterPopup.value = true
+			// 如果来料中有需要质检的物料才需要生成质检单
+			for (const item of tableData.value) {
+				if (item.bgsp === "1") {
+					const ree = await createQmInspectVoucher({
+						arrivalVouchId: res.data
+					})
+					// 如果报检单返回的有数据，则显示报检数据弹窗
+					if (ree && ree.data && ree.data.length > 0) {
+						centerPopupTableData.value = ree.data
+						showCenterPopup.value = true
+					}
+					break
+				}
 			}
+
 			reset()
 			uni.showToast({
 				title: "提交成功",
