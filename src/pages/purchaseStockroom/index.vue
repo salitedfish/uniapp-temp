@@ -97,18 +97,25 @@
 						item.batch = item.supplierCode ? `${item.supplierCode}-${batchFormat}` : batchFormat
 					}
 				}
-				/**
-				 * 筛选不需要质检的数据
-				 */
-				tableData.value = result.data.list.filter(item => item.bgsp !== "1")
-				/**
-				 * 筛选需要质检的数据
-				 * 如果有则弹窗提醒
-				 */
-				centerPopupTableData.value = result.data.list.filter(item => item.bgsp === "1")
-				if (centerPopupTableData.value.length > 0) {
-					showCenterPopup.value = true
+				// 如果参照检验单，则所有都是已检验的，直接赋值就行，不用删选
+				if (typeSelect.value === 2) {
+					tableData.value = result.data.list
+				} else {
+					// 如果不是按照检验单，则如果数据是需要检验的，则要筛选数据并提示去检验
+					/**
+					 * 筛选不需要质检的数据
+					 */
+					tableData.value = result.data.list.filter(item => item.bgsp !== "1")
+					/**
+					 * 筛选需要质检的数据
+					 * 如果有则弹窗提醒
+					 */
+					centerPopupTableData.value = result.data.list.filter(item => item.bgsp === "1")
+					if (centerPopupTableData.value.length > 0) {
+						showCenterPopup.value = true
+					}
 				}
+
 			}
 		} catch (err) {
 			console.log(err)
