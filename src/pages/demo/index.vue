@@ -303,6 +303,9 @@
 				<text>中间选择列表</text>
 			</view>
 		</u-popup>
+		<!-- 原生dom上传图片 -->
+		<up-input type="file" accept="image/*" multiple="multiple" />
+
 		<view class="content">
 			<view class="button-box">
 				<button @click="setPrint(0)" type="primary">0号</button>
@@ -328,13 +331,15 @@
 				</view>
 			</view>
 		</view>
-		<ChooseImage @success="chooseImage"></ChooseImage>
 		<ScanCode @scanSuccess="scanSuccess" label="扫描"></ScanCode>
+		<!-- uniapp的api上传图片 -->
+		<ChooseImage @success="chooseImage"></ChooseImage>
+		<!-- 第三方封装的上传图片或文件 -->
 		<file-upload v-model="files"></file-upload>
 		<file-upload v-model="files"></file-upload>
+		<!-- uiapp框架带的上传图片或视频 -->
 		<media-upload v-model="medias" accept="image"></media-upload>
 		<media-upload v-model="medias" accept="video"></media-upload>
-
 		<view class="common-section-title">
 			基本信息
 		</view>

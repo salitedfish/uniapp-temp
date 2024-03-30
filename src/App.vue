@@ -23,13 +23,14 @@
 
 			// web
 			if (Platform.isWeb()) {
-				const path = location.pathname.slice(3)
+				const path = location.pathname.slice(4)// 把前面的/h52去掉
 
 				// 判断页面是否存在
 				let name : string = ""
 				let key : RouteName
 				let exit = false
 				for (key in routes) {
+					console.log(routes[key].path)
 					if (routes[key].path === path) {
 						exit = true
 						name = key

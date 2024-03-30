@@ -2,6 +2,14 @@ import { uRequest } from "./instance"
 import type { Return, ReturnList } from "@/type/common"
 import type { } from "@/type/business"
 
+// 采购到货-直接扫码查询
+export const purchaseArrivalSearch = async (data : Obj) => {
+	return await uRequest.post<Return<ReturnList<Obj>>>({
+		url: "erp/getSrmDeliveryListPlus",
+		data,
+	})
+}
+
 // 查询采购到货
 export const getPurchaseArrivalList = async (data : Obj) => {
 	return await uRequest.post<Return<ReturnList<Obj>>>({

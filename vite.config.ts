@@ -10,13 +10,16 @@ export default defineConfig({
 		commonjs(),
 		basicSsl()
 	],
-	base: "h5",
+	base: "h52",
 	server: {
 		// https: true,
 		proxy: {
 			"^/api": {
-				target: "http://192.168.0.98:8082/",
-				// target: "http://192.168.0.87:8085/",
+				// 文博
+				// target: 'http://192.168.0.6:8082/',
+				// 晓楠
+				target: 'http://192.168.0.98:8082/',
+				// target: "http://182.106.226.177:64123/api/",
 				rewrite: (path) => path.replace(/^\/api/, ""),
 				changeOrigin: true,
 			},

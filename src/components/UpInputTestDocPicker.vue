@@ -8,13 +8,17 @@
 	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import TablePicker from "@/components/TablePicker.vue"
-	import { nowFormat } from "@/store/common"
+	import UpInputScan from "@/components/UpInputScan.vue"
+	import { nowFormat, preMonthFormat } from "@/store/common"
 
 	// 基础数据
 	const props = defineProps<
 		{
 			multiple ?: boolean,
-			selected ?: Obj[]
+			selected ?: Obj[],
+			scanAnyText ?: string,
+			materielSelected ?: Business[]
+			supplierSelected ?: Business[]
 		}>()
 	const emit = defineEmits<{
 		(event : "select", result : Obj[]) : void;
@@ -81,12 +85,49 @@
 		emit("update:selected", selected)
 	}
 
+	// 多选时候的限制条件，只有返回true时才支持选择
+	const multipleSelectCondition = (target : Obj, list : Obj[]) => {
+		return true
+		// if (list.length <= 0) {
+		// 	return true
+		// }
+		// else {
+		// 	const originSymbol = list[0]
+		// 	const targetSymbol = target
+		// 	if (true) {
+		// 		return true
+		// 	}
+		// 	else {
+		// 		uni.showModal({
+		// 			title: '提示',
+		// 			content: "只能选择相同仓库、供应商、部门、业务员、业务类型、采购类型的行"
+		// 		});
+		// 		return false
+		// 	}
+		// }
+	}
+
 	const colums = [{ label: "单号", key: "checkCode" }, { label: "报检日期", key: "ddate" }, { label: "供应商", key: "supplierName" }, { label: "物料编码", key: "invCode" }, { label: "物料名称", key: "invName" }, { label: "数量", key: "quantity" }]
 
+	defineExpose({ open })
 	//----------------------------下面是这个组件自身依赖的组件数据
+
+	// 发货单码
+	const scanAnyText = ref("")
+	if (props.scanAnyText) {
+		scanAnyText.value = props.scanAnyText
+		searchParam.value.code = props.scanAnyText
+	}
+	const scanAnySuccess = (res : string) => {
+		scanAnyText.value = res
+		searchParam.value.code = res
+	}
 
 	// 供应商选择
 	const supplierSelected = ref<Business[]>([])
+	if (props.supplierSelected) {
+		supplierSelected.value = props.supplierSelected
+	}
 	const supplierSelect = (res : Business[]) => {
 		if (res.length > 0) {
 			searchParam.value.supplierCode = res[0].code
@@ -97,16 +138,20 @@
 
 	// 物料选择相关
 	const materialSelected = ref<Business[]>([])
+	if (props.materielSelected) {
+		materialSelected.value = props.materielSelected
+	}
 	const materialSelect = (res : Business[]) => {
 		if (res.length > 0) {
-			searchParam.value.invCode = res[0].code
+			// searchParam.value.invCode = res[0].code
+			searchParam.value.invCode = res.map(item => item.code).join(",")
 		} else {
 			searchParam.value.invCode = null
 		}
 	}
 
 	// 单据日期选择相关
-	const dateSelected = ref([nowFormat, nowFormat])
+	const dateSelected = ref([preMonthFormat, nowFormat])
 	const dateSelect = (dates : string[]) => {
 		searchParam.value.startDate = dates[0]
 		searchParam.value.finishDate = dates[1]
@@ -126,6 +171,11 @@
 								选择检验单
 							</view>
 							<up-form class="common-form" labelPosition="left">
+								<up-form-item class="common-form-item" label="发货单码:" borderBottom labelWidth="80" style="padding: 0">
+									<up-input-scan v-model="scanAnyText" placeholder="请扫发货单码" clearable class="input-item"
+										@scanSuccess="scanAnySuccess"></up-input-scan>
+								</up-form-item>
+
 								<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">
 									<UpInputSupplierPicker border="none" placeholder="选择U8供应商" readonly clearable class="input-item"
 										@select="supplierSelect" v-model:selected="supplierSelected">
@@ -134,7 +184,7 @@
 
 								<up-form-item class="common-form-item" label="物料:" borderBottom labelWidth="80" style="padding: 0">
 									<UpInputMaterielPicker border="none" placeholder="选择U8存货档案" readonly clearable class="input-item"
-										@select="materialSelect" search v-model:selected="materialSelected">
+										@select="materialSelect" search v-model:selected="materialSelected" multiple>
 									</UpInputMaterielPicker>
 								</up-form-item>
 
@@ -155,7 +205,7 @@
 
 						<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="checkCode"
 							:searching="searching" :tableData="resultData?.list" @select="select" :multiple="multiple"
-							:colums="colums" withIndex>
+							:colums="colums" withIndex :multipleSelectCondition="multipleSelectCondition">
 
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"

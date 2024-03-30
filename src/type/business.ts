@@ -18,15 +18,15 @@ export enum PickerTypeId {
 // 各种业务统一返回的格式
 export type Business = {
 	id : number,
-	spec : string,
+	spec ?: string,
 	name : string,
 	code : string,
-	bPropertyCheck : string
-	bInvBatch : string,
-	parentId : number,
-	preset : string,
-	createTime : string,
-	bWhPos : string
+	bPropertyCheck ?: string
+	bInvBatch ?: string,
+	parentId ?: number,
+	preset ?: string,
+	createTime ?: string,
+	bWhPos ?: string
 }
 
 // 各种业务统一请求的参数

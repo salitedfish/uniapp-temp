@@ -12,6 +12,7 @@
 			tableData ?: Obj[],
 			searching ?: boolean,
 			multiple ?: boolean,
+			multipleSelectCondition ?: (target : Obj, list : Obj[]) => boolean,
 			withIndex ?: boolean,
 		}>(), {
 		tableData: () => []
@@ -49,12 +50,26 @@
 	}
 	// 多选中触发
 	const select = (item : Obj, status : boolean) => {
+		// 查看目标对象在列表中的位置
 		const index = getSelectedIndex(item)
+		// 如果是选中情况
 		if (status) {
+			// 如果选中列表中不存在
 			if (index === false) {
-				selectItems.value.push(item)
+				// 如果有限制多选的条件，则符合条件才选中
+				if (props.multipleSelectCondition) {
+					if (props.multipleSelectCondition(item, selectItems.value)) {
+						selectItems.value.push(item)
+					}
+				}
+				// 如果没有限制多选的条件，则直接选中
+				else {
+					selectItems.value.push(item)
+				}
 			}
-		} else {
+		}
+		// 如果是取消选中情况
+		else {
 			if (index !== false) {
 				selectItems.value.splice(Number(index), 1)
 			}
@@ -64,6 +79,12 @@
 	const multipleConfirm = () => {
 		emit("update:selected", [...selectItems.value])
 		emit("select", [...selectItems.value])
+	}
+	// 全部选中
+	const allSelect = () => {
+		for (const item of props.tableData) {
+			select(item, true)
+		}
 	}
 	// 清空选中
 	const clearSelect = () => {
@@ -75,14 +96,17 @@
 	<view class="content-box">
 		<uni-table ref="table" border stripe emptyText="暂无更多数据" :loading="searching">
 			<uni-tr>
-				<uni-th class="nowrap primary" align="left" width="50rpx" v-if="props.multiple" @click="clearSelect">清空</uni-th>
+				<uni-th class="nowrap primary" align="left" width="50rpx" v-if="props.multiple">
+					<span style="margin-right: 10px" @click="allSelect">全选</span>
+					<span @click="clearSelect">清空</span>
+				</uni-th>
 				<uni-th class="nowrap" align="left" width="50rpx" v-if="withIndex">序号</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx" v-for="item, key in colums"
 					:key="key">{{item.label}}</uni-th>
 			</uni-tr>
 			<uni-tr v-for="item,key in tableData" :key="key" @click="singleConfirm(item)"
 				:class="{selected: !multiple && (singleSelectKey === item[selectKey])}">
-				<uni-td class="nowrap" v-if="props.multiple">
+				<uni-td class="nowrap" v-if="props.multiple" style="display: flex; justify-content: center;">
 					<uni-icons custom-prefix="custom-icon" type="icon-xuanze" size="18" :color="globalColor.primary"
 						@click="select(item, false)" v-if="getSelectedIndex(item) !== false"></uni-icons>
 					<uni-icons custom-prefix="custom-icon" type="icon-mei-xuanze" size="18" :color="globalColor.default"

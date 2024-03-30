@@ -25,6 +25,7 @@
 	} from "@ultra-man/noa"
 	// 接口
 	import {
+		purchaseArrivalSearch,
 		getPurchaseArrivalList,
 		getArrivalVouchList,
 		purchaseStockroomSubmit,
@@ -48,6 +49,9 @@
 	import type {
 		PageListApi
 	} from "@/type/common"
+	import type {
+		Business
+	} from '@/type/business';
 	export default defineComponent({
 		name: ''
 	});
@@ -74,7 +78,7 @@
 		return config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos === "1"
 	})
 	// -------------------------------------------------------------------------------------表单操作
-	const typeSelect = ref(2)
+	const typeSelect = ref(0)
 	const searching = ref(false)
 	const scanAnyText = ref("")
 	const arrivalDocSelected = ref < Obj[] > ([])
@@ -85,37 +89,50 @@
 		try {
 			searching.value = true
 			const result = await api(params)
-			if (result.data.list.length > 0) {
-				// 循环处理数据
-				for (const item of result.data.list) {
-					item.quantity = Number(item.quantity)
-					item.inStockQuantity = Number(item.inStockQuantity)
-					item.rdQuantity = Number(item.rdQuantity)
-					item.poQuantity = Number(item.poQuantity)
-					item.count = item.quantity
-					if (item.binvBatch === '1') {
-						item.batch = item.supplierCode ? `${item.supplierCode}-${batchFormat}` : batchFormat
-					}
-				}
-				// 如果参照检验单，则所有都是已检验的，直接赋值就行，不用删选
-				if (typeSelect.value === 2) {
-					tableData.value = result.data.list
+			// 直接扫码，根据扫码结果自动判断后续如何操作
+			if (typeSelect.value === 0) {
+				// 先直接赋值scanSearchResult
+				scanSearchResult.value = result.data
+				// 先赋值供应商列表
+				supplierSelected.value = [{
+					code: scanSearchResult.value.supplierCode,
+					name: scanSearchResult.value.supplierName,
+				}]
+				// 保存到货物料和检验物料数量
+				const arrivedListLength = scanSearchResult.value.arrivedList?.length
+				const qualityInspectionListLength = scanSearchResult.value.qualityInspectionList?.length
+				// 根据到货物料列表和检验物料列表来判断操作
+				if (arrivedListLength > 0 && qualityInspectionListLength > 0) {
+					// 如果既有参照到货单，又有参照检验单，则让用户选
+					showSelectCenterPopup.value = true
+				} else if (arrivedListLength > 0) {
+					// 如果直接参照到货单
+					selectArrivalDoc()
+				} else if (qualityInspectionListLength > 0) {
+					// 如果直接参照检验单
+					selectTestDoc()
 				} else {
-					// 如果不是按照检验单，则如果数据是需要检验的，则要筛选数据并提示去检验
-					/**
-					 * 筛选不需要质检的数据
-					 */
-					tableData.value = result.data.list.filter(item => item.bgsp !== "1")
-					/**
-					 * 筛选需要质检的数据
-					 * 如果有则弹窗提醒
-					 */
-					centerPopupTableData.value = result.data.list.filter(item => item.bgsp === "1")
-					if (centerPopupTableData.value.length > 0) {
-						showCenterPopup.value = true
-					}
+					uni.showModal({
+						title: '提示',
+						content: "未查询到数据"
+					});
 				}
-
+			} else {
+				// 如果type不是0，那就是用户手动选择到货单或者检验单
+				if (result.data.list.length > 0) {
+					// 循环处理数据
+					for (const item of result.data.list) {
+						item.quantity = Number(item.quantity)
+						item.inStockQuantity = Number(item.inStockQuantity)
+						item.rdQuantity = Number(item.rdQuantity)
+						item.poQuantity = Number(item.poQuantity)
+						item.count = item.quantity
+						if (item.binvBatch === '1') {
+							item.batch = item.supplierCode ? `${item.supplierCode}-${batchFormat}` : batchFormat
+						}
+					}
+					tableData.value = result.data.list
+				}
 			}
 		} catch (err) {
 			console.log(err)
@@ -123,21 +140,21 @@
 			searching.value = false
 		}
 	}
-	// 箱/托/发货单码
+	// 箱/发货单码
 	const scanAnySuccess = useThrottle(async (code: string) => {
 		if (code) {
 			scanAnyText.value = code
 			await loadData({
 				code,
-				type: "rd"
-			}, getPurchaseArrivalList)
+			}, purchaseArrivalSearch)
 		}
 	}, 3000)
 	// 扫货单情况
 	const arrivalDocSelect = (res: Obj[]) => {
 		if (res && res.length) {
 			loadData({
-				cCode: res[0].ccode
+				// cCode: res[0].ccode
+				cCode: res.map(item => item.ccode).join(",")
 			}, getArrivalVouchList)
 		}
 	}
@@ -145,15 +162,21 @@
 	const testDocSelect = (res: Obj[]) => {
 		if (res && res.length) {
 			loadData({
-				cCode: res[0].checkCode
+				// cCode: res[0].checkCode
+				cCode: res.map(item => item.checkCode).join(",")
 			}, getTestVouchList)
 		}
 	}
-	watch(typeSelect, () => {
-		reset()
+	watch(typeSelect, (newValue: number, oldValue: number) => {
+		reset(newValue, oldValue)
 	})
-	const reset = () => {
-		scanAnyText.value = ""
+	const reset = (newValue ? : number, oldValue ? : number) => {
+		// 如果不是由直接扫码切换过来的，说明是到货单和检验单之间的切换，一些数据需要重置
+		if (oldValue !== 0) {
+			scanAnyText.value = ""
+			materielSelected.value = []
+			supplierSelected.value = []
+		}
 		arrivalDocSelected.value = []
 		testDocSelected.value = []
 		tableData.value = []
@@ -167,6 +190,51 @@
 			case 2:
 				return "检验单"
 		}
+	}
+	// -------------------------------------------------------------------------------------到货方式选择弹窗
+	const showSelectCenterPopup = ref(false)
+	// 组件ref
+	const arrivalDocDomRef = ref < Obj | null > (null)
+	const testDocDomRef = ref < Obj | null > (null)
+	// 这个是直接扫码返回的结果
+	const scanSearchResult = ref < Obj > ({})
+	// 这个给参照到货单和参照检验单一个默认的物料数组
+	const materielSelected = ref < Business[] > ([])
+	// 这个给参照到货单和参照检验单一个默认的供应商数组
+	const supplierSelected = ref < Obj[] > ([])
+	// 用户选择参照到货单
+	const selectArrivalDoc = () => {
+		showSelectCenterPopup.value = false
+		materielSelected.value = scanSearchResult.value.arrivedList.map((item: Obj) => {
+			return {
+				id: item.id,
+				code: item.invCode,
+				name: item.invName
+			}
+		})
+		typeSelect.value = 1
+		nextTick(() => {
+			if (arrivalDocDomRef.value) {
+				arrivalDocDomRef.value.open()
+			}
+		})
+	}
+	// 用户选择参照检验单
+	const selectTestDoc = () => {
+		showSelectCenterPopup.value = false
+		materielSelected.value = scanSearchResult.value.qualityInspectionList.map((item: Obj) => {
+			return {
+				id: item.id,
+				code: item.invCode,
+				name: item.invName
+			}
+		})
+		typeSelect.value = 2
+		nextTick(() => {
+			if (testDocDomRef.value) {
+				testDocDomRef.value.open()
+			}
+		})
 	}
 	// -------------------------------------------------------------------------------------表格操作
 	const tableData = ref < Obj[] > ([])
@@ -235,7 +303,8 @@
 		// 计算max值
 		let max = Number(originData.value.quantity)
 		for (const key in tableData.value) {
-			if ((1 + Number(key)) !== index.value && tableData.value[key].invCode === originData.value.invCode) {
+			if ((1 + Number(key)) !== index.value && tableData.value[key].invCode === originData.value.invCode && tableData
+				.value[key].iarrsId === originData.value.iarrsId) {
 				max = max - tableData.value[key].count
 			}
 		}
@@ -276,7 +345,7 @@
 		// 复制的数据的count值是应入库数量减去其他数据的count值
 		newRow.count = newRow.quantity
 		for (const item of tableData.value) {
-			if (newRow.invCode === item.invCode) {
+			if (newRow.invCode === item.invCode && newRow.iarrsId === item.iarrsId) {
 				newRow.count = newRow.count - item.count
 			}
 		}
@@ -290,8 +359,9 @@
 		}
 	}
 	// -------------------------------------------------------------------------------------检验提示弹窗
-	const showCenterPopup = ref(false)
-	const centerPopupTableData = ref < Obj[] > ([])
+	// const showCenterPopup = ref(false)
+	// const centerPopupTableData = ref < Obj[] > ([])
+
 	// -------------------------------------------------------------------------------------提交操作
 	const submiting = ref(false)
 	// 提交数据
@@ -405,27 +475,31 @@
 			<up-form-item class="common-form-item" label="到货单:" borderBottom labelWidth="80" style="padding: 0"
 				v-if="typeSelect === 1">
 				<UpInputArrivalDocPicker @select="arrivalDocSelect" border="none" placeholder="选择到货单" readonly clearable
-					class="input-item" v-model:selected="arrivalDocSelected">
+					class="input-item" v-model:selected="arrivalDocSelected" multiple :materielSelected="materielSelected"
+					:supplierSelected="supplierSelected" :scanAnyText="scanAnyText" ref="arrivalDocDomRef">
 				</UpInputArrivalDocPicker>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="检验单:" borderBottom labelWidth="80" style="padding: 0"
 				v-if="typeSelect === 2">
 				<UpInputTestDocPicker @select="testDocSelect" border="none" placeholder="选择检验单" readonly clearable
-					class="input-item" v-model:selected="testDocSelected"></UpInputTestDocPicker>
+					class="input-item" v-model:selected="testDocSelected" multiple :materielSelected="materielSelected"
+					:supplierSelected="supplierSelected" :scanAnyText="scanAnyText" ref="testDocDomRef">
+				</UpInputTestDocPicker>
 			</up-form-item>
 
-			<up-form-item class="common-form-item" label="入库日期:" borderBottom labelWidth="80" style="padding: 0">
+			<up-form-item class="common-form-item" label="入库日期:" borderBottom labelWidth="80" style="padding: 0"
+				v-if="typeSelect !== 0">
 				<UpInputDatePicker border="none" placeholder="选择入库日期" clearable class="input-item" readonly
 					v-model:selected="dateSelected" :maxDate="Date.now()">
 				</UpInputDatePicker>
 			</up-form-item>
 		</up-form>
 
-		<view class="common-section-title">
+		<view class="common-section-title" v-if="typeSelect !== 0">
 			本次入库明细
 		</view>
 
-		<view class="table-box ">
+		<view class="table-box " v-if="typeSelect !== 0">
 			<view class="common-table">
 				<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
 					<!-- 表头行 -->
@@ -446,7 +520,7 @@
 						<uni-td class="nowrap primary">{{ item.count + item.invUnit }}</uni-td>
 						<uni-td class="nowrap">{{ item.position }}</uni-td>
 						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">
-							<span style="margin-right: 5px" @click.stop="deleteTable(key)">删除</span>
+							<span class="error" style="margin-right: 5px" @click.stop="deleteTable(key)">删除</span>
 							<span @click.stop="copyTable(key)">复制</span>
 						</uni-td>
 					</uni-tr>
@@ -540,14 +614,14 @@
 			</view>
 		</view>
 
-		<view class="btn-box">
+		<view class="btn-box" v-if="typeSelect !== 0">
 			<up-button type="primary" text="提交入库" class="bottom-button" shape="circle" @click="submit"
 				:disabled="submitDisabled"></up-button>
 		</view>
 
 	</view>
 
-	<u-popup :show="showCenterPopup" round="10" mode="center" @close="showCenterPopup = false">
+	<!-- 	<u-popup :show="showCenterPopup" round="10" mode="center" @close="showCenterPopup = false">
 		<view style="width: 85vw" class="common-page-container center-popup">
 			<view class="common-section-title">
 				质检提示
@@ -572,6 +646,24 @@
 			<view class="btn-box">
 				<up-button type="primary" text="确认" class="bottom-button" shape="circle"
 					@click="showCenterPopup = false"></up-button>
+			</view>
+		</view>
+	</u-popup> -->
+
+	<u-popup :show="showSelectCenterPopup" round="10" mode="center" @close="showSelectCenterPopup = false">
+		<view style="width: 85vw" class="common-page-container center-popup">
+			<view class="common-section-title">
+				提示
+			</view>
+			<view class="tip">
+				请选择入库参照方式
+			</view>
+			<view class="common-page-largest">
+				<up-button type="primary" text="参照到货单入库" class="bottom-button" shape="circle" @click="selectArrivalDoc"
+					style="margin-bottom: 10px;"></up-button>
+
+				<up-button type="primary" text="参照检验单入库" class="bottom-button" shape="circle"
+					@click="selectTestDoc"></up-button>
 			</view>
 		</view>
 	</u-popup>
