@@ -275,7 +275,8 @@
 		const value = Number(editData.value.quantity)
 		const max = Number(originData.value.quantity)
 		const min = 0
-		if (value > max) {
+		// 如果没有应入库数量，则不限制
+		if (max > 0 && value > max) {
 			// uni.showToast({
 			// 	icon: "none",
 			// 	title: "入库数量不能大于应入库数量"

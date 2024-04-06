@@ -108,7 +108,7 @@
 		// }
 	}
 
-	const colums = [{ label: "单号", key: "ccode" }, { label: "单据日期", key: "ddate" }, { label: "供应商", key: "supplierName" }, { label: "部门", key: "deptName" }, { label: "制单人", key: "maker" }]
+	const colums = [{ label: "单号", key: "ccode" }, { label: "单据日期", key: "ddate" }, { label: "供应商", key: "supplierName" }, { label: "部门", key: "deptName" }, { label: "制单人", key: "maker" }, { label: "物料编码", key: "invCode" }, { label: "物料名称", key: "invName" }, { label: "数量", key: "quantity" }]
 
 
 	defineExpose({ open })
