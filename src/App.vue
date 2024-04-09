@@ -23,7 +23,8 @@
 
 			// web
 			if (Platform.isWeb()) {
-				const path = location.pathname.slice(4)// 把前面的/h52去掉
+				const root = "/" + import.meta.env.VITE_BASE_PAGE_PATH_WEB
+				const path = location.pathname.slice(root.length)// 把前面的根路径去掉
 
 				// 判断页面是否存在
 				let name : string = ""

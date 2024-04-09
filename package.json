@@ -6,7 +6,9 @@
 	},
 	"scripts": {
 		"dev:h5": "uni --mode dev",
-		"build:h5": "uni build --mode pro",
+		"build:h5-test": "uni build --mode tes",
+		"build:h5-pro": "uni build --mode pro",
+
 		"dev:app": "uni -p app",
 		"dev:app-android": "uni -p app-android",
 		"dev:app-ios": "uni -p app-ios",

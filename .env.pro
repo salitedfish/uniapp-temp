@@ -2,8 +2,5 @@
 
 VITE_BASE_API_URL_WEB = /api/
 
-// 测试环境
-VITE_BASE_API_URL_WEB = http://10.32.13.222:8081/
-
-// 正式环境
-VITE_BASE_API_URL_WEB = http://10.32.13.222:8082/
+// h5页面根路径
+VITE_BASE_PAGE_PATH_WEB = h5

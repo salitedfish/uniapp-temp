@@ -1,7 +1,12 @@
 <script lang="ts" setup>
-	import { useTimeFormat } from "@ultra-man/noa"
 	import { getBaseUrl } from "@/util/common"
 	import type { UploadMedia } from "@/type/file"
+
+	const genImgUrl = (url : string) => {
+		const index = url.indexOf("/uploadFiles/file")
+		const target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
+		return target + "?token2=fujianhuichuan"
+	}
 
 	// 直接改props里的数据算了
 	const props = withDefaults(defineProps<{
@@ -44,7 +49,7 @@
 					...oItem,
 					status: "success",
 					message: "",
-					url: JSON.parse(result).data + "?token2=fujianhuichuan",
+					url: genImgUrl(JSON.parse(result).data),
 				});
 			} else {
 				props.modelValue.splice(fileListLen, 1, {
