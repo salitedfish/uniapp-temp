@@ -82,7 +82,7 @@
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "单号", key: "cdlcode" }, { label: "发货日期", key: "ddate" }, { label: "物料编码", key: "cinvcode" }, { label: "物料名称", key: "cinvname" }, { label: "发货数量", key: "iquantity" }]
+	const colums = [{ label: "单号", key: "cdlcode" }, { label: "发货日期", key: "ddate" }, { label: "物料编码", key: "invCode" }, { label: "物料名称", key: "invName" }, { label: "发货数量", key: "quantity" }]
 
 	//----------------------------下面是这个组件自身依赖的组件数据
 
