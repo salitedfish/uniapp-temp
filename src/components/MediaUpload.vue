@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 	import { getBaseUrl } from "@/util/common"
 	import type { UploadMedia } from "@/type/file"
+	import { Platform } from "@/util/env"
 
 	const genImgUrl = (url : string) => {
-		const index = url.indexOf("/uploadFiles/file")
-		const target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
+		let target = url
+		// 只有正式环境的H5端才需要转化url
+		if (import.meta.env.RUN_TIME === "production" && Platform.isWeb()) {
+			const index = url.indexOf("/uploadFiles/file")
+			target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
+		}
 		return target + "?token2=fujianhuichuan"
 	}
 
