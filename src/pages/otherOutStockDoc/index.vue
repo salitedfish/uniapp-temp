@@ -61,14 +61,24 @@
 	onShow(() => {
 		const configStr = uni.getStorageSync("oOSDDefaultSet")
 		config.value = configStr ? JSON.parse(configStr) : {}
+		// 每次页面显示时判断如果是成品库，并且没有选择货位，则默认选择一个货位
+		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11" && !form.value
+			.position) {
+			shelfScanSuccess("11000001")
+		}
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
+		manInput.value = uni.getStorageSync("mainInput") || false
 	})
 	// 判断仓库是否开启货位管理，开启了才能选择货位
 	const shelfSelectEnable = computed(() => {
 		return config.value.stockroomSelected && config.value.stockroomSelected[0]?.bWhPos === "1"
 	})
+	const manInputChange = (value: boolean) => {
+		uni.setStorageSync("mainInput", value)
+	}
+	const manInput = ref(false)
 	// -------------------------------------------------------------------------------------表单操作
 	const initForm = () => {
 		return {
@@ -170,7 +180,7 @@
 				console.log(err)
 			}
 		}
-	})
+	}, 2000)
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -416,10 +426,16 @@
 		<view class="common-section-title">
 			基本信息
 		</view>
+		<up-form class="common-form" labelPosition="left">
+			<up-form-item class="common-form-item" label="手动输码:" borderBottom labelWidth="100" style="padding: 0">
+				<u-switch v-model="manInput" @change="manInputChange" size="20"></u-switch>
+			</up-form-item>
+		</up-form>
+
 		<up-form class="common-form" labelPosition="left" required>
 			<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
 				<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
-					v-model="form.invCode" focus></up-input-scan>
+					v-model="form.invCode" focus :manInput="manInput"></up-input-scan>
 			</up-form-item>
 
 			<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">

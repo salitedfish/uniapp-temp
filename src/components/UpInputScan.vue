@@ -2,6 +2,10 @@
 	import ScanCode from "@/components/ScanCode.vue"
 	import { useDebounce } from "@ultra-man/noa"
 
+	const props = defineProps<{
+		manInput ?: boolean,
+	}>()
+
 	const emit = defineEmits<{
 		(event : "scanSuccess", result : string) : void;
 	}>()
@@ -13,9 +17,18 @@
 		}
 	}
 
-	// 扫码枪或者手动输入
+	// 扫码枪输入
 	const changeSuccess = useDebounce((res : string) => {
-		console.log("扫码结果", res)
+		// 如果配置了手动输入，则不处理
+		if (props.manInput) return
+		if (res) {
+			emit("scanSuccess", res)
+		}
+	})
+	// 如果是手动输入
+	const blurSuccess = useDebounce((res : string) => {
+		// 如果配置了不是手动输入，则不处理
+		if (!props.manInput) return
 		if (res) {
 			emit("scanSuccess", res)
 		}
@@ -23,7 +36,7 @@
 </script>
 
 <template>
-	<up-input @change="changeSuccess">
+	<up-input @change="changeSuccess" @blur="blurSuccess">
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess"></ScanCode>
 		</template>
