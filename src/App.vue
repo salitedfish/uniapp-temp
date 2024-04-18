@@ -7,6 +7,7 @@
 	import { Platform } from "@/util/env"
 	import { authList, setUserInfo } from "@/store/auth"
 	import { blueTooth } from "@/store/blueTooth"
+	import { updateAllDate } from "@/store/common"
 	import type { RouteName } from "./type/route"
 
 	onLaunch(async () => {
@@ -105,8 +106,8 @@
 		}
 	})
 	onShow(() => {
-
 		console.log("App Show")
+		updateAllDate()
 	})
 	onHide(() => {
 		console.log("App Hide")

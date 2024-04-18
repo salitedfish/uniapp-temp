@@ -8,7 +8,6 @@
 		"dev:h5": "uni --mode dev",
 		"build:h5-test": "uni build --mode tes",
 		"build:h5-pro": "uni build --mode pro",
-
 		"dev:app": "uni -p app",
 		"dev:app-android": "uni -p app-android",
 		"dev:app-ios": "uni -p app-ios",
@@ -80,6 +79,7 @@
 		"@dcloudio/uni-automator": "3.0.0-3090820231124001",
 		"@dcloudio/uni-cli-shared": "3.0.0-3090820231124001",
 		"@dcloudio/uni-stacktracey": "3.0.0-3090820231124001",
+		"@dcloudio/uni-uts-v1": "3.0.0-3090820231124001",
 		"@dcloudio/vite-plugin-uni": "3.0.0-3090820231124001",
 		"@vue/runtime-core": "^3.2.45",
 		"@vue/tsconfig": "^0.1.3",

@@ -6,6 +6,9 @@
 	import { useLogout } from "@/hook/useLogout"
 	import { logged } from "@/util/common"
 	import { userInfo, authList } from "@/store/auth"
+	import { updateAllDate } from "@/store/common"
+
+	updateAllDate()
 
 	interface FunItem {
 		name ?: string,

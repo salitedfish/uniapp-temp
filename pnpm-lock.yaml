@@ -102,6 +102,9 @@ devDependencies:
   '@dcloudio/uni-stacktracey':
     specifier: 3.0.0-3090820231124001
     version: 3.0.0-3090820231124001
+  '@dcloudio/uni-uts-v1':
+    specifier: 3.0.0-3090820231124001
+    version: 3.0.0-3090820231124001
   '@dcloudio/vite-plugin-uni':
     specifier: 3.0.0-3090820231124001
     version: 3.0.0-3090820231124001(postcss@8.4.31)(vite@4.0.3)(vue@3.2.45)
@@ -1848,6 +1851,97 @@ packages:
     resolution: {integrity: sha512-e/lSbvR79KH9+d3D4ueNbvD6szigjO/5IyjBNmiTqaj0PTS324fBV3L6f3s1qpkYonM4rdOl000hVOcAg6Gh/A==}
     dev: false
 
+  /@dcloudio/uni-uts-v1@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-/BZFTUapY4/atCdDDg0Ei4vDCvk3Ean2Liyx9LPvb+Rj/Z3l7Dwp1zQpSnWLy4qFpFdbTvGXRkxoY8p1MffdSw==}
+    dependencies:
+      '@dcloudio/uts': 3.0.0-3090820231124001
+      '@rollup/pluginutils': 5.1.0
+      '@vue/shared': 3.2.47
+      adm-zip: 0.5.12
+      android-versions: 1.9.0
+      colors: 1.4.0
+      fast-glob: 3.3.2
+      find-cache-dir: 3.3.2
+      fs-extra: 10.1.0
+      graphlib: 2.1.8
+      jsonc-parser: 3.2.0
+      lodash: 4.17.21
+      md5-file: 5.0.0
+      object-hash: 3.0.0
+      semver: 7.5.4
+      source-map: 0.7.4
+      source-map-js: 1.0.2
+    transitivePeerDependencies:
+      - rollup
+    dev: true
+
+  /@dcloudio/uts-darwin-arm64@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-6KF2M145oIUZmkrfoN1Bir+BxJ/xRw14VYgToYLFtD44gefRJobqmKaQMgb+8l/jARliydVyJm1L+4f9rZHZwg==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts-darwin-x64@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-wReXs1Umwfg2Z49z5WaV9dKocFgay5Nu/A588D987AEqgUbTcfsyA6/NQ2LmFnp6c7NVkAqo3uHBPIX5UY5JqQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts-linux-x64-gnu@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-r2aesswuE4BAC8imx+rsoxDQM9R9/zuLiLk56dqw1xw1vEmzdr5hopRsHvq4OwfO+3syScsi8dRzAJcpj/q0Qw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [gnu]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts-linux-x64-musl@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-pdVVfzAZ2cF7EC3jGBEW4O5hKABgbwIfT1LpH32mwsj4G5PJuyOECL96Hda/qjxHs57OhNS/AWr8B4DL/Qj1DQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts-win32-ia32-msvc@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-PoxAgm8GjM21yz4lGHR9JktN6c5lpSmskKBIaxcZBtrH9HJlFJcZrEiort9Th/sso4MmUbJ9gsqgTYtMGAWk4Q==}
+    engines: {node: '>=10'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts-win32-x64-msvc@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-jN+dZE44IuJ+yiWwETt5B7h2iDTkdhKvouiI7rTdev7Hk7tCp2zTciLogSpngLYJ/xB3cRemnNFxO0xJ0XsavQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@dcloudio/uts@3.0.0-3090820231124001:
+    resolution: {integrity: sha512-DN7V188MZEqaeB7eaII8S1CqKn0PqzB7bUEWteLN2nRypCQe8NsEm/B5K+7IxOvcnfTQLC0NYQbjYKeTzoEWng==}
+    optionalDependencies:
+      '@dcloudio/uts-darwin-arm64': 3.0.0-3090820231124001
+      '@dcloudio/uts-darwin-x64': 3.0.0-3090820231124001
+      '@dcloudio/uts-linux-x64-gnu': 3.0.0-3090820231124001
+      '@dcloudio/uts-linux-x64-musl': 3.0.0-3090820231124001
+      '@dcloudio/uts-win32-ia32-msvc': 3.0.0-3090820231124001
+      '@dcloudio/uts-win32-x64-msvc': 3.0.0-3090820231124001
+    dev: true
+
   /@dcloudio/vite-plugin-uni@3.0.0-3090820231124001(postcss@8.4.31)(vite@4.0.3)(vue@3.2.45):
     resolution: {integrity: sha512-GAGAg3TEvyUE23O5O0XgzfJOTsZkQR0kPsGzgrGz3OCoGQixTkcYZfyGUXjkjJ3RM5ex/uq48bkzuySP4GXKJw==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -3576,6 +3670,11 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
+  /adm-zip@0.5.12:
+    resolution: {integrity: sha512-6TVU49mK6KZb4qG6xWaaM4C7sA/sgUMLy/JYMOzkcp3BvVLpW0fXDFQiIzAuxFCt/2+xD7fNIiPFAoLZPhVNLQ==}
+    engines: {node: '>=6.0'}
+    dev: true
+
   /agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -3601,6 +3700,12 @@ packages:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
     dev: false
+
+  /android-versions@1.9.0:
+    resolution: {integrity: sha512-13O2B6PQMEM4ej9n13ePRQeckrCoKbZrvuzlLvK+9s2QmncpHDbYzZxhgapN32sJNoifN6VAHexLnd/6CYrs7Q==}
+    dependencies:
+      semver: 7.5.4
+    dev: true
 
   /ansi-escapes@4.3.2:
     resolution: {integrity: sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==}
@@ -4010,6 +4115,11 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
 
+  /colors@1.4.0:
+    resolution: {integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==}
+    engines: {node: '>=0.1.90'}
+    dev: true
+
   /combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -4019,6 +4129,10 @@ packages:
 
   /commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
+
+  /commondir@1.0.1:
+    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
+    dev: true
 
   /compare-versions@3.6.0:
     resolution: {integrity: sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==}
@@ -4576,6 +4690,15 @@ packages:
       - supports-color
     dev: true
 
+  /find-cache-dir@3.3.2:
+    resolution: {integrity: sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==}
+    engines: {node: '>=8'}
+    dependencies:
+      commondir: 1.0.1
+      make-dir: 3.1.0
+      pkg-dir: 4.2.0
+    dev: true
+
   /find-up@4.1.0:
     resolution: {integrity: sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==}
     engines: {node: '>=8'}
@@ -4707,6 +4830,12 @@ packages:
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  /graphlib@2.1.8:
+    resolution: {integrity: sha512-jcLLfkpoVGmH7/InMC/1hIvOPSUh38oJtGhvrOFGzioE1DZ+0YW16RgmOJhHiuWTvGiJQ9Z1Ik43JvkRPRvE+A==}
+    dependencies:
+      lodash: 4.17.21
+    dev: true
 
   /has-flag@3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
@@ -5693,6 +5822,13 @@ packages:
       semver: 5.7.2
     optional: true
 
+  /make-dir@3.1.0:
+    resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
+    engines: {node: '>=8'}
+    dependencies:
+      semver: 6.3.1
+    dev: true
+
   /make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
@@ -5704,6 +5840,12 @@ packages:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
     dependencies:
       tmpl: 1.0.5
+    dev: true
+
+  /md5-file@5.0.0:
+    resolution: {integrity: sha512-xbEFXCYVWrSx/gEKS1VPlg84h/4L20znVIulKw6kMfmBUAZNAnF00eczz9ICMl+/hjQGo5KSXRxbL/47X3rmMw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /media-typer@0.3.0:
@@ -5878,6 +6020,11 @@ packages:
 
   /nwsapi@2.2.7:
     resolution: {integrity: sha512-ub5E4+FBPKwAZx0UwIQOjYWGHTEq5sPqHQNRN8Z9e4A7u3Tj1weLJsL59yH9vmvqEtBHaOmT6cYQKIZOxp35FQ==}
+    dev: true
+
+  /object-hash@3.0.0:
+    resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
+    engines: {node: '>= 6'}
     dev: true
 
   /object-inspect@1.13.1:

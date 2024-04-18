@@ -42,29 +42,30 @@ export const useVersionCheck = (p : { title ?: string, content ?: string, cancel
 			filename: "_downloads/"
 		}
 		// 创建下载任务
-		var dtask = plus.downloader.createDownload(downloadUrl, downloadOptions,
-			(downloadRes, status) => {
-				// 下载完成
-				if (status == 200) {
-					// 开始安装
-					plus.runtime.install(downloadRes.filename as string, { force: true },
-						() => {
-							// 进行重新启动;
-							plus.runtime.restart();
-						},
-						(e) => {
-							uni.showToast({
-								title: '安装升级包失败:' + JSON.stringify(e),
-								icon: 'none'
-							})
+		var dtask = plus.downloader.createDownload(downloadUrl, downloadOptions, (downloadRes, status) => {
+			// 下载结果回调
+			if (status == 200) {
+				// 升级包下载成功
+				plus.runtime.install(downloadRes.filename as string, { force: true },
+					() => {
+						// 安装成功，开始启动
+						plus.runtime.restart();
+					},
+					(e) => {
+						// 安装失败
+						uni.showToast({
+							title: '安装升级包失败:' + JSON.stringify(e),
+							icon: 'none'
 						})
-				} else {
-					uni.showToast({
-						title: "下载升级包失败: " + status,
-						icon: 'none'
 					})
-				}
-			});
+			} else {
+				// 升级包下载失败
+				uni.showToast({
+					title: "下载升级包失败: " + status,
+					icon: 'none'
+				})
+			}
+		});
 
 		if (plus.nativeObj.View && plus.screen.resolutionWidth) {
 			const view = new plus.nativeObj.View("maskView", {
