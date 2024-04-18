@@ -9,7 +9,7 @@ export default ({ mode }) => defineConfig({
 	plugins: [
 		uni(),
 		commonjs(),
-		basicSsl()
+		// basicSsl()
 	],
 	base: loadEnv(mode, process.cwd()).VITE_BASE_PAGE_PATH_WEB,
 	server: {

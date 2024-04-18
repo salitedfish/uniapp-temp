@@ -114,8 +114,10 @@
 </script>
 
 <template>
-	<u-upload :fileList="props.modelValue" @afterRead="afterRead" @delete="deletePic" name="3" multiple
-		:maxCount="maxCount" :previewFullImage="true"></u-upload>
+	<!-- 	<u-upload :fileList="props.modelValue" @afterRead="afterRead" @delete="deletePic" name="3" multiple
+		:maxCount="maxCount" :previewFullImage="true"></u-upload> -->
+	<up-upload :fileList="props.modelValue" @afterRead="afterRead" @delete="deletePic" name="3" multiple
+		:maxCount="maxCount" :previewFullImage="true"></up-upload>
 </template>
 
 <style lang="scss" scoped>
