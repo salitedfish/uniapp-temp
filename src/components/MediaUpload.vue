@@ -6,10 +6,13 @@
 	const genImgUrl = (url : string) => {
 		let target = url
 		// 只有正式环境的H5端才需要转化url
-		if (import.meta.env.RUN_TIME === "production" && Platform.isWeb()) {
+		if (import.meta.env.VITE_RUN_TIME === "production" && Platform.isWeb()) {
 			const index = url.indexOf("/uploadFiles/file")
 			target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
 		}
+		console.log("VITE_RUN_TIME", import.meta.env.VITE_RUN_TIME)
+		console.log("isWeb", Platform.isWeb())
+		console.log("result", target + "?token2=fujianhuichuan")
 		return target + "?token2=fujianhuichuan"
 	}
 
