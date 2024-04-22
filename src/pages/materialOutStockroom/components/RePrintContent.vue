@@ -3,7 +3,7 @@
 	import {
 		defineComponent,
 		ref,
-		reactive
+		reactive,
 	} from 'vue';
 	// 组件
 	import UpInputProcessPicker from "@/components/UpInputProcessPicker.vue"
@@ -22,7 +22,7 @@
 		printPage,
 	} from "@/store/print"
 	import {
-		blueToothStore
+		blueToothStore,
 	} from "@/store/blueTooth"
 	import {
 		Printer

@@ -35,7 +35,9 @@ export class BlueTooth {
 		if (blueToothStore.startFound) {
 			this.stopDiscoveryPrinter()
 		}
-		if (!blueToothStore.hasBlueTooth) return
+		if (!blueToothStore.hasBlueTooth) {
+			return
+		}
 		if (!blueToothStore.openBlueTooth) {
 			this.openBluetoothAdapter()
 			return
@@ -91,6 +93,7 @@ export class BlueTooth {
 				blueToothStore.connected = true
 				// 如果连接成功了，则保存连接的设备id
 				uni.setStorageSync("blueToothDeviceId", blueToothStore.deviceId)
+				this.onConnectStateChange(blueToothStore.deviceId)
 				// 获取服务列表
 				setTimeout(() => {
 					this.getBLEDeviceServices()
@@ -229,6 +232,32 @@ export class BlueTooth {
 		}
 	}
 
+	// 监听某个设备连接状态改变
+	private onConnectStateChange(deviceId : string) {
+		uni.onBLEConnectionStateChange((res) => {
+			console.log("蓝牙连接状态改变", res)
+			if (res.deviceId === deviceId && !res.connected) {
+				blueToothStore.connected = false
+			}
+		})
+	}
+
+	// 查看某个设备的连接状态
+	public showConnectState(deviceId : string) {
+		uni.getConnectedBluetoothDevices({
+			services: [deviceId],
+			success: (res) => {
+				console.log("success", res)
+			},
+			fail: (res) => {
+				console.log("fail", res)
+			},
+			complete: (res) => {
+				console.log("complete", res)
+			}
+		})
+	}
+
 	// 自动连接
 	public autoConnect(deviceId : string) {
 		//@ts-ignore
@@ -238,16 +267,19 @@ export class BlueTooth {
 			uni.openBluetoothAdapter({
 				complete: (e) => {
 					if (!e.code) {
+						blueToothStore.openBlueTooth = true
 						console.log("蓝牙初始化完成")
 						setTimeout(() => {
 							// 开始查找蓝牙设备
+							console.log("开始查找蓝牙")
 							this.discoveryPrinter()
 							// 每秒查看搜寻到的设备，看是否和保存的设备id匹配
-							let interval = 0
-							interval = setInterval(() => {
+							clearInterval(blueToothStore.checkListInterval)
+							blueToothStore.checkListInterval = setInterval(() => {
+								console.log("每秒查看搜寻到的设备，看是否和保存的设备id匹配")
 								for (const item of blueToothStore.devices) {
 									if (item.deviceId === deviceId) {
-										clearInterval(interval)
+										clearInterval(blueToothStore.checkListInterval)
 										blueToothStore.deviceId = deviceId
 										this.connect()
 										setTimeout(() => {
@@ -256,7 +288,7 @@ export class BlueTooth {
 									}
 								}
 							}, 1000)
-						}, 2000)
+						}, 1000)
 					} else if (e.code == 10001) {
 						uni.showToast({
 							icon: "none",

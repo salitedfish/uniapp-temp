@@ -98,10 +98,11 @@
 			// app
 			if (Platform.isApp()) {
 				//如果之前有连接过蓝牙，则自动连接蓝牙
-				const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
-				if (blueToothDeviceId) {
-					blueTooth.autoConnect(blueToothDeviceId)
-				}
+				// const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
+				// console.log("缓存的蓝牙设备id", blueToothDeviceId)
+				// if (blueToothDeviceId) {
+				// 	blueTooth.autoConnect(blueToothDeviceId)
+				// }
 			}
 		}
 	})

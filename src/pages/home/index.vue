@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-	import { computed } from "vue"
+	import { computed, ref } from "vue"
 	import { routes } from "@/store/route"
 	import { globalColor } from "@/store/theme"
 	import { RouteType, type Route } from "@/type/route"
 	import { useLogout } from "@/hook/useLogout"
 	import { logged } from "@/util/common"
 	import { userInfo, authList } from "@/store/auth"
-	import { updateAllDate } from "@/store/common"
+	import { updateAllDate, appVersion } from "@/store/common"
+
 
 	updateAllDate()
 
@@ -149,7 +150,7 @@
 	<u-navbar :fixed="true" placeholder title="">
 		<template #left>
 			<view>
-				{{routes.home.style.navigationBarTitleText}}
+				{{routes.home.style.navigationBarTitleText + " " + appVersion}}
 			</view>
 		</template>
 		<template #right>

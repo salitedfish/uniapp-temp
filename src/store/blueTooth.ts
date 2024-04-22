@@ -22,5 +22,7 @@ export const blueToothStore = reactive({
 
 	connected: false,
 
-	searching: false
+	searching: false,
+
+	checkListInterval: 0,
 })

@@ -1,8 +1,9 @@
 import { versionCheck as versionCheckApi } from "@/api/app"
 import { getBaseUrl } from "@/util/common"
+import { appVersion } from "@/store/common"
 
 // app版本检查并提示
-export const useVersionCheck = (p : { title ?: string, content ?: string, canceltext ?: string, oktext ?: string }) => {
+export const useVersionCheck = async (p : { title ?: string, content ?: string, canceltext ?: string, oktext ?: string }) => {
 	const param = Object.assign({
 		title: "检测到有新版本！",
 		content: "请升级app到最新版本！",
@@ -10,93 +11,117 @@ export const useVersionCheck = (p : { title ?: string, content ?: string, cancel
 		oktext: "立即升级"
 	}, p)
 
-	plus.runtime.getProperty(plus.runtime.appid as string, async (widgetInfo) => {
-		// 先请求版本看是否需要更新
-		const res = await versionCheckApi()
-		if (res.data) {
-			// 如果一样就不需要更新
-			if (widgetInfo.versionCode === res.data.versionCode) {
-				return;
-			} else if (res.data.versionCode) {
-				// android进行如下操作
-				uni.showModal({
-					title: param.title,
-					content: param.content,
-					showCancel: true,
-					confirmText: param.oktext,
-					cancelText: param.canceltext,
-					success: result => {
-						// 如果点了确认就开始更新
-						if (result.confirm) {
-							startUpdate(res.data.versionUrl)
-						}
+	const res = await versionCheckApi()
+	if (res.data) {
+		// 如果一样就不需要更新
+		if (appVersion.value === res.data.versionCode) {
+			return;
+		} else if (res.data.versionCode) {
+			// android进行如下操作
+			uni.showModal({
+				title: param.title,
+				content: param.content,
+				showCancel: true,
+				confirmText: param.oktext,
+				cancelText: param.canceltext,
+				success: result => {
+					// 如果点了确认就开始更新
+					if (result.confirm) {
+						startUpdate(res.data.versionUrl)
 					}
+				}
+			})
+		}
+	}
+
+	// plus.runtime.getProperty(plus.runtime.appid as string, async (widgetInfo) => {
+	// 	// 先请求版本看是否需要更新
+	// 	const res = await versionCheckApi()
+	// 	if (res.data) {
+	// 		// 如果一样就不需要更新
+	// 		if (widgetInfo.versionCode === res.data.versionCode) {
+	// 			return;
+	// 		} else if (res.data.versionCode) {
+	// 			// android进行如下操作
+	// 			uni.showModal({
+	// 				title: param.title,
+	// 				content: param.content,
+	// 				showCancel: true,
+	// 				confirmText: param.oktext,
+	// 				cancelText: param.canceltext,
+	// 				success: result => {
+	// 					// 如果点了确认就开始更新
+	// 					if (result.confirm) {
+	// 						startUpdate(res.data.versionUrl)
+	// 					}
+	// 				}
+	// 			})
+	// 		}
+	// 	}
+	// });
+}
+
+export const startUpdate = (versionUrl : string) => {
+	// const downloadUrl = getBaseUrl() + versionUrl
+	const downloadUrl = "https://mp-8451969f-649c-4931-ae5e-af3fc163dcd1.cdn.bspapp.com/cloudstorage/a94421ca-ff80-4454-8e50-2758f6b859ab.apk"
+	const downloadOptions = {
+		filename: "_downloads/"
+	}
+	// 创建下载任务
+	var dtask = plus.downloader.createDownload(downloadUrl, downloadOptions, (downloadRes, status) => {
+		// 下载结果回调
+		if (status == 200) {
+			// 升级包下载成功
+			plus.runtime.install(downloadRes.filename as string, { force: true },
+				() => {
+					// 安装成功，开始启动
+					plus.runtime.restart();
+				},
+				(e) => {
+					// 安装失败
+					uni.showToast({
+						title: '安装升级包失败:' + JSON.stringify(e),
+						icon: 'none'
+					})
 				})
-			}
+		} else {
+			// 升级包下载失败
+			uni.showToast({
+				title: "下载升级包失败: " + status,
+				icon: 'none'
+			})
 		}
 	});
 
-	const startUpdate = (versionUrl : string) => {
-		const downloadUrl = getBaseUrl() + versionUrl
-		const downloadOptions = {
-			filename: "_downloads/"
-		}
-		// 创建下载任务
-		var dtask = plus.downloader.createDownload(downloadUrl, downloadOptions, (downloadRes, status) => {
-			// 下载结果回调
-			if (status == 200) {
-				// 升级包下载成功
-				plus.runtime.install(downloadRes.filename as string, { force: true },
-					() => {
-						// 安装成功，开始启动
-						plus.runtime.restart();
-					},
-					(e) => {
-						// 安装失败
-						uni.showToast({
-							title: '安装升级包失败:' + JSON.stringify(e),
-							icon: 'none'
-						})
-					})
-			} else {
-				// 升级包下载失败
-				uni.showToast({
-					title: "下载升级包失败: " + status,
-					icon: 'none'
-				})
-			}
+	if (plus.nativeObj.View && plus.screen.resolutionWidth) {
+		const view = new plus.nativeObj.View("maskView", {
+			backgroundColor: "rgba(0,0,0,.6)",
+			left: ((plus.screen.resolutionWidth / 2) - 45) + "px",
+			bottom: "80px",
+			width: "90px",
+			height: "30px"
+		})
+		view.drawText('开始下载', {}, {
+			size: '12px',
+			color: '#FFFFFF'
 		});
+		view.show()
 
-		if (plus.nativeObj.View && plus.screen.resolutionWidth) {
-			const view = new plus.nativeObj.View("maskView", {
-				backgroundColor: "rgba(0,0,0,.6)",
-				left: ((plus.screen.resolutionWidth / 2) - 45) + "px",
-				bottom: "80px",
-				width: "90px",
-				height: "30px"
-			})
-			view.drawText('开始下载', {}, {
-				size: '12px',
-				color: '#FFFFFF'
-			});
-			view.show()
-
-			dtask.addEventListener("statechanged", (e) => {
-				if (e && e.downloadedSize && e.totalSize) {
-					if (e.downloadedSize > 0) {
-						const jindu = ((e.downloadedSize / e.totalSize) * 100).toFixed(2)
-						view.reset();
-						view.drawText('进度:' + jindu + '%', {}, {
-							size: '12px',
-							color: '#FFFFFF'
-						});
-					}
+		dtask.addEventListener("statechanged", (e) => {
+			if (e && e.downloadedSize && e.totalSize) {
+				if (e.downloadedSize > 0) {
+					const jindu = ((e.downloadedSize / e.totalSize) * 100).toFixed(2)
+					view.reset();
+					view.drawText('进度:' + jindu + '%', {}, {
+						size: '12px',
+						color: '#FFFFFF'
+					});
 				}
-			}, false);
+			}
+		}, false);
 
-			// 开始下载
-			dtask.start();
-		}
+		// 开始下载
+		dtask.start();
 	}
 }
 // let platform = plus.os.name.toLocaleLowerCase()

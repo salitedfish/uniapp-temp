@@ -2,7 +2,8 @@
 	// 框架
 	import {
 		onMounted,
-		onUnmounted
+		onUnmounted,
+		watch
 	} from 'vue';
 	import {
 		onShow
@@ -25,6 +26,10 @@
 	import {
 		routes
 	} from "@/store/route"
+	import {
+		blueTooth,
+		blueToothStore
+	} from "@/store/blueTooth"
 	import {
 		resetAll,
 		typeSelect,
@@ -55,15 +60,49 @@
 		})
 	}
 
+	// 蓝牙连接检查方法，封装个组件
+	const checkBlueTooth = () => {
+		if (!blueToothStore.connected) {
+			console.log("打印页面发现蓝牙未连接")
+			const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
+			if (blueToothDeviceId) {
+				console.log("连过蓝牙，自动连接", blueToothDeviceId)
+				blueTooth.autoConnect(blueToothDeviceId)
+			} else {
+				console.log("未连过蓝牙，提示手动连接")
+				uni.showModal({
+					title: '提示',
+					content: "首次连接蓝牙需手动连接",
+					success: () => {
+						uni.switchTab({
+							url: routes.blueTooth.path
+						})
+					}
+				});
+			}
+		}
+	}
+
 	onMounted(() => {
 		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
+		if (typeSelect.value === 2 || printTypeCheck.value === 0) {
+			checkBlueTooth()
+		}
+
 	})
 	onUnmounted(() => {
 		resetAll()
+		blueTooth.stopDiscoveryPrinter()
+		clearInterval(blueToothStore.checkListInterval)
 	})
 	onShow(() => {
 		const configStr = uni.getStorageSync("mOSDefaultSet")
 		config.value = configStr ? JSON.parse(configStr) : {}
+	})
+	watch([typeSelect, printTypeCheck], (values: number[]) => {
+		if (values[1] === 0 || values[0] === 2) {
+			checkBlueTooth()
+		}
 	})
 </script>
 
@@ -72,7 +111,13 @@
 		<CustomNavBar :title="routes.materialOutStockroom.style.navigationBarTitleText" @rightClick="rightClick">
 		</CustomNavBar>
 
-		<view class="common-section-title">
+		<u-sticky>
+			<up-button class="btn-item" @click="checkBlueTooth" :type="blueToothStore.connected? 'success' : 'primary' "
+				:text="blueToothStore.searching ? '蓝牙搜索中...' : blueToothStore.connected? '蓝牙已连接' : '点击连接蓝牙'">
+			</up-button>
+		</u-sticky>
+
+		<view class=" common-section-title">
 			基本信息
 		</view>
 		<view>
