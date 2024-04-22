@@ -53,6 +53,9 @@
 		confirmDisabled,
 		submiting
 	} from "./index"
+	import {
+		Platform
+	} from '@/util/env';
 
 	const rightClick = () => {
 		uni.navigateTo({
@@ -62,6 +65,7 @@
 
 	// 蓝牙连接检查方法，封装个组件
 	const checkBlueTooth = () => {
+		if (Platform.isWeb()) return
 		if (!blueToothStore.connected) {
 			console.log("打印页面发现蓝牙未连接")
 			const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
@@ -113,7 +117,8 @@
 
 		<u-sticky>
 			<up-button class="btn-item" @click="checkBlueTooth" :type="blueToothStore.connected? 'success' : 'primary' "
-				:text="blueToothStore.searching ? '蓝牙搜索中...' : blueToothStore.connected? '蓝牙已连接' : '点击连接蓝牙'">
+				:text="blueToothStore.searching ? '蓝牙搜索中...' : blueToothStore.connected? '蓝牙已连接' : '点击连接蓝牙'"
+				v-if="Platform.isApp()">
 			</up-button>
 		</u-sticky>
 
