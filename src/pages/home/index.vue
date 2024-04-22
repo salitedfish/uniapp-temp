@@ -8,7 +8,6 @@
 	import { userInfo, authList } from "@/store/auth"
 	import { updateAllDate, appVersion } from "@/store/common"
 
-
 	updateAllDate()
 
 	interface FunItem {
@@ -150,7 +149,8 @@
 	<u-navbar :fixed="true" placeholder title="">
 		<template #left>
 			<view>
-				{{routes.home.style.navigationBarTitleText + " " + appVersion}}
+				<!-- {{routes.home.style.navigationBarTitleText + " " + appVersion}} -->
+				{{routes.home.style.navigationBarTitleText}}
 			</view>
 		</template>
 		<template #right>

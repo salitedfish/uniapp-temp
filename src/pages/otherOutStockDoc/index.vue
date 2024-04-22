@@ -15,6 +15,7 @@
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import MediaUpload from "@/components/MediaUpload.vue"
+	import UpInputMaterielPicker from "@/components/UpInputMaterielPicker.vue"
 	// 工具
 	import {
 		useCheckEmptyInObj,
@@ -62,10 +63,10 @@
 		const configStr = uni.getStorageSync("oOSDDefaultSet")
 		config.value = configStr ? JSON.parse(configStr) : {}
 		// 每次页面显示时判断如果是成品库，并且没有选择货位，则默认选择一个货位
-		if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11" && !form.value
-			.position) {
-			shelfScanSuccess("11000001")
-		}
+		// if (config.value.stockroomSelected && config.value.stockroomSelected[0]?.code === "11" && !form.value
+		// 	.position) {
+		// 	shelfScanSuccess("11000001")
+		// }
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
@@ -90,50 +91,72 @@
 			position: "",
 			cwhCode: "",
 			shelfName: "",
-			bInvBatch: "",
+			// bInvBatch: "",
 			batch: "",
 			date: nowFormat
 		}
 	}
 	// 表单
 	const form = ref(initForm())
-	// 物料扫码
-	const procuctScanSuccess = useThrottle(async (code: string) => {
-		if (code) {
-			try {
-				const codeInfo = splitCodes(code)
-				nextTick(() => {
-					form.value.invCode = codeInfo.code
-				})
-				const res = await getBusiness({
-					id: PickerTypeId.MATERIAL,
-					code: codeInfo.code
-				})
-				if (res && res.data.list.length > 0) {
-					if (res.data.list[0].bInvBatch === '1') {
-						// 如果开启了批次管理
-						form.value.batch = codeInfo.batch
-					}
-					form.value.quantity = codeInfo.quantity
-					form.value.count = form.value.quantity
-					form.value.invName = res.data.list[0].name
-					form.value.bInvBatch = res.data.list[0].bInvBatch
-				} else {
-					// uni.showToast({
-					// 	title: "未查询到物料",
-					// 	icon: "none"
-					// })
-					uni.showModal({
-						title: '提示',
-						content: "未查询到物料",
-					});
-					form.value = initForm()
-				}
-			} catch (err) {
-				console.log(err)
-			}
+	// 查找参数
+	const scanSearchParams = ref < Obj > ({
+		searchKey: "code"
+	})
+	// 选择的物料
+	const materialSelected = ref < Obj[] > ([])
+	const materialSelect = (materiels: Obj[]) => {
+		// 处理form
+		if (materiels.length > 0) {
+			const item = materiels[0]
+			form.value.invCode = item.cInvCode
+			form.value.invName = item.cInvName
+			form.value.quantity = item.iQuantity
+			form.value.count = item.iQuantity
+			form.value.remark = ""
+			form.value.position = item.cposcode
+			form.value.cwhCode = item.cwhcode
+			form.value.shelfName = item.cwhname + item.cposname
+			// form.value.bInvBatch = item.bInvBatch
+			form.value.batch = item.cbatch
 		}
-	}, 2000)
+	}
+	// // 物料扫码
+	// const procuctScanSuccess = useThrottle(async (code: string) => {
+	// 	if (code) {
+	// 		try {
+	// 			const codeInfo = splitCodes(code)
+	// 			nextTick(() => {
+	// 				form.value.invCode = codeInfo.code
+	// 			})
+	// 			const res = await getBusiness({
+	// 				id: PickerTypeId.MATERIAL,
+	// 				code: codeInfo.code
+	// 			})
+	// 			if (res && res.data.list.length > 0) {
+	// 				if (res.data.list[0].bInvBatch === '1') {
+	// 					// 如果开启了批次管理
+	// 					form.value.batch = codeInfo.batch
+	// 				}
+	// 				form.value.quantity = codeInfo.quantity
+	// 				form.value.count = form.value.quantity
+	// 				form.value.invName = res.data.list[0].name
+	// 				form.value.bInvBatch = res.data.list[0].bInvBatch
+	// 			} else {
+	// 				// uni.showToast({
+	// 				// 	title: "未查询到物料",
+	// 				// 	icon: "none"
+	// 				// })
+	// 				uni.showModal({
+	// 					title: '提示',
+	// 					content: "未查询到物料",
+	// 				});
+	// 				form.value = initForm()
+	// 			}
+	// 		} catch (err) {
+	// 			console.log(err)
+	// 		}
+	// 	}
+	// }, 2000)
 	// 货位扫码
 	const shelfScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
@@ -434,8 +457,13 @@
 
 		<up-form class="common-form" labelPosition="left" required>
 			<up-form-item class="common-form-item" label="物料编码:" borderBottom labelWidth="80" style="padding: 0">
-				<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
-					v-model="form.invCode" focus :manInput="manInput"></up-input-scan>
+				<!-- 				<up-input-scan placeholder="扫码后,自动带出" clearable class="input-item" @scanSuccess="procuctScanSuccess"
+					v-model="form.invCode" focus :manInput="manInput"></up-input-scan> -->
+
+				<UpInputMaterielPicker @select="materialSelect" placeholder="扫码/手输物料编码" clearable class="input-item"
+					v-model:selected="materialSelected" v-model="form.invCode" scan :scanSearchParams="scanSearchParams" focus
+					:manInput="manInput">
+				</UpInputMaterielPicker>
 			</up-form-item>
 
 			<up-form-item class="common-form-item" label="物料名称:" borderBottom labelWidth="80" style="padding: 0">
@@ -443,9 +471,8 @@
 				</up-input>
 			</up-form-item>
 
-			<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0"
-				v-if="form.bInvBatch === '1'">
-				<up-input placeholder="" clearable class="input-item" v-model="form.batch">
+			<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input placeholder="自动填充" clearable class="input-item" v-model="form.batch">
 				</up-input>
 			</up-form-item>
 
@@ -548,9 +575,8 @@
 									readonly></up-input>
 							</up-form-item>
 
-							<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="100" style="padding: 0"
-								v-if="originData.bInvBatch === '1'">
-								<up-input placeholder="" clearable class="input-item" v-model="editData.batch">
+							<up-form-item class="common-form-item" label="批次号:" borderBottom labelWidth="100" style="padding: 0">
+								<up-input placeholder="自动带出" clearable class="input-item" v-model="editData.batch">
 								</up-input>
 							</up-form-item>
 						</up-form>

@@ -23,7 +23,7 @@ export default ({ mode }) => defineConfig({
 				// 南昌测试环境
 				target: "http://10.32.13.222:8081/",
 				// 南昌正式环境
-				// target: "http://10.32.13.222:8082/",
+				// target: "http://182.106.226.177:64123/api/",
 				rewrite: (path) => path.replace(/^\/api/, ""),
 				changeOrigin: true,
 			},
