@@ -77,10 +77,12 @@
 				uni.showModal({
 					title: '提示',
 					content: "首次连接蓝牙需手动连接",
-					success: () => {
-						uni.switchTab({
-							url: routes.blueTooth.path
-						})
+					success: (res) => {
+						if (res.confirm) {
+							uni.switchTab({
+								url: routes.blueTooth.path
+							})
+						}
 					}
 				});
 			}
