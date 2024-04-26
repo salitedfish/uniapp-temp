@@ -7,6 +7,7 @@
 	import { logged } from "@/util/common"
 	import { userInfo, authList } from "@/store/auth"
 	import { updateAllDate, appVersion } from "@/store/common"
+	import manifestJson from "@/manifest.json"
 
 	updateAllDate()
 
@@ -149,8 +150,8 @@
 	<u-navbar :fixed="true" placeholder title="">
 		<template #left>
 			<view>
-				<!-- {{routes.home.style.navigationBarTitleText + " " + appVersion}} -->
-				{{routes.home.style.navigationBarTitleText}}
+				{{routes.home.style.navigationBarTitleText + " v" + manifestJson.versionCode}}
+				<!-- {{routes.home.style.navigationBarTitleText}} -->
 			</view>
 		</template>
 		<template #right>

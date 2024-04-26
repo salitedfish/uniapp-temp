@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 	import { useVersionCheck } from "@/hook/useVersionCheck"
+	import { Platform } from "@/util/env"
 
-	// useVersionCheck({})
+	if (Platform.isApp()) {
+		useVersionCheck({})
+	}
 </script>
 
 <template>
