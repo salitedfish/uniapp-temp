@@ -57,6 +57,10 @@
 	onShow(() => {
 		const configStr = uni.getStorageSync("oSDDefaultSet")
 		config.value = configStr ? JSON.parse(configStr) : {}
+
+		if (!headRemark.value && config.value.stockroomSaveTypeSelected) {
+			headRemark.value = config.value.stockroomSaveTypeSelected[0].name
+		}
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
@@ -83,6 +87,7 @@
 	}
 	// 表单
 	const form = ref(initForm())
+	const headRemark = ref("")
 	// 物料扫码
 	const procuctScanSuccess = useThrottle(async (code: string) => {
 		if (code) {
@@ -372,7 +377,8 @@
 					crdcode: config.value.stockroomSaveTypeSelected[0].code,
 					cwhcode: config.value.stockroomSelected[0].code,
 					ddate: tableData.value[0].date,
-					cbusType: config.value.busTypeSelected.length > 0 ? config.value.busTypeSelected[0].name : ""
+					cbusType: config.value.busTypeSelected.length > 0 ? config.value.busTypeSelected[0].name : "",
+					cmemo: headRemark.value
 				}
 
 			}
@@ -425,8 +431,12 @@
 					</up-input>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
+				<!-- 				<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
 					<up-input placeholder="请输入备注" clearable class="input-item" v-model="form.remark">
+					</up-input>
+				</up-form-item> -->
+				<up-form-item class="common-form-item" label="表头备注:" borderBottom labelWidth="80" style="padding: 0">
+					<up-input placeholder="请输入备注" clearable class="input-item" v-model="headRemark">
 					</up-input>
 				</up-form-item>
 

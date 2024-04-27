@@ -67,6 +67,10 @@
 		// 	.position) {
 		// 	shelfScanSuccess("11000001")
 		// }
+		// 表单备注根据默认的出库类别名称来
+		if (!headRemark.value && config.value.outStockroomTypeSelected) {
+			headRemark.value = config.value.outStockroomTypeSelected[0].name
+		}
 	})
 	onMounted(() => {
 		dateSelected.value = [nowFormat]
@@ -98,6 +102,7 @@
 	}
 	// 表单
 	const form = ref(initForm())
+	const headRemark = ref("")
 	// 查找参数
 	const scanSearchParams = ref < Obj > ({
 		searchKey: "code"
@@ -413,6 +418,7 @@
 					cwhcode: config.value.stockroomSelected[0].code,
 					ddate: tableData.value[0].date,
 					depcode: config.value.depSelected.length > 0 ? config.value.depSelected[0].code : "",
+					cmemo: headRemark.value
 				},
 				attachmentList: medias.value.filter(item => item.status === "success").map(item => {
 					return {
@@ -481,8 +487,12 @@
 				</up-input>
 			</up-form-item>
 
-			<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
+			<!-- 			<up-form-item class="common-form-item" label="备注:" borderBottom labelWidth="80" style="padding: 0">
 				<up-input placeholder="请输入备注" clearable class="input-item" v-model="form.remark">
+				</up-input>
+			</up-form-item> -->
+			<up-form-item class="common-form-item" label="表头备注:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input placeholder="请输入备注" clearable class="input-item" v-model="headRemark">
 				</up-input>
 			</up-form-item>
 

@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 import commonjs from 'vite-plugin-commonjs';
-import basicSsl from '@vitejs/plugin-basic-ssl'
+// import basicSsl from '@vitejs/plugin-basic-ssl'
 
 
 // https://vitejs.dev/config/
@@ -21,7 +21,9 @@ export default ({ mode }) => defineConfig({
 				// 晓楠
 				// target: 'http://192.168.0.98:8082/',
 				// 南昌测试环境
-				target: "http://10.32.13.222:8081/",
+				// target: "http://10.32.13.222:8081/",
+				// 南昌测试环境
+				target: "http://192.168.0.8:8096/",
 				// 南昌正式环境
 				// target: "http://182.106.226.177:64123/api/",
 				rewrite: (path) => path.replace(/^\/api/, ""),

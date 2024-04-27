@@ -14,20 +14,23 @@ export const useVersionCheck = async (p : { title ?: string, content ?: string, 
 	const res = await versionCheckApi()
 	if (res.data) {
 		// 如果一样就不需要更新
-		if (appVersion.value === res.data.versionCode) {
+		if (appVersion.value === res.data.version) {
 			return;
-		} else if (res.data.versionCode) {
+		} else if (res.data.version) {
 			// android进行如下操作
 			uni.showModal({
-				title: param.title,
-				content: param.content,
+				title: param.title + `v${res.data.version}`,
+				content: res.data.remark,
 				showCancel: true,
 				confirmText: param.oktext,
 				cancelText: param.canceltext,
 				success: result => {
 					// 如果点了确认就开始更新
 					if (result.confirm) {
-						startUpdate(res.data.versionUrl)
+						console.log("立即更新")
+						startUpdate(res.data.url)
+					} else {
+						console.log("取消更新")
 					}
 				}
 			})
@@ -63,7 +66,8 @@ export const useVersionCheck = async (p : { title ?: string, content ?: string, 
 
 export const startUpdate = (versionUrl : string) => {
 	// const downloadUrl = getBaseUrl() + versionUrl
-	const downloadUrl = "https://mp-8451969f-649c-4931-ae5e-af3fc163dcd1.cdn.bspapp.com/cloudstorage/a94421ca-ff80-4454-8e50-2758f6b859ab.apk"
+	console.log("更新地址：", versionUrl)
+	const downloadUrl = versionUrl
 	const downloadOptions = {
 		filename: "_downloads/"
 	}

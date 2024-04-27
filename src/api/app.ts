@@ -1,12 +1,13 @@
 import { uRequest } from "./instance"
 import type { Return } from "@/type/common"
 
-// 登录
+// 版本检查
 export const versionCheck = async () => {
-	return await uRequest.get<Return<{
-		versionCode : string,
-		versionUrl : string
+	return await uRequest.post<Return<{
+		version : string,
+		url : string,
+		remark : string
 	}>>({
-		url: "versionCheck",
+		url: "app/versionCheck",
 	})
 }
