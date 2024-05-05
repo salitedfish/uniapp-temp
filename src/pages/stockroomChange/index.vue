@@ -81,7 +81,6 @@
 		}
 	}
 	const form = ref(initForm())
-
 	// 查找类型
 	const typeSelect = ref(0)
 	watch(typeSelect, () => {
@@ -107,6 +106,9 @@
 			form.value.quantity = item.iQuantity
 		}
 	}
+
+	// 表头备注
+	const headRemark = ref("")
 
 	// 日期
 	const dateSelected = ref < string[] > ([])
@@ -357,7 +359,8 @@
 					iwhcode: config.value.inStockroomSelected[0].code,
 					odepcode: config.value.outDepSelected.length > 0 ? config.value.outDepSelected[0].code : "",
 					ordcode: config.value.outStTypeSelected.length > 0 ? config.value.outStTypeSelected[0].code : "",
-					owhcode: config.value.outStockroomSelected[0].code
+					owhcode: config.value.outStockroomSelected[0].code,
+					ctvmemo: headRemark.value
 				}
 			}
 			await stockroomChange(params)
@@ -447,6 +450,13 @@
 				<up-form-item class="common-form-item" label="调拨数量:" borderBottom labelWidth="100" style="padding: 0">
 					<up-input placeholder="大于0, 小于现存量" clearable class="input-item" type="number" :min="0"
 						v-model="form.count">></up-input>
+				</up-form-item>
+			</up-form>
+			<up-form class="common-form" labelPosition="left">
+
+				<up-form-item class="common-form-item" label="表头备注:" borderBottom labelWidth="100" style="padding: 0">
+					<up-input placeholder="请输入备注" clearable class="input-item" v-model="headRemark">
+					</up-input>
 				</up-form-item>
 
 				<up-form-item class="common-form-item" label="制单日期:" borderBottom labelWidth="100" style="padding: 0">

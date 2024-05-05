@@ -19,11 +19,11 @@ export default ({ mode }) => defineConfig({
 				// 文博
 				// target: 'http://192.168.0.6:8082/',
 				// 晓楠
-				// target: 'http://192.168.0.98:8082/',
+				// target: 'http://192.168.0.98:8096/',
 				// 南昌测试环境
-				// target: "http://10.32.13.222:8081/",
+				target: "http://10.32.13.222:8081/",
 				// 南昌测试环境
-				target: "http://192.168.0.8:8096/",
+				// target: "http://192.168.0.8:8096/",
 				// 南昌正式环境
 				// target: "http://182.106.226.177:64123/api/",
 				rewrite: (path) => path.replace(/^\/api/, ""),

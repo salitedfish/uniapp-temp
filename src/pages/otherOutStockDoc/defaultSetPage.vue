@@ -93,11 +93,11 @@
 						v-model:selected="form.outStockroomTypeSelected"></UpInputOutSrTypePicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="业务类别:" borderBottom labelWidth="80" style="padding: 0">
+				<!-- 				<up-form-item class="common-form-item" label="业务类别:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputBusTypePicker border="none" placeholder="选择业务类型" clearable class="input-item" readonly
 						v-model:selected="form.busTypeSelected">
 					</UpInputBusTypePicker>
-				</up-form-item>
+				</up-form-item> -->
 
 			</up-form>
 		</view>

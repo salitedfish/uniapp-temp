@@ -69,7 +69,7 @@
 		// }
 		// 表单备注根据默认的出库类别名称来
 		if (!headRemark.value && config.value.outStockroomTypeSelected) {
-			headRemark.value = config.value.outStockroomTypeSelected[0].name
+			headRemark.value = config.value.outStockroomTypeSelected[0]?.name
 		}
 	})
 	onMounted(() => {
@@ -102,7 +102,6 @@
 	}
 	// 表单
 	const form = ref(initForm())
-	const headRemark = ref("")
 	// 查找参数
 	const scanSearchParams = ref < Obj > ({
 		searchKey: "code"
@@ -158,7 +157,7 @@
 	// 				form.value = initForm()
 	// 			}
 	// 		} catch (err) {
-	// 			console.log(err)
+	// 			console.log(err) 
 	// 		}
 	// 	}
 	// }, 2000)
@@ -209,6 +208,8 @@
 			}
 		}
 	}, 2000)
+	// 表头备注
+	const headRemark = ref("")
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	const dateSelect = (dates: string[]) => {
@@ -491,10 +492,7 @@
 				<up-input placeholder="请输入备注" clearable class="input-item" v-model="form.remark">
 				</up-input>
 			</up-form-item> -->
-			<up-form-item class="common-form-item" label="表头备注:" borderBottom labelWidth="80" style="padding: 0">
-				<up-input placeholder="请输入备注" clearable class="input-item" v-model="headRemark">
-				</up-input>
-			</up-form-item>
+
 
 			<up-form-item class="common-form-item" label="货位:" borderBottom labelWidth="80" style="padding: 0" required
 				v-if="shelfSelectEnable">
@@ -505,6 +503,13 @@
 			<up-form-item class="common-form-item" label="货位名称:" borderBottom labelWidth="80" style="padding: 0"
 				v-if="shelfSelectEnable">
 				<up-input border="none" placeholder="自动填充" clearable class="input-item" readonly v-model="form.shelfName">
+				</up-input>
+			</up-form-item>
+		</up-form>
+
+		<up-form class="common-form" labelPosition="left">
+			<up-form-item class="common-form-item" label="表头备注:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input placeholder="请输入备注" clearable class="input-item" v-model="headRemark">
 				</up-input>
 			</up-form-item>
 
