@@ -16,7 +16,8 @@
 
 <script lang='ts' setup>
 	defineProps < {
-		modelValue: number
+		modelValue: number,
+		label: string
 	} > ()
 	const emit = defineEmits < {
 		(event: "update:modelValue", value: number): void
@@ -37,7 +38,7 @@
 
 <template>
 	<up-form class="common-form" labelPosition="left">
-		<up-form-item class="common-form-item" label="打印出库明细:" borderBottom labelWidth="120" style="padding: 0">
+		<up-form-item class="common-form-item" :label="label" borderBottom labelWidth="120" style="padding: 0">
 			<view class="type-check-box">
 				<u-radio-group placement="row" class="radio-group" :modelValue="modelValue"
 					@update:modelValue="updateModelValue">

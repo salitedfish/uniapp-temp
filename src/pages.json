@@ -387,7 +387,7 @@
 		"fontSize": "12px",
 		"iconWidth": "24px",
 		"spacing": "3px",
-		"iconfontSrc": "static/iconfont.ttf", // app tabbar 字体.ttf文件路径 app 3.4.4+
+		"iconfontSrc": "./static/iconfont.ttf", // app tabbar 字体.ttf文件路径 app 3.4.4+
 		"list": [{
 				"pagePath": "pages/blueTooth/index",
 				"iconPath": "static/tabbar/blueTooth.png",

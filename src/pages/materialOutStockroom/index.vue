@@ -3,7 +3,8 @@
 	import {
 		onMounted,
 		onUnmounted,
-		watch
+		watch,
+		ref
 	} from 'vue';
 	import {
 		onShow
@@ -11,12 +12,13 @@
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import ReferTypeCheck from "./components/ReferTypeCheck.vue"
-	import PrintTypeCheck from "./components/PrintTypeCheck.vue"
+	import PrintTypeCheck from "@/components/PrintTypeCheck.vue"
 	import UnInputProcessSendDocPicker from "@/components/UpInputProcesSendDocPicker.vue"
 	import UpInputMaterielApplyDocPicker from "@/components/UpInputMaterielApplyDocPicker"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import PrintContent from "./components/PrintContent.vue"
 	import RePrintContent from "./components/RePrintContent"
+	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
 	// 工具
 	import {
 		useTimeFormat
@@ -53,9 +55,6 @@
 		confirmDisabled,
 		submiting
 	} from "./index"
-	import {
-		Platform
-	} from '@/util/env';
 
 	const rightClick = () => {
 		uni.navigateTo({
@@ -63,36 +62,14 @@
 		})
 	}
 
-	// 蓝牙连接检查方法，封装个组件
-	const checkBlueTooth = () => {
-		if (Platform.isWeb()) return
-		if (!blueToothStore.connected) {
-			console.log("打印页面发现蓝牙未连接")
-			const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
-			if (blueToothDeviceId) {
-				console.log("连过蓝牙，自动连接", blueToothDeviceId)
-				blueTooth.autoConnect(blueToothDeviceId)
-			} else {
-				console.log("未连过蓝牙，提示手动连接")
-				uni.showModal({
-					title: '提示',
-					content: "首次连接蓝牙需手动连接",
-					success: (res) => {
-						if (res.confirm) {
-							uni.switchTab({
-								url: routes.blueTooth.path
-							})
-						}
-					}
-				});
-			}
-		}
-	}
+	const autoConnectBlueTooth = ref < Obj | undefined > ();
 
 	onMounted(() => {
 		dateSelected.value = [useTimeFormat("{YYYY}-{MM}-{dd}")(Date.now()).format]
 		if (typeSelect.value === 2 || printTypeCheck.value === 0) {
-			checkBlueTooth()
+			if (autoConnectBlueTooth.value) {
+				autoConnectBlueTooth.value.checkBlueTooth()
+			}
 		}
 
 	})
@@ -106,8 +83,10 @@
 		config.value = configStr ? JSON.parse(configStr) : {}
 	})
 	watch([typeSelect, printTypeCheck], (values: number[]) => {
-		if (values[1] === 0 || values[0] === 2) {
-			checkBlueTooth()
+		if (values[0] === 2 || values[1] === 0) {
+			if (autoConnectBlueTooth.value) {
+				autoConnectBlueTooth.value.checkBlueTooth()
+			}
 		}
 	})
 </script>
@@ -119,10 +98,7 @@
 		</CustomNavBar>
 
 		<u-sticky>
-			<up-button class="btn-item" @click="checkBlueTooth" :type="blueToothStore.connected? 'success' : 'primary' "
-				:text="blueToothStore.searching ? '蓝牙搜索中...' : blueToothStore.connected? '蓝牙已连接' : '点击连接蓝牙'"
-				v-if="Platform.isApp()">
-			</up-button>
+			<AutoConnectBlueTooth ref="autoConnectBlueTooth"></AutoConnectBlueTooth>
 		</u-sticky>
 
 		<view class=" common-section-title">
@@ -237,7 +213,8 @@
 			</view>
 		</view>
 
-		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck" v-if="typeSelect === 0 && typeSelect !== 2">
+		<PrintTypeCheck class="print-check-box" v-model="printTypeCheck" label="打印出库明细:"
+			v-if="typeSelect === 0 && typeSelect !== 2">
 		</PrintTypeCheck>
 
 		<PrintContent class="" :printContent="tableData" :showPrintContent="showPrintContent"

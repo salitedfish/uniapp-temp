@@ -6,7 +6,6 @@
 	import { Env } from "@/type/env"
 	import { Platform } from "@/util/env"
 	import { authList, setUserInfo } from "@/store/auth"
-	import { blueTooth } from "@/store/blueTooth"
 	import { updateAllDate } from "@/store/common"
 	import type { RouteName } from "./type/route"
 
@@ -59,8 +58,9 @@
 								url: routes.home.path
 							})
 						}
-						// 没登录就去登录
-					} else {
+					}
+					// 没登录就去登录
+					else {
 						uni.redirectTo({
 							url: routes.login.path
 						})
@@ -69,14 +69,15 @@
 			}
 			// app
 			if (Platform.isApp()) {
+				// 如果已经登录了，则跳到首页
 				if (logged()) {
 					await setUserInfo()
-					// 如果已经登录了，则跳到首页
 					uni.switchTab({
 						url: routes.home.path
 					})
-				} else {
-					// 如果没登录，则跳到登录页面
+				}
+				// 如果没登录，则跳到登录页面
+				else {
 					uni.redirectTo({
 						url: routes.login.path
 					})
@@ -95,15 +96,6 @@
 			})
 		} finally {
 			console.log("App Launch")
-			// app
-			if (Platform.isApp()) {
-				//如果之前有连接过蓝牙，则自动连接蓝牙
-				// const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
-				// console.log("缓存的蓝牙设备id", blueToothDeviceId)
-				// if (blueToothDeviceId) {
-				// 	blueTooth.autoConnect(blueToothDeviceId)
-				// }
-			}
 		}
 	})
 	onShow(() => {
