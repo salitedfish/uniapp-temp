@@ -4,9 +4,13 @@ const pages = pagesJSON.pages
 
 // 实际路由数据从json中获取，但json无法获取类型，所以路由跳转类型能选哪些需要在这里配置
 type TabRouteName = "login" | "home" | "blueTooth" | "demo" | "demoInside"
-type HomeRouteName = "purchaseArrival" | "purchaseStockroom" | "materialOutStockroom" | "productionStockroom" | "deliveryMaterial" | "shelfChange" | "stockroomChange" | "codeCheck" | "otherStockDoc" | "otherOutStockDoc" | "refundDoc" | "outSrDocFlieUpload"
+// 仓储管理的路由
+type StockroomManagerName = "purchaseArrival" | "purchaseStockroom" | "materialOutStockroom" | "productionStockroom" | "deliveryMaterial" | "shelfChange" | "stockroomChange" | "codeCheck" | "otherStockDoc" | "otherOutStockDoc" |
+	"refundDoc" | "outSrDocFlieUpload"
 type DefaultSetRouteName = "pADefaultSetPage" | "pSDefaultSetPage" | "mOSDefaultSetPage" | "sCDefaultSetPage" | "prSDefaultSetPage" | "srCDefaultSetPage" | "oSDDefaultSetPage" | "oOSDDefaultSetPage" | "rDDefaultSetPage"
-export type RouteName = TabRouteName | HomeRouteName | DefaultSetRouteName
+// 追溯管理的路由
+type TraceManagerRouteName = "clockIn" | "checkout" | "workPlan" | "anDon" | "traceManager" | "traceSearch"
+export type RouteName = TabRouteName | StockroomManagerName | TraceManagerRouteName | DefaultSetRouteName
 // 从json中获取路由类型
 export type Route = typeof pages[0]
 

@@ -24,13 +24,18 @@
 			url: routes.home.path
 		})
 	}
+	withDefaults(defineProps < {
+		rightText: string
+	} > (), {
+		rightText: ""
+	})
 </script>
 
 <template>
 	<u-navbar :fixed="true" placeholder @leftClick="leftClick" v-bind="attrs">
 		<template #right>
 			<view class="link">
-				默认参数
+				{{rightText}}
 			</view>
 		</template>
 	</u-navbar>

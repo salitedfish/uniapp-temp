@@ -385,7 +385,8 @@
 
 <template>
 	<view class="common-page-container">
-		<CustomNavBar :title="routes.stockroomChange.style.navigationBarTitleText" @rightClick="rightClick"></CustomNavBar>
+		<CustomNavBar :title="routes.stockroomChange.style.navigationBarTitleText" @rightClick="rightClick"
+			rightText="默认参数"></CustomNavBar>
 
 		<view>
 			<view class="common-section-title">

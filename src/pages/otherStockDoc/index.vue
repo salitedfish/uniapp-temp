@@ -403,7 +403,7 @@
 
 <template>
 	<view class="common-page-container">
-		<CustomNavBar :title="routes.otherStockDoc.style.navigationBarTitleText" @rightClick="rightClick">
+		<CustomNavBar :title="routes.otherStockDoc.style.navigationBarTitleText" @rightClick="rightClick" rightText="默认参数">
 		</CustomNavBar>
 
 		<view>

@@ -297,7 +297,7 @@
 
 <template>
 	<view class="common-page-container">
-		<CustomNavBar :title="routes.refundDoc.style.navigationBarTitleText" @rightClick="rightClick">
+		<CustomNavBar :title="routes.refundDoc.style.navigationBarTitleText" @rightClick="rightClick" rightText="默认参数">
 		</CustomNavBar>
 
 		<view class="common-section-title">
