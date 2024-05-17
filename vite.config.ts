@@ -21,11 +21,15 @@ export default ({ mode }) => defineConfig({
 				// 晓楠
 				// target: 'http://192.168.0.98:8096/',
 				// 测试环境
-				target: "http://10.32.13.222:8081/",
+				// target: "http://10.32.13.222:8081/",
 				// 测试环境
 				// target: "http://192.168.0.8:8096/",
 				// 正式环境
 				// target: "http://182.106.226.177:64123/api/",
+				// 赤壁追溯H5测试
+				// target: "http://119.3.17.60:8096/",
+				// target: "http://192.168.0.87:8096/",
+				target: "http://192.168.0.40:8096/",
 				rewrite: (path) => path.replace(/^\/api/, ""),
 				changeOrigin: true,
 			},

@@ -6,6 +6,8 @@
 	const genImgUrl = (url : string) => {
 		let target = url
 		// 只有正式环境的H5端才需要转化url
+		// 为了让后端返回的内网地址转成公网地址（否则在公网地址无法回显内网地址的图片），如果h5只在内网用，则不能转换，看情况修改
+		// 或者接口是用代理的情况下，则不用修改
 		if (import.meta.env.VITE_RUN_TIME === "production" && Platform.isWeb()) {
 			const index = url.indexOf("/uploadFiles/file")
 			target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
@@ -66,7 +68,6 @@
 					url: "",
 				});
 			}
-
 
 			// 移动标记
 			fileListLen++;

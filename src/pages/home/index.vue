@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-	import { computed, ref } from "vue"
+	import { computed } from "vue"
 	import { routes } from "@/store/route"
 	import { globalColor } from "@/store/theme"
 	import { RouteType, type Route } from "@/type/route"
 	import { useLogout } from "@/hook/useLogout"
 	import { logged } from "@/util/common"
 	import { userInfo, authList } from "@/store/auth"
-	import { updateAllDate, appVersion } from "@/store/common"
+	import { updateAllDate } from "@/store/common"
 	import manifestJson from "@/manifest.json"
+	import { Env } from "@/type/env"
 
 	updateAllDate()
 
@@ -37,6 +38,62 @@
 		})
 	}
 
+	// 追溯系统页面
+	const traceManagerList = computed<FunItem[]>(() => {
+		return [
+			{
+				name: routes.LdOnDuty.name,
+				title: routes.LdOnDuty.style.navigationBarTitleText,
+				icon: "/static/home/clockIn.svg",
+				route: routes.LdOnDuty,
+				auth: authList.value.includes(routes.LdOnDuty.name)
+			},
+			{
+				name: routes.EquipmentCheck.name,
+				title: routes.EquipmentCheck.style.navigationBarTitleText,
+				icon: "/static/home/checkout.svg",
+				route: routes.EquipmentCheck,
+				auth: authList.value.includes(routes.EquipmentCheck.name)
+			},
+			{
+				name: routes.LdWorkPlan.name,
+				title: routes.LdWorkPlan.style.navigationBarTitleText,
+				icon: "/static/home/workPlan.svg",
+				route: routes.LdWorkPlan,
+				auth: authList.value.includes(routes.LdWorkPlan.name)
+			},
+			{
+				name: routes.LdAndon.name,
+				title: routes.LdAndon.style.navigationBarTitleText,
+				icon: "/static/home/anDon.svg",
+				route: routes.LdAndon,
+				auth: authList.value.includes(routes.LdAndon.name)
+			},
+			{
+				name: routes.Trace.name,
+				title: routes.Trace.style.navigationBarTitleText,
+				icon: "/static/home/traceManager.svg",
+				route: routes.Trace,
+				auth: authList.value.includes(routes.Trace.name)
+			},
+			{
+				name: routes.TraceSearch.name,
+				title: routes.TraceSearch.style.navigationBarTitleText,
+				icon: "/static/home/traceSearch.svg",
+				route: routes.TraceSearch,
+				auth: authList.value.includes(routes.TraceSearch.name)
+			},
+			{
+				name: routes.ProductJobList.name,
+				title: routes.ProductJobList.style.navigationBarTitleText,
+				icon: "/static/home/productJobList.svg",
+				route: routes.ProductJobList,
+				auth: authList.value.includes(routes.ProductJobList.name)
+			},
+		]
+	})
+
+	// 仓储系统页面
 	const stockroomManagerList = computed<FunItem[]>(() => {
 		return [
 			{
@@ -115,61 +172,20 @@
 				icon: "/static/home/returned_order.svg",
 				route: routes.refundDoc,
 				auth: authList.value.includes(routes.refundDoc.name)
-			},
-			{
-				// name: routes.outSrDocFlieUpload.name,
-				// title: routes.outSrDocFlieUpload.style.navigationBarTitleText,
-				// icon: "/static/home/out_sr_doc_upload.svg",
-				// route: routes.outSrDocFlieUpload,
-			},
+			}
 		]
 	})
 
-	const traceManagerList = computed<FunItem[]>(() => {
-		return [
+	// 独立的页面，开发时展示，打包时会隐藏入口
+	const devList = computed<FunItem[]>(() => {
+		return process.env.NODE_ENV === Env.DEV ? [
 			{
-				name: routes.clockIn.name,
-				title: routes.clockIn.style.navigationBarTitleText,
-				icon: "/static/home/clockIn.svg",
-				route: routes.clockIn,
-				auth: authList.value.includes(routes.clockIn.name)
+				name: routes.outSrDocFlieUpload.name,
+				title: routes.outSrDocFlieUpload.style.navigationBarTitleText,
+				icon: "/static/home/out_sr_doc_upload.svg",
+				route: routes.outSrDocFlieUpload,
 			},
-			{
-				name: routes.checkout.name,
-				title: routes.checkout.style.navigationBarTitleText,
-				icon: "/static/home/checkout.svg",
-				route: routes.checkout,
-				auth: authList.value.includes(routes.checkout.name)
-			},
-			{
-				name: routes.workPlan.name,
-				title: routes.workPlan.style.navigationBarTitleText,
-				icon: "/static/home/workPlan.svg",
-				route: routes.workPlan,
-				auth: authList.value.includes(routes.workPlan.name)
-			},
-			{
-				name: routes.anDon.name,
-				title: routes.anDon.style.navigationBarTitleText,
-				icon: "/static/home/anDon.svg",
-				route: routes.anDon,
-				auth: authList.value.includes(routes.anDon.name)
-			},
-			{
-				name: routes.traceManager.name,
-				title: routes.traceManager.style.navigationBarTitleText,
-				icon: "/static/home/traceManager.svg",
-				route: routes.traceManager,
-				auth: authList.value.includes(routes.traceManager.name)
-			},
-			{
-				name: routes.traceSearch.name,
-				title: routes.traceSearch.style.navigationBarTitleText,
-				icon: "/static/home/traceSearch.svg",
-				route: routes.traceSearch,
-				auth: authList.value.includes(routes.traceSearch.name)
-			},
-		]
+		] : []
 	})
 
 	// 点击跳转，不同类型路由跳转方式不一样
@@ -193,8 +209,7 @@
 	<u-navbar :fixed="true" placeholder title="">
 		<template #left>
 			<view>
-				{{routes.home.style.navigationBarTitleText + " v" + manifestJson.versionCode}}
-				<!-- {{routes.home.style.navigationBarTitleText}} -->
+				{{routes.home.style.navigationBarTitleText + " v" + manifestJson.versionName}}
 			</view>
 		</template>
 		<template #right>
@@ -208,18 +223,28 @@
 		</template>
 	</u-navbar>
 
-	<up-text text="仓储管理" class="grid-title" bold></up-text>
+	<up-text text="追溯管理" class="grid-title" bold></up-text>
 	<u-grid :border="true" class="grid-box">
-		<u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList.filter(item => item.auth)"
-			:key="index" class="grid-item" :name="item.title">
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList" :key="index" class="grid-item">
 			<image :src="item.icon" class="grid-icon"></image>
 			<text class="grid-text">{{item.title}}</text>
 		</u-grid-item>
 	</u-grid>
 
-	<up-text text="追溯管理" class="grid-title" bold></up-text>
+	<up-text text="仓储管理" class="grid-title" bold></up-text>
 	<u-grid :border="true" class="grid-box">
-		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList" :key="index" class="grid-item">
+		<!-- <u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList.filter(item => item.auth)" -->
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList" :key="index" class="grid-item"
+			:name="item.title">
+			<image :src="item.icon" class="grid-icon"></image>
+			<text class="grid-text">{{item.title}}</text>
+		</u-grid-item>
+	</u-grid>
+
+	<up-text text="其他" class="grid-title" bold v-if="devList.length"></up-text>
+	<u-grid :border="false" class="grid-box">
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in devList" :key="index" class="grid-item"
+			:name="item.title">
 			<image :src="item.icon" class="grid-icon"></image>
 			<text class="grid-text">{{item.title}}</text>
 		</u-grid-item>

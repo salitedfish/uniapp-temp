@@ -1,10 +1,8 @@
 <script lang="ts" setup>
+	// #ifdef APP-PLUS
 	import { useVersionCheck } from "@/hook/useVersionCheck"
-	import { Platform } from "@/util/env"
-
-	if (Platform.isApp()) {
-		useVersionCheck({})
-	}
+	useVersionCheck({})
+	// #endif
 </script>
 
 <template>

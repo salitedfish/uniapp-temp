@@ -1,4 +1,3 @@
-import { Platform } from "@/util/env"
 import { Env } from "@/type/env"
 import { batchFormat } from "@/store/common"
 /**
@@ -16,28 +15,28 @@ export const logged = () => {
 
 // 通过网络url获取本地临时路径
 export const genLocalFileUrl = (fileUrl : string) => {
-	if (Platform.isWeb()) {
-		return fileUrl
-	}
-	if (Platform.isApp()) {
-		return `file://${plus.io.convertLocalFileSystemURL(fileUrl)}`
-	}
+	// #ifdef APP-PLUS
+	return `file://${plus.io.convertLocalFileSystemURL(fileUrl)}`
+	// #endif
+	// #ifdef H5
+	return fileUrl
+	// #endif
 }
 
 // 获取后端地址
 export const getBaseUrl = () => {
 	let baseUrl = ""
-	if (Platform.isApp()) {
-		if (process.env.NODE_ENV === Env.DEV) {
-			baseUrl = import.meta.env.VITE_BASE_API_URL_APP_DEV
-		}
-		if (process.env.NODE_ENV === Env.PROD) {
-			baseUrl = import.meta.env.VITE_BASE_API_URL_APP_PRO
-		}
+	// #ifdef APP-PLUS
+	if (process.env.NODE_ENV === Env.DEV) {
+		baseUrl = import.meta.env.VITE_BASE_API_URL_APP_DEV
 	}
-	if (Platform.isWeb()) {
-		baseUrl = import.meta.env.VITE_BASE_API_URL_WEB
+	if (process.env.NODE_ENV === Env.PROD) {
+		baseUrl = import.meta.env.VITE_BASE_API_URL_APP_PRO
 	}
+	// #endif
+	// #ifdef H5
+	baseUrl = import.meta.env.VITE_BASE_API_URL_WEB
+	// #endif
 	return baseUrl
 }
 
@@ -53,7 +52,8 @@ export const splitCodes = (code : string) => {
 		return {
 			code: codes[0] === '1' ? codes[1].slice(0, -1) : codes[1],
 			quantity: codes[5] !== 'null' ? codes[5] : "0",
-			batch: supplierCode ? supplierCode + "-" + batch : batch
+			// batch: supplierCode ? supplierCode + "-" + batch : batch
+			batch: supplierCode ? supplierCode + batch : batch
 		}
 	} else {
 		// 扫的是物料编码

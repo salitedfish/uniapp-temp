@@ -83,3 +83,14 @@ export const pdStockroomSubmit = async (data : Obj) => {
 		}
 	})
 }
+
+// 获取产成品二维码入库信息
+export const getQrcodeSrInfo = async (data : Obj) => {
+	return await uRequest.post<Return<string>>({
+		url: "erp/queryWorkOrderHasInStore",
+		data,
+		header: {
+			"Content-Type": "application/json",
+		}
+	})
+}

@@ -9,7 +9,7 @@ type StockroomManagerName = "purchaseArrival" | "purchaseStockroom" | "materialO
 	"refundDoc" | "outSrDocFlieUpload"
 type DefaultSetRouteName = "pADefaultSetPage" | "pSDefaultSetPage" | "mOSDefaultSetPage" | "sCDefaultSetPage" | "prSDefaultSetPage" | "srCDefaultSetPage" | "oSDDefaultSetPage" | "oOSDDefaultSetPage" | "rDDefaultSetPage"
 // 追溯管理的路由
-type TraceManagerRouteName = "clockIn" | "checkout" | "workPlan" | "anDon" | "traceManager" | "traceSearch"
+type TraceManagerRouteName = "LdOnDuty" | "EquipmentCheck" | "LdWorkPlan" | "LdAndon" | "Trace" | "TraceProcess" | "TraceInfo" | "TraceSearch" | "ProductJobList" | "ProductJobPrinter"
 export type RouteName = TabRouteName | StockroomManagerName | TraceManagerRouteName | DefaultSetRouteName
 // 从json中获取路由类型
 export type Route = typeof pages[0]

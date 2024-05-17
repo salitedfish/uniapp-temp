@@ -50,8 +50,8 @@ dependencies:
     specifier: ^2.0.5
     version: 2.0.5
   '@ultra-man/noa':
-    specifier: ^0.0.46
-    version: 0.0.46
+    specifier: ^0.0.60
+    version: 0.0.60
   '@vitejs/plugin-basic-ssl':
     specifier: ^1.0.2
     version: 1.0.2(vite@4.0.3)
@@ -3184,10 +3184,12 @@ packages:
       '@types/yargs-parser': 21.0.2
     dev: true
 
-  /@ultra-man/noa@0.0.46:
-    resolution: {integrity: sha512-TO1pSX8nlEpxk+Xgh+dPupIzadFAnIIICv2p02tXDzZCIFSchwyGTiGDLXbgxPyrIB2dyx0mnEbSNpsHOjNmVQ==}
+  /@ultra-man/noa@0.0.60:
+    resolution: {integrity: sha512-ofCZDvkt7gU2P5+yt6mlWwbDPaTynKwrU3hAHuk2M3NLiUCWPSE10MsNz7mFIlPSSn23BM8w+dOJIOQ4gpH+mA==}
     dependencies:
       clipboard: 2.0.11
+      crypto-js: 4.2.0
+      print-js: 1.6.0
       spark-md5: 3.0.2
     dev: false
 
@@ -4200,6 +4202,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    dev: false
 
   /css-font-size-keywords@1.0.0:
     resolution: {integrity: sha512-Q+svMDbMlelgCfH/RVDKtTDaf5021O486ZThQPIpahnIjUkMUslC+WuOQSWTgGSrNCH08Y7tYNEmmy0hkfMI8Q==}
@@ -6319,6 +6325,10 @@ packages:
       ansi-styles: 5.2.0
       react-is: 17.0.2
     dev: true
+
+  /print-js@1.6.0:
+    resolution: {integrity: sha512-BfnOIzSKbqGRtO4o0rnj/K3681BSd2QUrsIZy/+WdCIugjIswjmx3lDEZpXB2ruGf9d4b3YNINri81+J0FsBWg==}
+    dev: false
 
   /process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}

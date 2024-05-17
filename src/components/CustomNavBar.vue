@@ -8,9 +8,6 @@
 	// 工具
 	// 接口
 	// 数据
-	import {
-		routes
-	} from "@/store/route"
 	// 类型
 	export default defineComponent({
 		name: ''
@@ -20,12 +17,20 @@
 <script lang='ts' setup>
 	const attrs = useAttrs()
 	const leftClick = () => {
-		uni.switchTab({
-			url: routes.home.path
-		})
+		if (props.leftClick) {
+			props.leftClick()
+		} else {
+			// #ifdef APP-PLUS
+			uni.navigateBack()
+			// #endif
+			// #ifdef H5
+			history.back()
+			// #endif
+		}
 	}
-	withDefaults(defineProps < {
-		rightText: string
+	const props = withDefaults(defineProps < {
+		rightText ? : string
+		leftClick ? : () => void
 	} > (), {
 		rightText: ""
 	})

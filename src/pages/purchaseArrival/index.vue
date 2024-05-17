@@ -55,13 +55,13 @@
 	}
 
 	onShow(() => {
-		if (depSelected.value.length <= 0) {
-			const configStr = uni.getStorageSync("pADefaultSet")
-			if (configStr) {
-				const config = JSON.parse(configStr)
-				depSelected.value = config.depSelected
-			}
-		}
+		// if (depSelected.value.length <= 0) {
+		// 	const configStr = uni.getStorageSync("pADefaultSet")
+		// 	if (configStr) {
+		// 		const config = JSON.parse(configStr)
+		// 		depSelected.value = config.depSelected
+		// 	}
+		// }
 	})
 
 	onMounted(() => {
@@ -74,7 +74,7 @@
 	// 扫描带出供应商
 	const supplier = ref < Obj > ({})
 	// 选择的部门
-	const depSelected = ref < Business[] > ([])
+	// const depSelected = ref < Business[] > ([])
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	// 表格数据
@@ -110,7 +110,9 @@
 							item.batch = item.supplierCode ? `${item.supplierCode}-${batchFormat}` : batchFormat
 						}
 					}
+					// 供应商和部门选列表第一项
 					supplier.value = tableData.value[0]
+					// depSelected.value = tableData.value[0]
 				}
 			} catch (err) {
 				nextTick(() => {
@@ -200,17 +202,17 @@
 				});
 				return
 			}
-			if (depSelected.value.length <= 0) {
-				// uni.showToast({
-				// 	title: "请选择部门",
-				// 	icon: "none"
-				// })
-				uni.showModal({
-					title: '提示',
-					content: "请选择部门"
-				});
-				return
-			}
+			// if (depSelected.value.length <= 0) {
+			// 	// uni.showToast({
+			// 	// 	title: "请选择部门",
+			// 	// 	icon: "none"
+			// 	// })
+			// 	uni.showModal({
+			// 		title: '提示',
+			// 		content: "请选择部门"
+			// 	});
+			// 	return
+			// }
 			// 开始处理生成到货单
 			submiting.value = true
 			uni.showLoading({
@@ -222,8 +224,8 @@
 			const params = {
 				billDate: dateSelected.value[0],
 				busType: config.busTypeSelected[0].name,
-				deptCode: depSelected.value[0].code,
-				deptName: depSelected.value[0].name,
+				// deptCode: depSelected.value[0].code,
+				// deptName: depSelected.value[0].name,
 				list: tableData.value.map(item => {
 					return {
 						...item,
@@ -273,7 +275,8 @@
 	// 提交按钮可不可用
 	const submitDisabled = computed(() => {
 		if (!codeText.value || submiting.value || !supplier.value.supplierCode || tableData.value.length <= 0 ||
-			depSelected.value.length <= 0 || dateSelected.value.length <= 0) {
+			// depSelected.value.length <= 0 || 
+			dateSelected.value.length <= 0) {
 			return true
 		}
 		return false
@@ -299,11 +302,11 @@
 						readonly>
 					</up-input>
 				</up-form-item>
-				<up-form-item class="common-form-item" label="部门:" borderBottom labelWidth="80" style="padding: 0">
+				<!-- 				<up-form-item class="common-form-item" label="部门:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputDepPicker border="none" placeholder="选择部门" readonly clearable class="input-item"
 						v-model:selected="depSelected">
 					</UpInputDepPicker>
-				</up-form-item>
+				</up-form-item> -->
 				<up-form-item class="common-form-item" label="制单日期:" borderBottom labelWidth="80" style="padding: 0">
 					<UpInputDatePicker border="none" placeholder="选择制单日期" clearable class="input-item" readonly
 						v-model:selected="dateSelected" :maxDate="Date.now()">

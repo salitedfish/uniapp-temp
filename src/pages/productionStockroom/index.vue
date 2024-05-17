@@ -12,7 +12,7 @@
 	} from "@dcloudio/uni-app"
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
-	import UpInputScan from "@/components/UpInputScan.vue"
+	import UpInputScan from "@/components/UpInputScanNew.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	// 工具
 	import {
@@ -28,7 +28,8 @@
 		getPositionInfo
 	} from "@/api/business"
 	import {
-		pdStockroomSubmit
+		pdStockroomSubmit,
+		getQrcodeSrInfo
 	} from "@/api/purchaseArrival"
 	// 数据
 	import {
@@ -81,9 +82,12 @@
 	// -------------------------------------------------------------------------------------表单操作
 	const initForm = () => {
 		return {
+			qrCode: "",
+			qrCodeId: "",
 			invCode: "",
 			invName: "",
 			quantity: "",
+			restQuantity: "",
 			count: "",
 			remark: "",
 			position: "",
@@ -98,9 +102,12 @@
 		form.value = {
 			...form.value
 		}
+		form.value.qrCode = ""
+		form.value.qrCodeId = ""
 		form.value.invCode = ""
 		form.value.invName = ""
 		form.value.quantity = ""
+		form.value.restQuantity = ""
 		form.value.count = ""
 		form.value.remark = ""
 		form.value.bInvBatch = ""
@@ -108,26 +115,61 @@
 	}
 	// 表单
 	const form = ref(initForm())
+	// 二维码是否进行数量校验
+	const qrCodeLimit = ref(false)
 	// 产品扫码
 	const procuctScanSuccess = useThrottle(async (code: string) => {
+		form.value.qrCode = qrCodeLimit.value ? code : "";
 		if (code) {
 			try {
+				// 分割通用码
 				const codeInfo = splitCodes(code)
 				nextTick(() => {
 					form.value.invCode = codeInfo.code
 				})
+				// 获取产品信息
 				const res = await getBusiness({
 					id: PickerTypeId.MATERIAL,
 					code: codeInfo.code
 				})
+
 				if (res && res.data.list.length > 0) {
-					form.value.bInvBatch = res.data.list[0].bInvBatch
+					form.value.bInvBatch = res.data.list[0].bInvBatch || ""
 					if (res.data.list[0].bInvBatch === '1') {
 						// 如果开启了批次管理
 						form.value.batch = codeInfo.batch
 					}
 					form.value.quantity = codeInfo.quantity
-					form.value.count = form.value.quantity
+					// 如果需要限制码数量
+					if (qrCodeLimit.value) {
+						// 获取二维码入库信息, 主要获取入库数量
+						const ree = await getQrcodeSrInfo({
+							cdefine30: code
+						})
+						// 条码的可入库数量要减去已入库数量
+						form.value.restQuantity = String(Number(form.value.quantity) - Number(ree.data))
+						// 如果扫的二维码已全部入库，则提示并重置数据
+						if (form.value.restQuantity === '0') {
+							uni.showModal({
+								title: '提示',
+								content: "该二维码已全部入库"
+							});
+							resetForm()
+							return
+						}
+						// 拿到码的唯一值，以便后面提示
+						const arrCodes = form.value.qrCode.split("^")
+						const arrCode2 = arrCodes[arrCodes.length - 1]
+						if (arrCode2) {
+							const arrCodes2 = arrCode2.split("-")
+							form.value.qrCodeId = arrCodes2[arrCodes2.length - 1]
+						}
+					}
+					// 如果不限制码提交数量
+					else {
+						form.value.restQuantity = form.value.quantity
+					}
+					form.value.count = form.value.restQuantity
 					form.value.invName = res.data.list[0].name
 				} else {
 					// uni.showToast({
@@ -141,6 +183,7 @@
 					resetForm()
 				}
 			} catch (err) {
+				resetForm()
 				console.log(err)
 			}
 		}
@@ -332,6 +375,25 @@
 					}
 				}
 			}
+			// 如果开启了入库数量限制则要进行入库数量判断
+			if (qrCodeLimit.value) {
+				for (const item of tableData.value) {
+					const restQuantity = item.restQuantity
+					let count = 0
+					for (const i of tableData.value) {
+						if (item.qrCode === i.qrCode) {
+							count = Number(count) + Number(i.count)
+						}
+					}
+					if (restQuantity < count) {
+						uni.showModal({
+							title: '提示',
+							content: `物料编码：${item.invCode}, 物料名称：${item.invName}, 二维码：${item.qrCodeId}, 剩余最大可入库数量为${restQuantity}, 表格实际总和为${count}, 请确认后再试`
+						});
+						return
+					}
+				}
+			}
 
 			// 开始提交
 			submiting.value = true
@@ -345,7 +407,8 @@
 				body: tableData.value.map(item => {
 					return {
 						...item,
-						quantity: item.count
+						quantity: item.count,
+						cdefine30: item.qrCode
 					}
 				}),
 				head: {
@@ -366,6 +429,7 @@
 		} catch (err) {
 			console.log(err)
 		} finally {
+			uni.hideLoading();
 			submiting.value = false
 		}
 	}
@@ -442,6 +506,7 @@
 						<uni-th class="nowrap" align="left" width="100rpx">产品名称</uni-th>
 						<uni-th class="nowrap" align="left" width="100rpx">入库数量</uni-th>
 						<uni-th class="nowrap" align="left" width="100rpx">货位信息</uni-th>
+						<uni-th class="nowrap" align="left" width="100rpx">二维码</uni-th>
 						<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 					</uni-tr>
 					<!-- 表格数据行 -->
@@ -451,6 +516,7 @@
 						<uni-td class="nowrap">{{ item.invName }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.count }}</uni-td>
 						<uni-td class="nowrap primary">{{ item.position }}</uni-td>
+						<uni-td class="nowrap">{{ item.qrCodeId }}</uni-td>
 						<uni-td class="warning nowrap" @click.stop="deleteTable(key)">删除</uni-td>
 					</uni-tr>
 				</uni-table>

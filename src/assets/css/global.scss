@@ -28,6 +28,9 @@
 			border-top: 1px solid $u-border-color;
 		}
 	}
+	.common-form-next {
+		margin-top: 10px;
+	}
 	.uni-input-input {
 		padding-left: 5px;
 	}
@@ -71,4 +74,9 @@
 	}
 	.success {
 		color: $u-success !important;
+	}
+	
+	.u-cell__body {
+		padding-left: 0 !important;
+		padding-right: 0 !important;
 	}

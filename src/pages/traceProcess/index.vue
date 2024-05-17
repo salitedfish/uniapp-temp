@@ -1,5 +1,4 @@
 <script lang='ts' setup>
-	//
 	import {
 		ref,
 		onMounted
@@ -8,18 +7,24 @@
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	// 数据
 	import {
-		routes
-	} from "@/store/route"
-	import {
 		userInfo
 	} from "@/store/auth"
+	import {
+		routes
+	} from "@/store/route"
 	import {
 		globalColor
 	} from "@/store/theme"
 	// 接口
 	import {
-		getTraceLineList
+		getTraceLineDetail
 	} from "@/api/trace"
+
+	const props = defineProps < {
+			lineId: string,
+			lineName: string
+		} >
+		()
 
 	onMounted(() => {
 		initData()
@@ -31,10 +36,11 @@
 			uni.showLoading({
 				title: "查询中"
 			})
-			const res = await getTraceLineList({
-				personId: userInfo.value.orgId
-			});
-			tableData.value = res.data
+			const res = await getTraceLineDetail({
+				personId: userInfo.value.orgId,
+				lineId: props.lineId
+			})
+			tableData.value = res.data.list
 		} catch (err) {
 			console.log(err)
 		} finally {
@@ -42,24 +48,24 @@
 		}
 	}
 
-	const goTraceProcess = (line: Obj) => {
+	const goTraceProcessInfo = (process: Obj) => {
 		uni.navigateTo({
-			url: `${routes.TraceProcess.path}?lineName=${line.lineName}&lineId=${line.lineId}`,
+			url: `${routes.TraceInfo.path}?lineDetailId=${process.lineDetailId}&procedureName=${process.procedureName}`,
 		})
 	}
 </script>
 
 <template>
-	<CustomNavBar :title="routes.Trace.style.navigationBarTitleText"></CustomNavBar>
+	<CustomNavBar :title="lineName"></CustomNavBar>
 
-	<up-empty mode="order" icon="http://cdn.uviewui.com/uview/empty/order.png" text="暂无追溯项目"
+	<up-empty mode="order" icon="http://cdn.uviewui.com/uview/empty/order.png" text="暂无追溯流程"
 		v-if="tableData.length === 0">
 	</up-empty>
 
 	<u-grid :border="true" class="grid-box" v-else>
-		<u-grid-item @click="goTraceProcess(item)" v-for="(item,index) in tableData" :key="index" class="grid-item">
-			<image src="/static/common/workLine.svg" class="grid-icon"></image>
-			<view class="grid-text">{{item.lineName}}</view>
+		<u-grid-item @click="goTraceProcessInfo(item)" v-for="(item,index) in tableData" :key="index" class="grid-item">
+			<image src="/static/common/process.svg" class="grid-icon"></image>
+			<view class="grid-text">{{item.procedureName}}</view>
 		</u-grid-item>
 	</u-grid>
 </template>

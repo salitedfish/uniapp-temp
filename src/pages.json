@@ -295,7 +295,7 @@
 		},
 		// 追溯管理
 		{
-			"name": "clockIn",
+			"name": "LdOnDuty",
 			"path": "pages/clockIn/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -306,7 +306,7 @@
 			"needLogin": true
 		},
 		{
-			"name": "checkout",
+			"name": "EquipmentCheck",
 			"path": "pages/checkout/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -317,7 +317,7 @@
 			"needLogin": true
 		},
 		{
-			"name": "workPlan",
+			"name": "LdWorkPlan",
 			"path": "pages/workPlan/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -328,7 +328,7 @@
 			"needLogin": true
 		},
 		{
-			"name": "anDon",
+			"name": "LdAndon",
 			"path": "pages/anDon/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -339,7 +339,7 @@
 			"needLogin": true
 		},
 		{
-			"name": "traceManager",
+			"name": "Trace",
 			"path": "pages/traceManager/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -350,7 +350,51 @@
 			"needLogin": true
 		},
 		{
-			"name": "traceSearch",
+			"name": "TraceProcess",
+			"path": "pages/traceProcess/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "追溯流程"
+			},
+			"type": "nav"
+			// "needLogin": true
+		},
+		{
+			"name": "TraceInfo",
+			"path": "pages/traceInfo/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "追溯信息"
+			},
+			"type": "nav"
+			// "needLogin": true
+		},
+		{
+			"name": "ProductJobList",
+			"path": "pages/productJobList/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "报工记录"
+			},
+			"type": "nav"
+			// "needLogin": true
+		},
+		{
+			"name": "ProductJobPrinter",
+			"path": "pages/productJobPrinter/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "报工打印"
+			},
+			"type": "nav"
+			// "needLogin": true
+		},
+		{
+			"name": "TraceSearch",
 			"path": "pages/traceSearch/index",
 			"style": {
 				"navigationStyle": "custom",

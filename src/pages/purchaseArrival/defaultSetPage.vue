@@ -22,13 +22,13 @@
 </script>
 
 <script lang='ts' setup>
-	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
+	// import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
 	import UpInputBusTypePicker from "@/components/UpInputBusTypePicker.vue"
 	import UpInputPurTypePicker from "@/components/UpInputPurTypePicker.vue"
 	import CommonNavBar from "@/components/CommonNavBar.vue"
 
 	const form = ref < Obj < Business[] >> ({
-		depSelected: [],
+		// depSelected: [],
 		busTypeSelected: [],
 		purTypeSelected: []
 	})
@@ -54,7 +54,7 @@
 	// 重置
 	const reset = () => {
 		form.value = {
-			depSelected: [],
+			// depSelected: [],
 			busTypeSelected: [],
 			purTypeSelected: []
 		}
@@ -84,11 +84,11 @@
 					</UpInputPurTypePicker>
 				</up-form-item>
 
-				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0" required>
+				<!-- 				<up-form-item class="common-form-item" label="部门名称:" borderBottom labelWidth="80" style="padding: 0" required>
 					<UpInputDepPicker border="none" placeholder="选择部门" clearable class="input-item" readonly
 						v-model:selected="form.depSelected">
 					</UpInputDepPicker>
-				</up-form-item>
+				</up-form-item> -->
 			</up-form>
 		</view>
 
