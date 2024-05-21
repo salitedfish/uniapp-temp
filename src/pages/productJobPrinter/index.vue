@@ -105,26 +105,14 @@
 
 	// 组件没提供最大最小值限制
 	watch(() => form.value.boxNum, (newValue) => {
-		if (newValue > productJobDetail.value.thisNum) {
-			nextTick(() => {
-				form.value.boxNum = productJobDetail.value.thisNum
-			})
-			return
-		}
-		if (newValue < 0) {
-			nextTick(() => {
-				form.value.boxNum = 0
-			})
-			return
-		}
-		if (Math.floor(newValue) != newValue) {
-			nextTick(() => {
-				form.value.boxNum = Math.floor(newValue)
-			})
-			return
+		let num = Math.floor(newValue)
+		if (num > productJobDetail.value.thisNum) {
+			num = productJobDetail.value.thisNum
+		} else if (num < 0) {
+			num = 0
 		}
 		nextTick(() => {
-			form.value.boxNum = Math.floor(newValue)
+			form.value.boxNum = num
 		})
 	})
 

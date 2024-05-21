@@ -9,11 +9,20 @@ export class ScanCode {
 	private static html5Qrcode : Html5Qrcode
 	// 运行入口
 	static async run(runConfig : FunConfig) {
+		// 纯app
 		if (Platform.isApp()) {
 			return await ScanCode.appRun(runConfig)
-		} else if (Platform.isWeb()) {
+		}
+		// 钉钉内嵌H5
+		else if (Platform.isInDD()) {
+			return await ScanCode.ddRun(runConfig)
+		}
+		// 纯H5
+		else if (Platform.isWeb()) {
 			return await ScanCode.webRun(runConfig)
-		} else {
+		}
+		// 都不匹配
+		else {
 			uni.showToast({
 				icon: "none",
 				title: "当前环境不支持"
@@ -33,6 +42,18 @@ export class ScanCode {
 					reject(err)
 				}
 			})
+		})
+	}
+	// dd内嵌H5
+	private static async ddRun(runConfig : FunConfig) {
+		return new Promise((resolve, reject) => {
+			// @ts-ignore
+			dd.biz.util.scan({
+				type: "qrCode", // type 为 all、qrCode、barCode，默认是all。
+				onSuccess: (obj : Obj) => {
+					resolve(obj.text)
+				},
+			});
 		})
 	}
 	// web端

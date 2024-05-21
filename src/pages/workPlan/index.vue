@@ -123,7 +123,7 @@
 					<uni-th class="nowrap" align="left" width="100rpx">产品编号</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">产品名称</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">计划数量</uni-th>
-					<uni-th class="nowrap" align="left" width="100rpx">操作</uni-th>
+					<uni-th class="nowrap table-fixed-right" align="left" width="100rpx">操作</uni-th>
 				</uni-tr>
 				<!-- 表格数据行 -->
 				<uni-tr v-for="item,key in resultData?.list" :key="key" @click='goWorkDouble(item)'>
@@ -135,7 +135,7 @@
 					<uni-td class="nowrap">{{ item.productCode }}</uni-td>
 					<uni-td class="nowrap">{{ item.productName }}</uni-td>
 					<uni-td class="nowrap">{{ item.planNum }}</uni-td>
-					<uni-td class="nowrap primary" @click="goWork(item)">开工</uni-td>
+					<uni-td class="nowrap primary table-fixed-right" @click="goWork(item)">开工</uni-td>
 				</uni-tr>
 			</uni-table>
 		</view>

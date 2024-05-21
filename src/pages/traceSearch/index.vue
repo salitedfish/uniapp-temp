@@ -16,6 +16,8 @@
 		getTraceList
 	} from "@/api/trace"
 
+	const relationArry = ['壳体条码', '中间条码', '临时条码', '客供条码']
+
 	const initForm = () => {
 		return {
 			lineId: "",
@@ -95,7 +97,7 @@
 					<uni-td class="nowrap">{{ item.procedureName }}</uni-td>
 					<uni-td class="nowrap">
 						<view v-if="item.isFile == 0">
-							<view style="text-align: left;" v-for="row in item.contentList" :key="row.index">
+							<view style="text-align: left;" v-for="row, index in item.contentList" :key="index">
 								{{row}}
 							</view>
 						</view>

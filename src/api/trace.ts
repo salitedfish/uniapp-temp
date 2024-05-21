@@ -164,3 +164,11 @@ export const printProductJob = async (data : Obj) => {
 		data
 	})
 }
+
+// 首末件检查
+export const checkHeadTail = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "trace/checkFirstFinal",
+		data,
+	})
+}

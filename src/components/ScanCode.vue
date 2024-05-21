@@ -20,7 +20,8 @@
 	 * 初始化扫描
 	 */
 	const initScan = async () => {
-		if (Platform.isWeb()) {
+		// 纯浏览器H5端才需要显示
+		if (Platform.isWeb() && !Platform.isInDD()) {
 			showWebCamera.value = true
 		}
 		try {
@@ -32,6 +33,22 @@
 		} catch (err) {
 			showWebCamera.value = false
 		}
+
+		// 微信
+		// @ts-ignore
+		// wx.scanQRCode({
+		// 	desc: "scanQRCode desc",
+		// 	needResult: 1, // 默认为0，扫描结果由企业微信处理，1则直接返回扫描结果，
+		// 	scanType: ["qrCode"], // 可以指定扫二维码还是条形码（一维码），默认二者都有
+		// 	success: (obj: Obj) => {
+		// 		emit("scanSuccess", obj.resultStr)
+		// 	},
+		// 	error: function (err: Obj) {
+		// 		if (err.errMsg.indexOf("function_not_exist") > 0) {
+		// 			alert("版本过低请升级");
+		// 		}
+		// 	},
+		// });
 	}
 	/**
 	 * 取消扫描

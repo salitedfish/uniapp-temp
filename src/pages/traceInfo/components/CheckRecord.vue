@@ -28,7 +28,7 @@
 	const surveyValueChange = (item: Obj) => {
 		const min = Number(item.minSurvey)
 		const max = Number(item.maxSurvey)
-		const survey = Number(item.survey)
+		const survey = Number(item.surveyValue)
 		if (survey >= min && survey <= max) {
 			item.result = "1"
 		} else {
@@ -157,7 +157,7 @@
 				</template>
 				<template #value>
 					<view class="u-cell-text cell-value">
-						<u-radio-group placement="row" class="radio-group" v-model="item.result" @change=" setFormResult">
+						<u-radio-group placement="row" class="radio-group" v-model="item.result" @change="setFormResult">
 							<u-radio :name="'1'" label="合格"></u-radio>
 							<u-radio :name="'0'" label="不合格" style="margin-left: 10px;"></u-radio>
 						</u-radio-group>

@@ -1,5 +1,6 @@
 	$bg-color-default: rgba(245,245,248, 0.8);
 	$bg-color-primary: rgba(84, 157, 248, 0.1);
+	$bg-color-table: rgba(255,255,255, 1);
 	
 	
 	.common-page {
@@ -79,4 +80,16 @@
 	.u-cell__body {
 		padding-left: 0 !important;
 		padding-right: 0 !important;
+	}
+	
+	.table-fixed-right {
+		position: sticky;
+		right: 0;
+		background: $bg-color-table;
+	}
+	
+	.table-fixed-left {
+		position: sticky;
+		left: 0;
+		background: $bg-color-table;
 	}

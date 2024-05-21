@@ -64,6 +64,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
+  dingtalk-jsapi:
+    specifier: ^3.0.33
+    version: 3.0.33
   html5-qrcode:
     specifier: ^2.3.8
     version: 2.3.8
@@ -4362,6 +4365,12 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dev: true
 
+  /dingtalk-jsapi@3.0.33:
+    resolution: {integrity: sha512-BNgcM56ojU34QB3Wzyy9G65Yvx83yxZdFPHk5ggJXPEcPibOPBVnSh9fRsjntuQgd9GuJ1iqjLiJtSQJPpaXwQ==}
+    dependencies:
+      promise-polyfill: 7.1.2
+    dev: false
+
   /dom-walk@0.1.2:
     resolution: {integrity: sha512-6QvTW9mrGeIegrFXdtQi9pk7O/nSK6lSdXW2eqUspN5LWD7UTji2Fqw5V2YLjBpHEoU9Xl/eUWNpDeZvoyOv2w==}
     dev: false
@@ -6333,6 +6342,10 @@ packages:
   /process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
     engines: {node: '>= 0.6.0'}
+    dev: false
+
+  /promise-polyfill@7.1.2:
+    resolution: {integrity: sha512-FuEc12/eKqqoRYIGBrUptCBRhobL19PS2U31vMNTfyck1FxPyMfgsXyW4Mav85y/ZN1hop3hOwRlUDok23oYfQ==}
     dev: false
 
   /prompts@2.4.2:

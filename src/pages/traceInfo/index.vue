@@ -3,7 +3,7 @@
 		ref,
 		onMounted,
 		onBeforeUnmount,
-		watch
+		watch,
 	} from "vue"
 	// 类型
 	import type {
@@ -36,7 +36,8 @@
 		getEquipmentByLineDetailId,
 		getCheckItemListApi,
 		productJobSubmit,
-		productJobDel
+		productJobDel,
+		checkHeadTail
 	} from "@/api/trace"
 	import {
 		getWorkPlan
@@ -79,8 +80,13 @@
 			productCode: "",
 			planNum: "",
 			realNum: "",
+			// 是否需要检验单
 			checked: "",
-
+			// 首末件
+			checkFirstFinal: 0,
+			firstNum: 0,
+			finalNum: 0,
+			// 各条码
 			barcode1: "",
 			barcodeName1: "",
 			barcode2: "",
@@ -94,11 +100,11 @@
 
 			relation1: "",
 			relation2: "",
-
+			// 提交数量
 			thisNum: "",
 
 			unbind: 0,
-
+			// 提交类型
 			submitType: "1",
 
 			statistics: "",
@@ -137,7 +143,7 @@
 
 	// 获取流程详情
 	const getProcess = async () => {
-		const res = await getProcessDetail({
+		await getProcessDetail({
 			lineDetailId: props.lineDetailId
 		})
 	}
@@ -158,7 +164,9 @@
 			relation2,
 			unbind,
 			scanCode,
-			checked
+			checked,
+			checkFirstFinal,
+
 		} = res.data
 		form.value.processId = processId
 		form.value.orgIds = factoryId
@@ -170,6 +178,8 @@
 		form.value.barcodeName2 = BarcodeNames[relation2] || ""
 		form.value.unbind = unbind
 		form.value.scanCode = scanCode
+		form.value.checkFirstFinal = checkFirstFinal
+
 		// 如果是数据采集，则获取设备，和定时获取报工列表
 		if (res.data.procedureKindCode == PK.数据采集) {
 			getEquipment()
@@ -211,13 +221,16 @@
 					productCode,
 					planNum,
 					realNum,
-
+					firstNum,
+					finalNum,
 				} = res.data
 				form.value.planId = planId;
 				form.value.planCode = resCode
 				form.value.productCode = productCode
 				form.value.planNum = planNum
 				form.value.realNum = realNum
+				form.value.firstNum = firstNum
+				form.value.finalNum = finalNum
 
 				// 获取完计划，如果不是数据采集，则获取一次列表
 				if (res.data.procedureKindCode !== PK.数据采集 && traceTableRef.value) {
@@ -329,6 +342,13 @@
 
 	// 提交前校验
 	const preSubmit = (type ? : string) => {
+		if (!form.value.planId) {
+			uni.showModal({
+				title: '提示',
+				content: "请先填写计划id",
+			});
+			return false
+		}
 		if (type === P.定制流程3) {
 			if (form.value.barcode1 != form.value.barcode2) {
 				uni.showModal({
@@ -395,67 +415,104 @@
 		}
 		return true
 	}
+	// 首末件校验
+	const headTailCheck = async () => {
+		// 如果开启了首末件检查
+		if (form.value.checkFirstFinal) {
+			// 如果没设置首末件数量，则提示
+			if (!form.value.firstNum || !form.value.finalNum) {
+				uni.showModal({
+					title: '提示',
+					content: "请先进行首末件检查设置",
+				});
+				return false
+			}
+			// 如果达到了要求，则先进行检查
+			else if (form.value.realNum >= form.value.firstNum) {
+				let checkTypeCode = 1
+				if (form.value.realNum >= form.value.finalNum) {
+					checkTypeCode = 2
+				}
+				await checkHeadTail({
+					planCode: form.value.planCode,
+					checkTypeCode
+				})
+				return true
+			}
+			// 如果未达到要求，则不校验
+			else {
+				return true
+			}
+		}
+		// 如果此计划未开启首末件检查
+		else {
+			// 否则直接返回
+			return true
+		}
+	}
 	// 提交
 	const submit = useThrottle(async (type ? : string) => {
-		if (preSubmit(type)) {
-			try {
-				uni.showLoading({
-					mask: true,
-					title: "提交中"
+		if (!preSubmit(type)) return
+		const res = await headTailCheck()
+		if (!res) return
+		try {
+			uni.showLoading({
+				mask: true,
+				title: "提交中"
+			})
+			// 构造提交参数
+			const params = Object.assign({}, form.value)
+			// 构造附件提交参数
+			params.fileUrl = params.images.map((item: Obj) => item.url).join(",")
+			params.fileName = params.images.map((item: Obj) => item.name).join(",")
+			// 构造检验单提交参数
+			if (form.value.checked == "1") {
+				params.checkList = checkRecords.value.map((item) => {
+					return {
+						...item,
+						imagesUrl: item.images.map((i: Obj) => i.url).join(",")
+					}
 				})
-				// 构造提交参数
-				const params = Object.assign({}, form.value)
-				// 构造附件提交参数
-				params.fileUrl = params.images.map((item: Obj) => item.url).join(",")
-				params.fileName = params.images.map((item: Obj) => item.name).join(",")
-				// 构造检验单提交参数
-				if (form.value.checked == "1") {
-					params.checkList = checkRecords.value.map((item) => {
-						return {
-							...item,
-							imagesUrl: item.images.map((i: Obj) => i.url).join(",")
-						}
+			}
+			// 提交
+			const res = await productJobSubmit(params)
+			uni.showToast({
+				icon: "none",
+				title: "提交成功"
+			})
+			// 提交完重新获取计划
+			await getPlanInfo(form.value.planCode)
+			// 重置数据
+			form.value.thisNum = "1"
+			form.value.remark = ""
+			form.value.toolingCode = ""
+			form.value.images = []
+			failureModSelected.value = []
+			// 如果是气密
+			if (form.value.procedureKindCode == PK.数据采集) {
+				equipmentLoading.value = true;
+			}
+			// 如果不是气密
+			else {
+				form.value.barcode1 = "";
+				if (form.value.procedureCode != P.条码关联返工) {
+					form.value.barcode2 = "";
+				}
+				form.value.barcode3 = "";
+				form.value.barcode4 = "";
+				form.value.barcode5 = "";
+				form.value.barcode6 = "";
+				// 如果选择了确认打印，则跳到打印界面
+				if (printTypeCheck.value === 0) {
+					uni.navigateTo({
+						url: `${routes.ProductJobPrinter.path}?id=${res.data}`,
 					})
 				}
-				// 提交
-				const res = await productJobSubmit(params)
-				uni.showToast({
-					icon: "none",
-					title: "提交成功"
-				})
-				// 提交完重新获取计划
-				await getPlanInfo(form.value.planCode)
-				// 重置数据
-				form.value.thisNum = "1"
-				form.value.remark = ""
-				form.value.toolingCode = ""
-				failureModSelected.value = []
-				// 如果是气密
-				if (form.value.procedureKindCode == PK.数据采集) {
-					equipmentLoading.value = true;
-				}
-				// 如果不是气密
-				else {
-					form.value.barcode1 = "";
-					if (form.value.procedureCode != P.条码关联返工) {
-						form.value.barcode2 = "";
-					}
-					form.value.barcode3 = "";
-					form.value.barcode4 = "";
-					form.value.barcode5 = "";
-					form.value.barcode6 = "";
-					// 如果选择了确认打印，则跳到打印界面
-					if (printTypeCheck.value === 0) {
-						uni.navigateTo({
-							url: `${routes.ProductJobPrinter.path}?id=${res.data.id}`,
-						})
-					}
-				}
-			} catch (err) {
-				console.log(err)
-			} finally {
-				uni.hideLoading()
 			}
+		} catch (err) {
+			console.log(err)
+		} finally {
+			uni.hideLoading()
 		}
 	})
 	// 条码解绑
@@ -573,7 +630,7 @@
 
 			<up-form-item class="common-form-item" label="客供条码:" borderBottom labelWidth="80" style="padding: 0"
 				v-if="form.procedureCode == P.条码关联返工">
-				<up-input v-model="form.barcode6" placeholder="请输入条码" clearable class="input-item"></up-input>
+				<up-input v-model="form.barcode2" placeholder="请输入条码" clearable class="input-item"></up-input>
 			</up-form-item>
 
 			<up-form-item class="common-form-item" label="数量:" borderBottom labelWidth="80" style="padding: 0">
