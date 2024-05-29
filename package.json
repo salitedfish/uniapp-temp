@@ -60,7 +60,7 @@
 		"@dcloudio/uni-quickapp-webview": "3.0.0-3090820231124001",
 		"@dcloudio/uni-ui": "^1.4.28",
 		"@ttou/uview-typings": "^2.0.5",
-		"@ultra-man/noa": "^0.0.60",
+		"@ultra-man/noa": "latest",
 		"@vitejs/plugin-basic-ssl": "^1.0.2",
 		"base-64": "^1.0.0",
 		"clipboard": "^2.0.11",
@@ -73,7 +73,8 @@
 		"utf8": "^3.0.0",
 		"uview-plus": "^3.1.39",
 		"vue": "^3.2.45",
-		"vue-i18n": "^9.1.9"
+		"vue-i18n": "^9.1.9",
+		"weixin-js-sdk": "^1.6.5"
 	},
 	"devDependencies": {
 		"@dcloudio/types": "^3.3.2",

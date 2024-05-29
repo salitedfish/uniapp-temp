@@ -18,12 +18,7 @@ export class Platform {
 	}
 	// 如果是微信内嵌H5
 	static isInWx() {
-		if (!Platform.isWeb || !navigator) return false
-		if (navigator.userAgent.toLowerCase().indexOf("micromessenger") != -1) {
-			return true
-		} else {
-			false
-		}
+		return Platform.isWeb() && navigator.userAgent.toLowerCase().indexOf("micromessenger") != -1
 	}
 }
 

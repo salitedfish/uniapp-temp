@@ -4,6 +4,7 @@
 	import { updateAllDate } from "@/store/common"
 	import { Platform } from "@/util/env"
 	import { initInDD } from "@/util/initInDD"
+	import { initInWX } from "@/util/initInWX"
 	import { initPage } from "@/util/initPage"
 
 	onLaunch(async () => {
@@ -11,6 +12,10 @@
 		// 钉钉内嵌H5要先初始化钉钉信息，才能初始化页面，否则页面判断会异常
 		if (Platform.isInDD()) {
 			initInDD()
+		}
+		// 如果是微信内嵌H5
+		else if (Platform.isInWx()) {
+			initInWX()
 		}
 		// 其他情况直接初始化页面
 		else {

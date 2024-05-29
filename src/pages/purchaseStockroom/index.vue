@@ -468,9 +468,9 @@
 		<StockTypeCheck v-model="typeSelect" class="tab-box"></StockTypeCheck>
 
 		<up-form class="common-form" labelPosition="left">
-			<up-form-item class="common-form-item" label="发货单码:" borderBottom labelWidth="80" style="padding: 0"
+			<up-form-item class="common-form-item" label="箱码:" borderBottom labelWidth="80" style="padding: 0"
 				v-if="typeSelect === 0">
-				<up-input-scan v-model="scanAnyText" placeholder="请扫发货单码" clearable class="input-item"
+				<up-input-scan v-model="scanAnyText" placeholder="请扫箱码" clearable class="input-item"
 					@scanSuccess="scanAnySuccess" focus></up-input-scan>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="到货单:" borderBottom labelWidth="80" style="padding: 0"

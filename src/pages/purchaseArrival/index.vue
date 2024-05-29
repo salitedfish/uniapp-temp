@@ -224,16 +224,16 @@
 			const params = {
 				billDate: dateSelected.value[0],
 				busType: config.busTypeSelected[0].name,
-				// deptCode: depSelected.value[0].code,
-				// deptName: depSelected.value[0].name,
+				deptCode: tableData.value[0].cdepCode,
+				deptName: tableData.value[0].cdepName,
+				purchaseTypeCode: config.purTypeSelected[0].code,
+				purchaseTypeName: config.purTypeSelected[0].name,
 				list: tableData.value.map(item => {
 					return {
 						...item,
 						quantity: item.count
 					}
 				}),
-				purchaseTypeCode: config.purTypeSelected[0].code,
-				purchaseTypeName: config.purTypeSelected[0].name,
 			}
 			// 请求生成到货单
 			const res = await confirmArrival(params)
@@ -293,8 +293,8 @@
 				基本信息
 			</view>
 			<up-form class="common-form" labelPosition="left">
-				<up-form-item class="common-form-item" label="发货单码:" borderBottom labelWidth="80" style="padding: 0">
-					<up-input-scan v-model="codeText" placeholder="请扫发货单码" clearable class="input-item" @scanSuccess="scanSuccess"
+				<up-form-item class="common-form-item" label="箱码:" borderBottom labelWidth="80" style="padding: 0">
+					<up-input-scan v-model="codeText" placeholder="请扫箱码" clearable class="input-item" @scanSuccess="scanSuccess"
 						focus></up-input-scan>
 				</up-form-item>
 				<up-form-item class="common-form-item" label="供应商:" borderBottom labelWidth="80" style="padding: 0">

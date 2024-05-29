@@ -27,7 +27,8 @@
 	// 工具
 	import {
 		useThrottle,
-		useRmRepeat
+		useRmRepeat,
+		useDownloadByURL
 	} from "@ultra-man/noa"
 	// 接口
 	import {
@@ -142,10 +143,12 @@
 	const form = ref(initForm())
 
 	// 获取流程详情
+	const processDetail = ref < Obj > ({})
 	const getProcess = async () => {
-		await getProcessDetail({
+		const res = await getProcessDetail({
 			lineDetailId: props.lineDetailId
 		})
+		processDetail.value = res.data
 	}
 	// 获取产线详情
 	let airtightnessInterval = 0
@@ -291,7 +294,6 @@
 		})
 		// 去重
 		failureModSelected.value = useRmRepeat(arr)({
-			deep: false,
 			condition: item => item.id
 		})
 	}
@@ -552,6 +554,11 @@
 
 		<!-- 基础数据表单 -->
 		<up-form class="common-form" labelPosition="left">
+			<up-form-item class="common-form-item" label="指导书:" borderBottom labelWidth="80" style="padding: 0">
+				<up-button type="primary" class="btn" size="small" @click="useDownloadByURL(processDetail.fileUrl)('作业指导书')">
+					点 击 下 载</up-button>
+			</up-form-item>
+
 			<up-form-item class="common-form-item" label="计划单号:" borderBottom labelWidth="80" style="padding: 0" required>
 				<up-input-scan v-model="form.planCode" placeholder="请输入计划单号" clearable class="input-item" focus
 					@scanSuccess="getPlanInfo"></up-input-scan>

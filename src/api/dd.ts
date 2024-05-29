@@ -18,6 +18,7 @@ export const ddSignature = async (data : Obj) => {
 
 //
 export const ddGetUser = async (data : Obj) => {
+	data.loginSource = "DD"
 	return await uRequest.post<Return<Obj>>({
 		url: "dingdingUser/getUser",
 		data

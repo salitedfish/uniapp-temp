@@ -1,6 +1,7 @@
 import { initPage } from "@/util/initPage"
 import { setUserInfo } from "@/store/auth"
 import { ddQuery, ddSignature, ddGetUser } from "@/api/dd"
+// @ts-ignore
 import * as dd from "dingtalk-jsapi";
 
 // 初始化钉钉微应用
@@ -57,7 +58,6 @@ export const initInDD = () => {
 			onSuccess: async (ret : Obj) => {
 				if (ret.code) {
 					const reb = await ddGetUser({
-						loginSource: "DD",
 						code: ret.code
 					})
 					// 获取token成功

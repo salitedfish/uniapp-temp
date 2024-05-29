@@ -1,14 +1,17 @@
 import { needLoginRoutes, routes } from "@/store/route"
 import { logged } from "@/util/common"
+import { Platform } from "@/util/env"
+import { setWxConfig } from "@/util/initInWX"
 
 // 需要添加拦截器的方法功能说明
-const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
+const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab", "navigateBack"];
 
 export const initInterceptor = () => {
 	// 循环添加拦截器
 	list.forEach(item => {
 		uni.addInterceptor(item, {
 			invoke(e) {
+				console.log("interceptor", e)
 				let url = e.url.split('?')[0]
 				// 判断要打开的页面是否需要验证登录
 				if (needLoginRoutes.includes(url) && !logged()) {
@@ -25,10 +28,11 @@ export const initInterceptor = () => {
 					})
 					return false
 				}
-				// 如果是微信内嵌的浏览器
-				// if (Platform.isWeb()) {
-				// 	setWxConfig({ url })
-				// }
+				// 如果是微信内嵌的浏览器，路由改变需要重新配置wx
+				if (Platform.isInWx()) {
+					const rootPath = import.meta.env.VITE_BASE_PAGE_PATH_WEB ? `/${import.meta.env.VITE_BASE_PAGE_PATH_WEB}` : ""
+					setWxConfig({ url: `${window.location.origin}${rootPath}${e.url}` })
+				}
 				return true
 			},
 			fail(err) { // 失败回调拦截 
