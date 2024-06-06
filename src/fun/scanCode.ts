@@ -47,8 +47,7 @@ export class ScanCode {
 	// dd内嵌H5
 	private static async ddRun(runConfig : FunConfig) {
 		return new Promise((resolve, reject) => {
-			// @ts-ignore
-			dd.biz.util.scan({
+			dingding.biz.util.scan({
 				type: "qrCode", // type 为 all、qrCode、barCode，默认是all。
 				onSuccess: (obj : Obj) => {
 					resolve(obj.text)
@@ -94,7 +93,7 @@ export class ScanCode {
 	// wx端
 	// private static async wxRun(runConfig : FunConfig) {
 	// 	return new Promise((resolve, reject) => {
-	// 		jWeixin.scanCode({
+	// 		weixin.scanCode({
 	// 			onlyFromCamera: true,
 	// 			success: ({ resultStr }) => {
 	// 				resolve(resultStr);

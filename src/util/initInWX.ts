@@ -1,10 +1,9 @@
 import { wxGetUser, wxSignature } from "@/api/wx"
 import { initPage } from "@/util/initPage"
-import { setUserInfo, setToken } from "@/store/auth"
+import { setToken } from "@/store/auth"
 import { routes } from "@/store/route"
 import { useGenUrlParams } from "@ultra-man/noa"
-// @ts-ignore
-import wx from "weixin-js-sdk"
+import weixin from "weixin-js-sdk"
 
 // 初始化微信内嵌H5
 export const initInWX = async () => {
@@ -13,8 +12,7 @@ export const initInWX = async () => {
 		mask: true
 	})
 
-	// @ts-ignore
-	window.wx = wx
+	window.weixin = weixin
 
 	const code = useGenUrlParams(window.location.href).code;
 
@@ -50,7 +48,7 @@ export const setWxConfig = async (data : Obj) => {
 	const ree = await wxSignature({
 		url: data.url || window.location.href
 	});
-	wx.config({
+	weixin.config({
 		// beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
 		debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
 		appId: ree.data.appID || "", // 必填，企业微信的corpID

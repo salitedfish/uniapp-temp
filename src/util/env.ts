@@ -1,4 +1,4 @@
-import * as dd from "dingtalk-jsapi";
+import * as dingding from "dingtalk-jsapi";
 
 // 判断平台
 export class Platform {
@@ -15,7 +15,7 @@ export class Platform {
 	}
 	// 如果钉钉内嵌H5
 	static isInDD() {
-		return Platform.isWeb() && dd && dd.env.platform !== "notInDingTalk"
+		return Platform.isWeb() && dingding && dingding.env.platform !== "notInDingTalk"
 	}
 	// 如果是微信内嵌H5
 	static isInWx() {

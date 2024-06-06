@@ -1,10 +1,9 @@
 import { initPage } from "@/util/initPage"
-import { setUserInfo, setToken } from "@/store/auth"
+import { setToken } from "@/store/auth"
 import { ddQuery, ddSignature, ddGetUser, ddGetUserByPhone } from "@/api/dd"
 import { getInfo } from "@/api/yinlun"
 import { Platform } from "./env"
-// @ts-ignore
-import * as dd from "dingtalk-jsapi";
+import * as dingding from "dingtalk-jsapi";
 
 // 初始化钉钉微应用
 export const initInDD = async () => {
@@ -12,14 +11,11 @@ export const initInDD = async () => {
 		title: "初始化中",
 		mask: true
 	})
-
+	window.dingding = dingding
 	// 隐藏dd自带的navbar
-	dd.biz.navigation.hideBar({
+	dingding.biz.navigation.hideBar({
 		hidden: true,
 	});
-
-	// @ts-ignore
-	window.dd = dd
 	// 获取corpId
 	const res = await ddQuery();
 	if (!res.data.corpId) {
@@ -30,9 +26,9 @@ export const initInDD = async () => {
 		return
 	}
 
-	dd.ready(async () => {
+	dingding.ready(async () => {
 		// dd请求数据
-		dd.runtime.permission.requestAuthCode({
+		dingding.runtime.permission.requestAuthCode({
 			corpId: res.data.corpId,
 			// @ts-ignore
 			onSuccess: async (ret : Obj) => {
@@ -91,7 +87,7 @@ export const initInDD = async () => {
 		const ree = await ddSignature({
 			url: window.location.href
 		})
-		dd.config({
+		dingding.config({
 			// 微应用ID
 			agentId: ree.data.agentId,
 			// agentId: 3125119952,
@@ -117,7 +113,7 @@ export const initInDD = async () => {
 		});
 	});
 
-	dd.error(() => {
+	dingding.error(() => {
 		uni.hideLoading()
 		uni.showToast({
 			title: "初始化失败",

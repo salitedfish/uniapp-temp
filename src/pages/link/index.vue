@@ -8,7 +8,6 @@
 	const initScan = async () => {
 		const res = await ScanCode.run() as string
 		// 向子页面传递数据
-		// @ts-ignore
 		linkWindow.window.postMessage(res, routes.link.linkOrigin);
 	}
 

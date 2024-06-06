@@ -4,7 +4,7 @@ import { Platform } from "@/util/env"
 import { setWxConfig } from "@/util/initInWX"
 
 // 需要添加拦截器的方法功能说明
-const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab", "navigateBack"];
+const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
 
 export const initInterceptor = () => {
 	// 循环添加拦截器

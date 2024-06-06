@@ -32,8 +32,7 @@
 				async success(res) {
 					if (res.confirm) {
 						await logout()
-						// @ts-ignore
-						dd.biz.navigation.close()
+						dingding.biz.navigation.close({})
 					}
 				}
 			})
