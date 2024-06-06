@@ -3,6 +3,7 @@ import * as dd from "dingtalk-jsapi";
 // 判断平台
 export class Platform {
 	static platform = ""
+	static webPlatform = ""
 
 	// 纯app
 	static isApp() {
@@ -20,11 +21,26 @@ export class Platform {
 	static isInWx() {
 		return Platform.isWeb() && navigator.userAgent.toLowerCase().indexOf("micromessenger") != -1
 	}
+	// 如果是ios浏览器
+	static isIosWeb() {
+		return Platform.webPlatform === 'ios'
+	}
+	// 如果是安卓浏览器
+	static isAndrodWeb() {
+		return Platform.webPlatform === 'android'
+	}
+
+	// 判断使用的公司是否是内部公司
+	static isInterCompany() {
+		return true
+		// return ["zongbu", "shanghai", "sdyl_single"].includes(import.meta.env.VITE_COMPANY)
+	}
 }
 
 uni.getSystemInfo({
 	success(res) {
 		console.log("systemInfo:", res)
 		Platform.platform = res.uniPlatform
+		Platform.webPlatform = res.platform
 	}
 })

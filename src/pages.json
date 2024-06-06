@@ -16,7 +16,7 @@
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "登录"
 			},
-			"type": "nav"
+			"type": "nav",
 		},
 		{
 			"name": "home",
@@ -52,7 +52,7 @@
 				}
 			},
 			"type": "tab",
-			"needLogin": true
+			// "needLogin": true
 		},
 		{
 			"name": "demoInside",
@@ -61,6 +61,26 @@
 				"navigationBarTitleText": "内部测试"
 			},
 			"type": "nav"
+		},
+
+		{
+			"name": "link",
+			"path": "pages/link/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "外链测试",
+				"app-plus": {
+					"pullToRefresh": {
+						"support": true,
+						"style": "default"
+					}
+				}
+			},
+			"type": "tab",
+			"needLogin": true,
+			"linkUrl": "http://192.168.0.8:8082/line-digitalization-mobile/#/",
+			"linkOrigin": "http://192.168.0.8:8082",
 		},
 		// 仓库管理
 		{
@@ -155,8 +175,8 @@
 			"name": "deliveryMaterial",
 			"path": "pages/deliveryMaterial/index",
 			"style": {
-				// "navigationStyle": "custom",
-				// "backgroundColor": "#f8f8f8",
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "发货备料"
 			},
 			"type": "nav",
@@ -441,7 +461,14 @@
 			{
 				"pagePath": "pages/demo/index",
 				"text": "测试"
-			}, {
+			},
+			{
+				"pagePath": "pages/link/index",
+				"iconPath": "static/tabbar/mold.png",
+				"selectedIconPath": "static/tabbar/mold_active.png",
+				"text": "工模"
+			},
+			{
 				"pagePath": "pages/home/index",
 				"iconPath": "static/tabbar/home.png",
 				"selectedIconPath": "static/tabbar/home_active.png",

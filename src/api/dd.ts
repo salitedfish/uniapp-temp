@@ -24,3 +24,11 @@ export const ddGetUser = async (data : Obj) => {
 		data
 	})
 }
+
+// 
+export const ddGetUserByPhone = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "dingdingUser/getUserByPhone",
+		data
+	})
+}

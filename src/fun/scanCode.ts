@@ -1,14 +1,14 @@
 import { Platform } from "@/util/env"
 import { Html5Qrcode } from "html5-qrcode"
 
-interface FunConfig { container : string }
+interface FunConfig { container ?: string }
 
 // 扫码，根据当前环境自动选择调用的方法
 export class ScanCode {
 	// 这个是专门给h5用的（h5需要在https环境下）
 	private static html5Qrcode : Html5Qrcode
 	// 运行入口
-	static async run(runConfig : FunConfig) {
+	static async run(runConfig : FunConfig = {}) {
 		// 纯app
 		if (Platform.isApp()) {
 			return await ScanCode.appRun(runConfig)
@@ -63,7 +63,7 @@ export class ScanCode {
 			Html5Qrcode.getCameras().then(() => {
 				// 有则开启摄像头
 				if (!ScanCode.html5Qrcode) {
-					ScanCode.html5Qrcode = new Html5Qrcode(runConfig.container);
+					ScanCode.html5Qrcode = new Html5Qrcode("scan-dom");
 				}
 				const config = {
 					fps: 5,

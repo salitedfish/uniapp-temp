@@ -9,6 +9,7 @@
 	import { updateAllDate } from "@/store/common"
 	import manifestJson from "@/manifest.json"
 	import { Env } from "@/type/env"
+	import { Platform } from "@/util/env"
 
 	updateAllDate()
 
@@ -24,18 +25,33 @@
 
 	// 退出
 	const logoutHandler = async () => {
-		uni.showModal({
-			content: "确定要退出吗？",
-			showCancel: true,
-			async success(res) {
-				if (res.confirm) {
-					await logout()
-					uni.redirectTo({
-						url: routes.login.path
-					})
+		if (Platform.isInDD()) {
+			uni.showModal({
+				content: "确定要退出吗？",
+				showCancel: true,
+				async success(res) {
+					if (res.confirm) {
+						await logout()
+						// @ts-ignore
+						dd.biz.navigation.close()
+					}
 				}
-			}
-		})
+			})
+		} else {
+			uni.showModal({
+				content: "确定要退出吗？",
+				showCancel: true,
+				async success(res) {
+					if (res.confirm) {
+						await logout()
+						uni.redirectTo({
+							url: routes.login.path
+						})
+					}
+				}
+			})
+		}
+
 	}
 
 	// 追溯系统页面

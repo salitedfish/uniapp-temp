@@ -25,9 +25,7 @@
 			showWebCamera.value = true
 		}
 		try {
-			const res = await ScanCode.run({
-				container: "scan-dom"
-			})
+			const res = await ScanCode.run()
 			emit("scanSuccess", res as string)
 			showWebCamera.value = false
 		} catch (err) {

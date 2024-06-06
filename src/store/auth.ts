@@ -5,7 +5,14 @@ import { geUserInfo } from "@/api/auth"
 export const userInfo = ref<Obj>(uni.getStorageSync("userInfo") || {})
 // 权限列表
 export const authList = ref<string[]>(uni.getStorageSync("userAuth") || [])
+// token
+export const token = ref<string>(uni.getStorageSync("token"))
 
+// 设置token
+export const setToken = async (_token : string) => {
+	token.value = _token
+	uni.setStorageSync("token", _token)
+}
 // 设置用户信息
 export const setUserInfo = async () => {
 	const res = await geUserInfo()

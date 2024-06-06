@@ -57,8 +57,8 @@ importers:
         specifier: ^2.0.5
         version: 2.0.5
       '@ultra-man/noa':
-        specifier: latest
-        version: 0.0.62
+        specifier: ^0.0.65
+        version: 0.0.65
       '@vitejs/plugin-basic-ssl':
         specifier: ^1.0.2
         version: 1.0.2(vite@4.0.3(@types/node@20.8.10)(less@4.2.0)(sass@1.69.5)(terser@5.24.0))
@@ -863,14 +863,12 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [gnu]
 
   '@dcloudio/uts-linux-x64-musl@3.0.0-3090820231124001':
     resolution: {integrity: sha512-pdVVfzAZ2cF7EC3jGBEW4O5hKABgbwIfT1LpH32mwsj4G5PJuyOECL96Hda/qjxHs57OhNS/AWr8B4DL/Qj1DQ==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@dcloudio/uts-win32-ia32-msvc@3.0.0-3090820231124001':
     resolution: {integrity: sha512-PoxAgm8GjM21yz4lGHR9JktN6c5lpSmskKBIaxcZBtrH9HJlFJcZrEiort9Th/sso4MmUbJ9gsqgTYtMGAWk4Q==}
@@ -1524,8 +1522,8 @@ packages:
   '@types/yargs@16.0.7':
     resolution: {integrity: sha512-lQcYmxWuOfJq4IncK88/nwud9rwr1F04CFc5xzk0k4oKVyz/AI35TfsXmhjf6t8zp8mpCOi17BfvuNWx+zrYkg==}
 
-  '@ultra-man/noa@0.0.62':
-    resolution: {integrity: sha512-mRua9Tpi73A989ruB2CXuH8+xLgkVYk4UguMMYCIxpAf4yB2vK5JHRDWiPYv7gdX+GRW4gIYm8a/n40qZbMnBg==}
+  '@ultra-man/noa@0.0.65':
+    resolution: {integrity: sha512-cJ/Y90VkjO3W9OgO1iPvUfackyIWsE89fzp6dx/LiKFR6hfQGf+9cTYHxoCw77/RJBRizvDz7Ol2Gsg/5kEffA==}
 
   '@vitejs/plugin-basic-ssl@1.0.2':
     resolution: {integrity: sha512-DKHKVtpI+eA5fvObVgQ3QtTGU70CcCnedalzqmGSR050AzKZMdUzgC8KmlOneHWH8dF2hJ3wkC9+8FDVAaDRCw==}
@@ -5906,7 +5904,7 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.2
 
-  '@ultra-man/noa@0.0.62':
+  '@ultra-man/noa@0.0.65':
     dependencies:
       clipboard: 2.0.11
       crypto-js: 4.2.0

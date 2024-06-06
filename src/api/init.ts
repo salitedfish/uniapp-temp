@@ -71,6 +71,7 @@ export class URequest {
 								success: function (res) {
 								}
 							});
+							uni.hideLoading()
 						}
 						// 请求成功，数据也正常
 						resolve(res.data as unknown as T)
@@ -95,6 +96,7 @@ export class URequest {
 							success: function (res) {
 							}
 						});
+						uni.hideLoading()
 						reject(res)
 					}
 				} else {
@@ -110,6 +112,7 @@ export class URequest {
 						success: function (res) {
 						}
 					});
+					uni.hideLoading()
 					reject(res)
 				}
 			}
@@ -126,6 +129,7 @@ export class URequest {
 					success: function (res) {
 					}
 				});
+				uni.hideLoading()
 				reject(err)
 			}
 			console.log("请求配置：", config)

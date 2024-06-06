@@ -4,3 +4,7 @@ VITE_RUN_TIME = production
 VITE_BASE_API_URL_WEB = /api/
 
 VITE_BASE_PAGE_PATH_WEB = h5
+
+VITE_YL_BASE_API = 'http://dingding.yinlun.cn:1032/'
+
+VITE_COMPANY = ""

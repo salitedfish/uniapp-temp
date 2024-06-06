@@ -2,12 +2,20 @@ import { initPrintPage } from "@/store/print"
 import { routes, needLoginRoutes } from "@/store/route"
 import { logged } from "@/util/common"
 import { Env } from "@/type/env"
-import { authList, setUserInfo } from "@/store/auth"
+import { authList, setUserInfo, userInfo } from "@/store/auth"
 import type { RouteName } from "@/type/route"
+import { Platform } from "@/util/env"
 
 export const initPage = async () => {
 	try {
 
+		// 生产环境且不是pda端则隐藏蓝牙
+		if (process.env.NODE_ENV === Env.PROD && !Platform.isApp()) {
+			uni.setTabBarItem({
+				index: 0,
+				visible: false
+			})
+		}
 		// 打包隐藏测试页面
 		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({

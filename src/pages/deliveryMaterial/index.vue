@@ -6,6 +6,7 @@
 		nextTick
 	} from 'vue';
 	// 组件
+	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
 	import UpInputCustomerPicker from "@/components/UpInputCustomerPicker.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
@@ -35,6 +36,9 @@
 	import {
 		PickerTypeId
 	} from "@/type/business"
+	import {
+		routes
+	} from "@/store/route"
 	// 类型
 	import type {
 		Business
@@ -126,6 +130,9 @@
 
 <template>
 	<view class="common-page-container ">
+		<CustomNavBar :title="routes.deliveryMaterial.style.navigationBarTitleText">
+		</CustomNavBar>
+
 		<up-form class="common-form" labelPosition="left">
 			<up-form-item class="common-form-item" label="计划发货日期:" borderBottom labelWidth="100" style="padding: 0">
 				<UpInputDatePicker border="none" placeholder="选择计划发货日期" clearable class="input-item" readonly

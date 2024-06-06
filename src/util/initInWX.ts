@@ -1,25 +1,10 @@
 import { wxGetUser, wxSignature } from "@/api/wx"
 import { initPage } from "@/util/initPage"
-import { setUserInfo } from "@/store/auth"
+import { setUserInfo, setToken } from "@/store/auth"
 import { routes } from "@/store/route"
-// import { useGenUrlParams } from "@ultra-man/noa"
+import { useGenUrlParams } from "@ultra-man/noa"
 // @ts-ignore
 import wx from "weixin-js-sdk"
-
-const useGenUrlParams = (url : string) : Obj => {
-	const paramsStr = url.split("?")[1];
-	if (paramsStr) {
-		const paramsObj : Obj = {};
-		const paramsArr = paramsStr.split("&");
-		for (const item of paramsArr) {
-			const [key, value] = item.split("=");
-			paramsObj[key] = value;
-		}
-		return paramsObj;
-	} else {
-		return {};
-	}
-};
 
 // 初始化微信内嵌H5
 export const initInWX = async () => {
@@ -53,9 +38,7 @@ export const initInWX = async () => {
 			code,
 		});
 		// 获取token成功
-		uni.setStorageSync("token", reb.data)
-		// 获取用户信息
-		await setUserInfo()
+		setToken(reb.data as unknown as string)
 		// 初始化页面
 		initPage()
 		uni.hideLoading()

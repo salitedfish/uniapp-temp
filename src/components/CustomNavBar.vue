@@ -6,6 +6,9 @@
 	} from 'vue';
 	// 组件
 	// 工具
+	import {
+		Platform
+	} from "@/util/env"
 	// 接口
 	// 数据
 	// 类型
@@ -38,6 +41,9 @@
 
 <template>
 	<u-navbar :fixed="true" placeholder @leftClick="leftClick" v-bind="attrs">
+		<!-- 		<template #left v-if="Platform.isInDD()">
+			<view></view>
+		</template> -->
 		<template #right>
 			<view class="link">
 				{{rightText}}
