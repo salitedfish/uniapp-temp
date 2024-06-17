@@ -5,7 +5,7 @@ import { batchFormat } from "@/store/common"
  */
 export const logged = () => {
 	const token = uni.getStorageSync("token")
-	const userInfo = uni.getStorageSync("userInfo")
+	// const userInfo = uni.getStorageSync("userInfo")
 	// if (token === '' || token === null || token === undefined || userInfo === '' || userInfo === null || userInfo === undefined) {
 	if (token === '' || token === null || token === undefined) {
 		return false

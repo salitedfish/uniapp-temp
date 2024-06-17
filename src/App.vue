@@ -5,7 +5,8 @@
 	import { Platform } from "@/util/env"
 	import { initInDD } from "@/util/initInDD"
 	import { initInWX } from "@/util/initInWX"
-	import { initPage } from "@/util/initPage"
+	import { initWeb } from "@/util/initWeb"
+	import { initApp } from "@/util/initApp"
 
 	onLaunch(async () => {
 		console.log("App Launch")
@@ -17,9 +18,13 @@
 		else if (Platform.isInWx()) {
 			initInWX()
 		}
-		// 其他情况直接初始化页面
-		else {
-			initPage()
+		// 如果是H5
+		else if (Platform.isWeb()) {
+			initWeb()
+		}
+		// 如果是app
+		else if (Platform.isApp()) {
+			initApp()
 		}
 	})
 	onShow(() => {

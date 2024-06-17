@@ -1,16 +1,14 @@
-import { initPrintPage } from "@/store/print"
 import { routes, needLoginRoutes } from "@/store/route"
 import { logged } from "@/util/common"
 import { Env } from "@/type/env"
-import { authList, setUserInfo, userInfo } from "@/store/auth"
+import { authList, setUserInfo } from "@/store/auth"
 import type { RouteName } from "@/type/route"
-import { Platform } from "@/util/env"
 
-export const initPage = async () => {
+export const initWeb = async () => {
 	try {
 
-		// 生产环境且不是pda端则隐藏蓝牙
-		if (process.env.NODE_ENV === Env.PROD && !Platform.isApp()) {
+		// 生产环境隐藏蓝牙
+		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({
 				index: 0,
 				visible: false
@@ -24,7 +22,6 @@ export const initPage = async () => {
 			})
 		}
 
-		// #ifdef H5
 		const root = "/" + import.meta.env.VITE_BASE_PAGE_PATH_WEB
 		const path = location.pathname.slice(root.length)// 把前面的根路径去掉
 		// 判断页面是否存在
@@ -66,25 +63,6 @@ export const initPage = async () => {
 				})
 			}
 		}
-		// #endif
-
-		// #ifdef APP-PLUS
-		// 初始化数据
-		initPrintPage()
-		// 如果已经登录了，则跳到首页
-		if (logged()) {
-			await setUserInfo()
-			uni.switchTab({
-				url: routes.home.path
-			})
-		}
-		// 如果没登录，则跳到登录页面
-		else {
-			uni.redirectTo({
-				url: routes.login.path
-			})
-		}
-		// #endif
 
 	} catch (err) {
 		console.log(err)

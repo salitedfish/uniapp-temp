@@ -1,5 +1,5 @@
 import { wxGetUser, wxSignature } from "@/api/wx"
-import { initPage } from "@/util/initPage"
+import { initWeb } from "@/util/initWeb"
 import { setToken } from "@/store/auth"
 import { routes } from "@/store/route"
 import { useGenUrlParams } from "@ultra-man/noa"
@@ -38,7 +38,7 @@ export const initInWX = async () => {
 		// 获取token成功
 		setToken(reb.data as unknown as string)
 		// 初始化页面
-		initPage()
+		initWeb()
 		uni.hideLoading()
 	}
 }

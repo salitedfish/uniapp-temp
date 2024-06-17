@@ -17,7 +17,7 @@ export default ({ mode }) => defineConfig({
 		proxy: {
 			"^/api": {
 				// 文博
-				// target: 'http://192.168.0.84:8097/',
+				target: 'http://192.168.0.84:8097/',
 				// 晓楠
 				// target: 'http://192.168.0.98:8097/',
 				// 测试环境
@@ -31,7 +31,7 @@ export default ({ mode }) => defineConfig({
 				// target: "http://192.168.0.87:8097/",
 				// target: "http://119.3.91.43:18097/",
 				// target: "http://192.168.0.40:8096/",
-				target: 'http://119.3.91.43:18097/',
+				// target: 'http://119.3.91.43:18097/',
 				rewrite: (path) => path.replace(/^\/api/, ""),
 				changeOrigin: true,
 			},

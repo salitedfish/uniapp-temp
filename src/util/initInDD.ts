@@ -1,4 +1,4 @@
-import { initPage } from "@/util/initPage"
+import { initWeb } from "@/util/initWeb"
 import { setToken } from "@/store/auth"
 import { ddQuery, ddSignature, ddGetUser, ddGetUserByPhone } from "@/api/dd"
 import { getInfo } from "@/api/yinlun"
@@ -69,19 +69,19 @@ export const initInDD = async () => {
 						})
 					} finally {
 						// 初始化页面
-						initPage()
+						initWeb()
 						uni.hideLoading()
 					}
 				}
 			},
 			onFail: (err : Obj) => {
 				uni.showToast({
+					icon: "none",
 					title: JSON.stringify(err)
 				})
 				uni.hideLoading()
 			}
 		})
-
 
 		// dd权限配置
 		const ree = await ddSignature({

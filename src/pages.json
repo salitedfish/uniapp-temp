@@ -16,7 +16,7 @@
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "登录"
 			},
-			"type": "nav",
+			"type": "nav"
 		},
 		{
 			"name": "home",
@@ -51,7 +51,7 @@
 					}
 				}
 			},
-			"type": "tab",
+			"type": "tab"
 			// "needLogin": true
 		},
 		{
@@ -64,12 +64,12 @@
 		},
 
 		{
-			"name": "link",
-			"path": "pages/link/index",
+			"name": "moldLink",
+			"path": "pages/moldLink/index",
 			"style": {
 				"navigationStyle": "custom",
 				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "外链测试",
+				"navigationBarTitleText": "工模",
 				"app-plus": {
 					"pullToRefresh": {
 						"support": true,
@@ -79,8 +79,8 @@
 			},
 			"type": "tab",
 			"needLogin": true,
-			"linkUrl": "http://192.168.0.8:8082/line-digitalization-mobile/#/",
-			"linkOrigin": "http://192.168.0.8:8082",
+			"linkUrl": "http://192.168.0.8:8082/tmlm_single_mobile/",
+			"linkOrigin": "http://192.168.0.8:8082"
 		},
 		// 仓库管理
 		{
@@ -325,17 +325,17 @@
 			"type": "nav",
 			"needLogin": true
 		},
-		{
-			"name": "EquipmentCheck",
-			"path": "pages/checkout/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "点检"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
+		// {
+		// 	"name": "EquipmentCheck",
+		// 	"path": "pages/checkout/index",
+		// 	"style": {
+		// 		"navigationStyle": "custom",
+		// 		"backgroundColor": "#f8f8f8",
+		// 		"navigationBarTitleText": "点检"
+		// 	},
+		// 	"type": "nav",
+		// 	"needLogin": true
+		// },
 		{
 			"name": "LdWorkPlan",
 			"path": "pages/workPlan/index",
@@ -377,8 +377,8 @@
 				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "追溯流程"
 			},
-			"type": "nav"
-			// "needLogin": true
+			"type": "nav",
+			"needLogin": true
 		},
 		{
 			"name": "TraceInfo",
@@ -388,8 +388,8 @@
 				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "追溯信息"
 			},
-			"type": "nav"
-			// "needLogin": true
+			"type": "nav",
+			"needLogin": true
 		},
 		{
 			"name": "ProductJobList",
@@ -399,8 +399,8 @@
 				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "报工记录"
 			},
-			"type": "nav"
-			// "needLogin": true
+			"type": "nav",
+			"needLogin": true
 		},
 		{
 			"name": "ProductJobPrinter",
@@ -410,8 +410,8 @@
 				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "报工打印"
 			},
-			"type": "nav"
-			// "needLogin": true
+			"type": "nav",
+			"needLogin": true
 		},
 		{
 			"name": "TraceSearch",
@@ -453,17 +453,17 @@
 		"spacing": "3px",
 		"iconfontSrc": "./static/iconfont.ttf", // app tabbar 字体.ttf文件路径 app 3.4.4+
 		"list": [{
+				"pagePath": "pages/demo/index",
+				"text": "测试"
+			}, {
 				"pagePath": "pages/blueTooth/index",
 				"iconPath": "static/tabbar/blueTooth.png",
 				"selectedIconPath": "static/tabbar/blueTooth_active.png",
 				"text": "蓝牙"
 			},
+
 			{
-				"pagePath": "pages/demo/index",
-				"text": "测试"
-			},
-			{
-				"pagePath": "pages/link/index",
+				"pagePath": "pages/moldLink/index",
 				"iconPath": "static/tabbar/mold.png",
 				"selectedIconPath": "static/tabbar/mold_active.png",
 				"text": "工模"

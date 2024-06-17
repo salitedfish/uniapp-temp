@@ -1,5 +1,4 @@
 import { versionCheck as versionCheckApi } from "@/api/app"
-import { getBaseUrl } from "@/util/common"
 import { appVersion } from "@/store/common"
 
 // app版本检查并提示
@@ -36,32 +35,6 @@ export const useVersionCheck = async (p : { title ?: string, content ?: string, 
 			})
 		}
 	}
-
-	// plus.runtime.getProperty(plus.runtime.appid as string, async (widgetInfo) => {
-	// 	// 先请求版本看是否需要更新
-	// 	const res = await versionCheckApi()
-	// 	if (res.data) {
-	// 		// 如果一样就不需要更新
-	// 		if (widgetInfo.versionCode === res.data.versionCode) {
-	// 			return;
-	// 		} else if (res.data.versionCode) {
-	// 			// android进行如下操作
-	// 			uni.showModal({
-	// 				title: param.title,
-	// 				content: param.content,
-	// 				showCancel: true,
-	// 				confirmText: param.oktext,
-	// 				cancelText: param.canceltext,
-	// 				success: result => {
-	// 					// 如果点了确认就开始更新
-	// 					if (result.confirm) {
-	// 						startUpdate(res.data.versionUrl)
-	// 					}
-	// 				}
-	// 			})
-	// 		}
-	// 	}
-	// });
 }
 
 export const startUpdate = (versionUrl : string) => {

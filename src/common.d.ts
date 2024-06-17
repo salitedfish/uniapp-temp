@@ -4,14 +4,12 @@ type Obj<T = any> = Record<string, T>
 
 type DingDing = typeof import("dingtalk-jsapi")
 type WeiXin = typeof import("weixin-js-sdk").default
-
-declare const linkWindow : Obj
-
 declare const dingding : DingDing
-
 declare const weixin : WeiXin
-
 declare interface Window {
 	dingding : DingDing;
 	weixin : WeiXin;
 }
+
+// iframe的window名称
+declare const moldLinkWindow : Obj

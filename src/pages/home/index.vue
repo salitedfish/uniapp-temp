@@ -3,13 +3,12 @@
 	import { routes } from "@/store/route"
 	import { globalColor } from "@/store/theme"
 	import { RouteType, type Route } from "@/type/route"
-	import { useLogout } from "@/hook/useLogout"
 	import { logged } from "@/util/common"
 	import { userInfo, authList } from "@/store/auth"
 	import { updateAllDate } from "@/store/common"
 	import manifestJson from "@/manifest.json"
 	import { Env } from "@/type/env"
-	import { Platform } from "@/util/env"
+	import { useCloseApp } from "@/hook/useCloseApp"
 
 	updateAllDate()
 
@@ -19,38 +18,6 @@
 		icon ?: string,
 		route ?: Route,
 		auth ?: boolean
-	}
-
-	const { logout } = useLogout()
-
-	// 退出
-	const logoutHandler = async () => {
-		if (Platform.isInDD()) {
-			uni.showModal({
-				content: "确定要退出吗？",
-				showCancel: true,
-				async success(res) {
-					if (res.confirm) {
-						await logout()
-						dingding.biz.navigation.close({})
-					}
-				}
-			})
-		} else {
-			uni.showModal({
-				content: "确定要退出吗？",
-				showCancel: true,
-				async success(res) {
-					if (res.confirm) {
-						await logout()
-						uni.redirectTo({
-							url: routes.login.path
-						})
-					}
-				}
-			})
-		}
-
 	}
 
 	// 追溯系统页面
@@ -63,13 +30,13 @@
 				route: routes.LdOnDuty,
 				auth: authList.value.includes(routes.LdOnDuty.name)
 			},
-			{
-				name: routes.EquipmentCheck.name,
-				title: routes.EquipmentCheck.style.navigationBarTitleText,
-				icon: "/static/home/checkout.svg",
-				route: routes.EquipmentCheck,
-				auth: authList.value.includes(routes.EquipmentCheck.name)
-			},
+			// {
+			// 	name: routes.EquipmentCheck.name,
+			// 	title: routes.EquipmentCheck.style.navigationBarTitleText,
+			// 	icon: "/static/home/checkout.svg",
+			// 	route: routes.EquipmentCheck,
+			// 	auth: authList.value.includes(routes.EquipmentCheck.name)
+			// },
 			{
 				name: routes.LdWorkPlan.name,
 				title: routes.LdWorkPlan.style.navigationBarTitleText,
@@ -233,14 +200,15 @@
 					{{`Hi, ${userInfo.jobName}`}}
 				</view>
 				<uni-icons custom-prefix="custom-icon" type="icon-guanji" class="link" :color=" globalColor.primary"
-					@click="logoutHandler" size="20"></uni-icons>
+					@click="useCloseApp" size="20"></uni-icons>
 			</view>
 		</template>
 	</u-navbar>
 
 	<up-text text="追溯管理" class="grid-title" bold></up-text>
 	<u-grid :border="true" class="grid-box">
-		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList" :key="index" class="grid-item">
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList.filter(item => !!item.auth)"
+			:key="index" class="grid-item">
 			<image :src="item.icon" class="grid-icon"></image>
 			<text class="grid-text">{{item.title}}</text>
 		</u-grid-item>
@@ -248,9 +216,9 @@
 
 	<up-text text="仓储管理" class="grid-title" bold></up-text>
 	<u-grid :border="true" class="grid-box">
-		<!-- <u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList.filter(item => item.auth)" -->
-		<u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList" :key="index" class="grid-item"
-			:name="item.title">
+		<!-- .filter(item => item.auth) -->
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList.filter(item => !!item.auth)"
+			:key="index" class="grid-item" :name="item.title">
 			<image :src="item.icon" class="grid-icon"></image>
 			<text class="grid-text">{{item.title}}</text>
 		</u-grid-item>
