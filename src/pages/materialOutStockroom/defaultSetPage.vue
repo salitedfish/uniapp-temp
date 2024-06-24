@@ -8,7 +8,7 @@
 	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
 	import UpInputStockroomPicker from "@/components/UpInputStockroomPicker.vue"
 	import UpInputOutSrTypePicker from "@/components/UpInputOutSrTypePicker.vue"
-	import CommonNavBar from "@/components/CommonNavBar.vue"
+	import CustomNavBar from "@/components/CustomNavBar.vue"
 	// 工具
 	// 接口
 	// 数据
@@ -64,7 +64,7 @@
 
 <template>
 	<view class="common-page common-page-container">
-		<CommonNavBar :title="routes.mOSDefaultSetPage.style.navigationBarTitleText"></CommonNavBar>
+		<CustomNavBar :title="routes.mOSDefaultSetPage.style.navigationBarTitleText"></CustomNavBar>
 
 		<view class="common-section-title">
 			基本信息

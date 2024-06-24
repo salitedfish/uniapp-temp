@@ -4,6 +4,7 @@ import { Platform } from "@/util/env"
 import { setWxConfig } from "@/util/initInWX"
 
 // 需要添加拦截器的方法功能说明
+// navigateBack先不加拦截器
 const list = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
 
 export const initInterceptor = () => {
@@ -28,7 +29,7 @@ export const initInterceptor = () => {
 					})
 					return false
 				}
-				// 如果是微信内嵌的浏览器，路由改变需要重新配置wx
+				// 如果是微信内嵌的浏览器，路由改变需要重新配置wx（页面回退效果待确认）
 				if (Platform.isInWx()) {
 					const rootPath = import.meta.env.VITE_BASE_PAGE_PATH_WEB ? `/${import.meta.env.VITE_BASE_PAGE_PATH_WEB}` : ""
 					setWxConfig({ url: `${window.location.origin}${rootPath}${e.url}` })

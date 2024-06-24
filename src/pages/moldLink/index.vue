@@ -10,6 +10,7 @@
 	import { useCloseApp } from "@/hook/useCloseApp"
 	import { useGenParamsUrl } from "@ultra-man/noa"
 
+	// #ifdef H5
 	const linkOrigin = routes.moldLink.linkOrigin
 
 	const initScan = async () => {
@@ -38,7 +39,9 @@
 			} finally {
 				moldLinkWindow.window.postMessage(IframeActionResult.AUDIO_PLAY_END, linkOrigin);
 			}
-		} catch (err) {
+		}
+		// 播放失败
+		catch (err) {
 			moldLinkWindow.window.postMessage("", linkOrigin);
 		}
 	}
@@ -71,7 +74,8 @@
 	}
 
 	// 父页面监听子页面的消息
-	window.addEventListener("message", async (e : { origin : string, data : string }) => {
+	window.onmessage = async (e : { origin : string, data : string }) => {
+		// 无论那个子页面派发message都会触发这个函数，所有需要通过子页面地址过滤出对应的页面操作
 		if (e.origin === linkOrigin) {
 			const res = JSON.parse(e.data)
 			// 扫码操作
@@ -102,10 +106,19 @@
 			if (res.action === IframeAction.VOICE_RECORD_STOP) {
 				voiceRecordStop()
 			}
+			// 跳转登陆页
+			if (res.action === IframeAction.LOGIN_PAGE) {
+				uni.redirectTo({
+					url: routes.login.path
+				})
+				uni.removeStorageSync("token")
+				uni.removeStorageSync("userInfo")
+			}
 			// 目标地址的其他操作
 			// ...
 		}
-	})
+	}
+	// #endif
 
 	// 外链全路径包括传参
 	const url = computed(() => {

@@ -1,5 +1,6 @@
 import { Platform } from "@/util/env"
 
+// 录音服务
 export class VoiceRecord {
 
 	public static start() {

@@ -25,7 +25,7 @@
 	// import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
 	import UpInputBusTypePicker from "@/components/UpInputBusTypePicker.vue"
 	import UpInputPurTypePicker from "@/components/UpInputPurTypePicker.vue"
-	import CommonNavBar from "@/components/CommonNavBar.vue"
+	import CustomNavBar from "@/components/CustomNavBar.vue"
 
 	const form = ref < Obj < Business[] >> ({
 		// depSelected: [],
@@ -64,7 +64,7 @@
 
 <template>
 	<view class="common-page common-page-container">
-		<CommonNavBar :title="routes.pADefaultSetPage.style.navigationBarTitleText"></CommonNavBar>
+		<CustomNavBar :title="routes.pADefaultSetPage.style.navigationBarTitleText"></CustomNavBar>
 
 		<view class="common-section-title">
 			基本信息

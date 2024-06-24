@@ -8,6 +8,9 @@ export enum IframeAction {
 
 	VOICE_RECORD_START = "voiceRecordStart",
 	VOICE_RECORD_STOP = "voiceRecordStop",
+
+	// 页面跳转
+	LOGIN_PAGE = "loginPage"
 }
 
 export enum IframeActionResult {

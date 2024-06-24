@@ -10,7 +10,7 @@ export const initApp = async () => {
 		// 打包隐藏测试页面
 		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({
-				index: 1,
+				index: 0,
 				visible: false
 			})
 		}

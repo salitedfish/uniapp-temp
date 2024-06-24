@@ -24,7 +24,7 @@
 <script lang='ts' setup>
 	import UpInputDepPicker from "@/components/UpInputDepPicker.vue"
 	import UpInputStockroomPicker from "@/components/UpInputStockroomPicker.vue"
-	import CommonNavBar from "@/components/CommonNavBar.vue"
+	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputOutSrTypePicker from "@/components/UpInputOutSrTypePicker.vue"
 	import UpInputSrSaveTypePicker from "@/components/UpInputSrSaveTypePicker.vue"
 
@@ -71,7 +71,7 @@
 
 <template>
 	<view class="common-page common-page-container">
-		<CommonNavBar :title="routes.srCDefaultSetPage.style.navigationBarTitleText"></CommonNavBar>
+		<CustomNavBar :title="routes.srCDefaultSetPage.style.navigationBarTitleText"></CustomNavBar>
 
 		<view class="common-section-title">
 			基本信息

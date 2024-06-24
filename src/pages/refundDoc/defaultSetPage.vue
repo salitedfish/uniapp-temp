@@ -26,7 +26,7 @@
 	import UpInputStockroomPicker from "@/components/UpInputStockroomPicker.vue"
 	import UpInputBusTypePicker from "@/components/UpInputBusTypePicker.vue"
 	import UpInputSaleTypePicker from "@/components/UpInputSaleTypePicker.vue"
-	import CommonNavBar from "@/components/CommonNavBar.vue"
+	import CustomNavBar from "@/components/CustomNavBar.vue"
 
 
 	const form = ref < Obj < Business[] >> ({
@@ -68,7 +68,7 @@
 
 <template>
 	<view class="common-page common-page-container">
-		<CommonNavBar :title="routes.rDDefaultSetPage.style.navigationBarTitleText"></CommonNavBar>
+		<CustomNavBar :title="routes.rDDefaultSetPage.style.navigationBarTitleText"></CustomNavBar>
 
 		<view class="common-section-title">
 			基本信息

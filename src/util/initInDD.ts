@@ -83,10 +83,11 @@ export const initInDD = async () => {
 			}
 		})
 
-		// dd权限配置
+		// 获取dd的签名
 		const ree = await ddSignature({
 			url: window.location.href
 		})
+		// dd功能权限配置
 		dingding.config({
 			// 微应用ID
 			agentId: ree.data.agentId,
@@ -113,11 +114,10 @@ export const initInDD = async () => {
 		});
 	});
 
-	dingding.error(() => {
+	dingding.error((err) => {
 		uni.hideLoading()
-		uni.showToast({
-			title: "初始化失败",
-			icon: "none"
+		uni.showModal({
+			content: JSON.stringify(err)
 		})
 	})
 }

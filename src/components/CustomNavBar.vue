@@ -23,11 +23,14 @@
 		if (props.leftClick) {
 			props.leftClick()
 		} else {
-			// #ifdef APP-PLUS
-			uni.navigateBack()
-			// #endif
+			// h5端如果使用navigateBack无法携带原页面本来的参数
+			// 所以用浏览器自带的方法代替
 			// #ifdef H5
 			history.back()
+			// #endif
+			// app端没这个问题
+			// #ifdef APP-PLUS
+			uni.navigateBack()
 			// #endif
 		}
 	}

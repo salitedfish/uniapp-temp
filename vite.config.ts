@@ -29,7 +29,6 @@ export default ({ mode }) => defineConfig({
 				// 赤壁追溯H5测试
 				// target: "http://119.3.17.60:8096/",
 				// target: "http://192.168.0.87:8097/",
-				// target: "http://119.3.91.43:18097/",
 				// target: "http://192.168.0.40:8096/",
 				// target: 'http://119.3.91.43:18097/',
 				rewrite: (path) => path.replace(/^\/api/, ""),

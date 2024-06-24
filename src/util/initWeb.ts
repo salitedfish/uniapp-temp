@@ -7,14 +7,14 @@ import type { RouteName } from "@/type/route"
 export const initWeb = async () => {
 	try {
 
-		// 生产环境隐藏蓝牙
+		// 生产环境隐藏测试页面
 		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({
 				index: 0,
 				visible: false
 			})
 		}
-		// 打包隐藏测试页面
+		// 生产环境隐藏蓝牙
 		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({
 				index: 1,
