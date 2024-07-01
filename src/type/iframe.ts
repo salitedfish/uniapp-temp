@@ -14,7 +14,11 @@ export enum IframeAction {
 }
 
 export enum IframeActionResult {
+	AUDIO_PLAY_SUCCESS = "audioPlaySuccess",
+	AUDIO_PLAY_FAIL = "audioPlayFail",
+
 	AUDIO_PLAY_END = "audioPlayEnd",
+
 	AUDIO_STOP_SUCCESS = "audioStopSuccess",
 	AUDIO_STOP_FAIL = "audioStopFail",
 

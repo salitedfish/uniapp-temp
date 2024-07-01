@@ -69,18 +69,10 @@
 			"style": {
 				"navigationStyle": "custom",
 				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "工模",
-				"app-plus": {
-					"pullToRefresh": {
-						"support": true,
-						"style": "default"
-					}
-				}
+				"navigationBarTitleText": "工模"
 			},
 			"type": "tab",
-			"needLogin": true,
-			"linkUrl": "http://192.168.0.8:8082/tmlm_single_mobile/",
-			"linkOrigin": "http://192.168.0.8:8082"
+			"needLogin": true
 		},
 		// 仓库管理
 		{

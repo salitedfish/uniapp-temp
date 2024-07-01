@@ -1,14 +1,19 @@
 import { defineConfig, loadEnv } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 import commonjs from 'vite-plugin-commonjs';
+// import legacyPlugin from "@vitejs/plugin-legacy"
 // import basicSsl from '@vitejs/plugin-basic-ssl'
 
-
-// https://vitejs.dev/config/
 export default ({ mode }) => defineConfig({
 	plugins: [
 		uni(),
 		commonjs(),
+		// legacyPlugin这个插件在打包成app的时候会报错，所以只在h5端使用
+		// legacyPlugin({
+		// 	modernPolyfills: true,
+		// 	targets: ['chrome < 60', 'edge < 15'],
+		// 	renderLegacyChunks: true,
+		// }),
 		// basicSsl()
 	],
 	base: loadEnv(mode, process.cwd()).VITE_BASE_PAGE_PATH_WEB,
