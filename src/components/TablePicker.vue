@@ -24,6 +24,7 @@
 		(event : "select", result : Obj[]) : void;
 		(event : "update:selected", selected : Obj[]) : void
 		(event : "searchList") : void
+		(event : "singleClick", result : Obj) : void
 	}>()
 
 	onMounted(() => {
@@ -44,6 +45,8 @@
 			emit("update:selected", [item])
 			emit("select", [item])
 		}
+		// 无论要不要多选，都反射一个单击事件
+		emit("singleClick", item)
 	}
 	// 获取在选择列表中的index
 	const getSelectedIndex = (item : Obj) => {
