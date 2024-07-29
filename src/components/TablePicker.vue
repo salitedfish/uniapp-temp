@@ -14,6 +14,9 @@
 			multiple ?: boolean,
 			multipleSelectCondition ?: (target : Obj, list : Obj[]) => boolean,
 			withIndex ?: boolean,
+			// 如果有值说明每行还能展示详情
+			subKey ?: string,
+			subColums ?: { label : string, key : string }[],
 		}>(), {
 		tableData: () => []
 	})
@@ -90,6 +93,25 @@
 	const clearSelect = () => {
 		selectItems.value = []
 	}
+
+	// 详情展示的行
+	const showSubListItem = ref<Obj>({})
+	// 是否显示popup
+	const showPopup = ref(false)
+	// 展示子列表
+	const showSubList = (item : Obj) => {
+		showSubListItem.value = item
+		open()
+	}
+	// 打开弹窗
+	const open = () => {
+		showPopup.value = true
+	}
+	// 关闭弹窗
+	const close = () => {
+		showPopup.value = false
+		showSubListItem.value = {}
+	}
 </script>
 
 <template>
@@ -100,6 +122,7 @@
 					<span style="margin-right: 10px" @click="allSelect">全选</span>
 					<span @click="clearSelect">清空</span>
 				</uni-th>
+				<uni-td class="nowrap" v-if="subKey">详情</uni-td>
 				<uni-th class="nowrap" align="left" width="50rpx" v-if="withIndex">序号</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx" v-for="item, key in colums"
 					:key="key">{{item.label}}</uni-th>
@@ -112,10 +135,29 @@
 					<uni-icons custom-prefix="custom-icon" type="icon-mei-xuanze" size="18" :color="globalColor.default"
 						@click="select(item, true)" v-else></uni-icons>
 				</uni-td>
+				<uni-td class="nowrap primary" v-if="subKey" @click.stop="showSubList(item)">展开</uni-td>
 				<uni-td class="nowrap" v-if="withIndex">{{ key + 1 }}</uni-td>
 				<uni-td class="nowrap" v-for="i, k in colums" :key="k">{{ item[i.key]}}</uni-td>
 			</uni-tr>
 		</uni-table>
+
+		<u-popup :show="showPopup" @close="close" mode="bottom" style="">
+			<view style="padding-top: 10px; padding-bottom: 10px;" class="common-table common-page-container popup-content">
+				<view style="height: 50vh; overflow-y: scroll;">
+					<uni-table ref="table" border stripe emptyText="暂无更多数据" :loading="searching">
+						<uni-tr>
+							<uni-th class="nowrap" align="left" width="50rpx" v-if="withIndex">序号</uni-th>
+							<uni-th class="nowrap" align="left" width="100rpx" v-for="item, key in subColums"
+								:key="key">{{item.label}}</uni-th>
+						</uni-tr>
+						<uni-tr v-for="item,key in showSubListItem[subKey]" :key="key" @click="singleConfirm(item)">
+							<uni-td class="nowrap" v-if="withIndex">{{ key + 1 }}</uni-td>
+							<uni-td class="nowrap" v-for="i, k in subColums" :key="k">{{ item[i.key]}}</uni-td>
+						</uni-tr>
+					</uni-table>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 
 	<slot></slot>
