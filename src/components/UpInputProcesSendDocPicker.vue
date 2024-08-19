@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, onMounted, watch, nextTick } from "vue"
+	import { ref, onMounted, watch, nextTick, computed } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useTable } from "@/hook/usePageTable"
 	import { getProductionOrderDispatchProcessInfos } from "@/api/business"
@@ -54,6 +54,9 @@
 
 	// 生成分页所需的数据和方法
 	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getProductionOrderDispatchProcessInfos)
+	const tableData = computed(() => {
+		return resultData.value?.list.map(item => { return { ...item, quantity: Number(item.quantity) } })
+	})
 
 	// 确认搜索
 	const search = () => {
@@ -156,8 +159,7 @@
 					</view>
 
 					<TablePicker :selected="selected" @update:selected="updateSelected" selectKey="rowNo" :searching="searching"
-						:tableData="resultData?.list.map(item => {return {...item, quantity: Number(item.quantity)}})"
-						@select="select" :multiple="multiple" :colums="colums" withIndex>
+						:tableData="tableData" @select="select" :multiple="multiple" :colums="colums" withIndex>
 
 						<view class="page-box">
 							<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
