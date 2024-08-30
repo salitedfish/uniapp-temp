@@ -57,8 +57,8 @@
 		}
 	}, 3000)
 
-	const problemSelected = ref < Obj[] > ([])
-	const problemSelect = (res: Obj[]) => {
+	const problemSelected = ref < Objs > ([])
+	const problemSelect = (res: Objs) => {
 		if (res.length > 0) {
 			form.value.problemTypeCode = res[0].problemTypeCode
 			form.value.problemTypeName = res[0].problemTypeName

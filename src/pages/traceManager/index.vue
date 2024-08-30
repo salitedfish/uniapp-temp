@@ -25,7 +25,7 @@
 		initData()
 	})
 
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const initData = async () => {
 		try {
 			uni.showLoading({

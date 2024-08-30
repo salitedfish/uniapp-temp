@@ -11,7 +11,7 @@ export const getLineList = async (data : Paging & Obj) => {
 
 // 追溯查询
 export const getTraceList = async (data : Obj = {}) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "trace/search",
 		data
 	})
@@ -35,7 +35,7 @@ export const getEquipmentSchemeList = async (data : Paging & Obj) => {
 
 // 获取设备点检项目
 export const getEquipmentSchemeChildList = async (data : Obj) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "tmlm/schemeChildList",
 		data
 	})
@@ -43,7 +43,7 @@ export const getEquipmentSchemeChildList = async (data : Obj) => {
 
 // 设备点检审核
 export const submitEquipentSchemeCheckout = async (data : Obj) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "checkEquipment/add",
 		data
 	})
@@ -51,7 +51,7 @@ export const submitEquipentSchemeCheckout = async (data : Obj) => {
 
 // 获取追溯产线列表
 export const getTraceLineList = async (data : Obj) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "ldLine/listLineAll",
 		data
 	})
@@ -99,7 +99,7 @@ export const getAirtightnessTracePageList = async (data : Paging & Obj) => {
 
 // 获取设备信息
 export const getEquipmentByLineDetailId = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "trace/findEquipment",
 		data
 	})
@@ -115,7 +115,7 @@ export const getFailureModList = async (data : Paging & Obj) => {
 
 // 获取检验单列表
 export const getCheckItemListApi = async (data : Obj) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "ldCheckItem/checkList",
 		data
 	})
@@ -172,3 +172,22 @@ export const checkHeadTail = async (data : Obj) => {
 		data,
 	})
 }
+
+// 码规则、重码、上到工序及返工校验
+export const codeCheckInfoApi = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "trace/checkBarcode",
+		data,
+		header: {
+			"Content-Type": "application/json",
+		}
+	})
+}
+
+// 通过网址获取设备编码
+export const findCardByUrl = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "ldEquipment/findCardByUrl",
+		data,
+	});
+};

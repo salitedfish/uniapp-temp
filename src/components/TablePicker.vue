@@ -6,13 +6,13 @@
 	// 基础数据
 	const props = withDefaults(defineProps<
 		{
-			selected : Obj[],
+			selected : Objs,
 			selectKey : string,
 			colums : { label : string, key : string }[],
-			tableData ?: Obj[],
+			tableData ?: Objs,
 			searching ?: boolean,
 			multiple ?: boolean,
-			multipleSelectCondition ?: (target : Obj, list : Obj[]) => boolean,
+			multipleSelectCondition ?: (target : Obj, list : Objs) => boolean,
 			withIndex ?: boolean,
 			// 如果有值说明每行还能展示子列表
 			subSearching ?: boolean,
@@ -22,8 +22,8 @@
 		tableData: () => []
 	})
 	const emit = defineEmits<{
-		(event : "select", result : Obj[]) : void;
-		(event : "update:selected", selected : Obj[]) : void
+		(event : "select", result : Objs) : void;
+		(event : "update:selected", selected : Objs) : void
 		(event : "searchList") : void
 		(event : "singleClick", result : Obj) : void
 		(event : "showSubList", result : Obj) : void
@@ -39,7 +39,7 @@
 	// 单选的唯一值
 	const singleSelectKey = ref("")
 	// 多选择的列表
-	const selectItems = ref<Obj[]>([])
+	const selectItems = ref<Objs>([])
 
 	// 单选确认
 	const singleConfirm = (item : Obj) => {

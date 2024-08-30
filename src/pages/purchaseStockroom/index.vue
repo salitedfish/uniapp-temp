@@ -81,8 +81,8 @@
 	const typeSelect = ref(0)
 	const searching = ref(false)
 	const scanAnyText = ref("")
-	const arrivalDocSelected = ref < Obj[] > ([])
-	const testDocSelected = ref < Obj[] > ([])
+	const arrivalDocSelected = ref < Objs > ([])
+	const testDocSelected = ref < Objs > ([])
 	const dateSelected = ref < string[] > ([])
 	// 加载数据
 	const loadData = async (params: Obj, api: PageListApi) => {
@@ -150,7 +150,7 @@
 		}
 	}, 3000)
 	// 扫货单情况
-	const arrivalDocSelect = (res: Obj[]) => {
+	const arrivalDocSelect = (res: Objs) => {
 		if (res && res.length) {
 			loadData({
 				// cCode: res[0].ccode
@@ -159,7 +159,7 @@
 		}
 	}
 	// 扫检验单情况
-	const testDocSelect = (res: Obj[]) => {
+	const testDocSelect = (res: Objs) => {
 		if (res && res.length) {
 			loadData({
 				// cCode: res[0].checkCode
@@ -201,7 +201,7 @@
 	// 这个给参照到货单和参照检验单一个默认的物料数组
 	const materielSelected = ref < Business[] > ([])
 	// 这个给参照到货单和参照检验单一个默认的供应商数组
-	const supplierSelected = ref < Obj[] > ([])
+	const supplierSelected = ref < Objs > ([])
 	// 用户选择参照到货单
 	const selectArrivalDoc = () => {
 		showSelectCenterPopup.value = false
@@ -237,7 +237,7 @@
 		})
 	}
 	// -------------------------------------------------------------------------------------表格操作
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 
 	const open = (item: Obj, key: number) => {
 		index.value = key
@@ -360,7 +360,7 @@
 	}
 	// -------------------------------------------------------------------------------------检验提示弹窗
 	// const showCenterPopup = ref(false)
-	// const centerPopupTableData = ref < Obj[] > ([])
+	// const centerPopupTableData = ref < Objs > ([])
 
 	// -------------------------------------------------------------------------------------提交操作
 	const submiting = ref(false)

@@ -25,7 +25,7 @@
 <script lang='ts' setup>
 	const props = defineProps < {
 		showPrintContent ? : boolean,
-		printContent: Obj[]
+		printContent: Objs
 	} > ()
 	const emit = defineEmits < {
 		(event: "closePrintContent"): void

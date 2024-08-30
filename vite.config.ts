@@ -22,7 +22,9 @@ export default ({ mode }) => defineConfig({
 		proxy: {
 			"^/api": {
 				// 文博
-				target: 'http://192.168.0.84:8097/',
+				// target: 'http://192.168.0.84:8097/',
+				// 达虎
+				target: 'http://192.168.0.40:8097/',
 				// 晓楠
 				// target: 'http://192.168.0.98:8097/',
 				// 测试环境

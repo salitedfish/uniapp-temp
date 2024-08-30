@@ -196,7 +196,7 @@
 
 	// -------------------------------------------------------------------------------------表格操作
 	// table实际展示的数据, 表格由前端自己维护
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	// 表格操作
 	const showPopup = ref(false)
 	const editData = ref({

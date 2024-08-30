@@ -55,7 +55,7 @@
 		}
 	}
 	const editData = ref < Obj > (initEditData())
-	const popupTable = ref < Obj[] > ([])
+	const popupTable = ref < Objs > ([])
 	const scanSuccess = useThrottle((code: string) => {
 		if (code) {
 			const res = splitCodes(code)
@@ -90,7 +90,7 @@
 	// --------------------------------------------------------------------------------表格
 	// 表格
 	const loading = ref(false)
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const genTableData = async () => {
 		if (checkDocSelected.value.length > 0) {
 			try {

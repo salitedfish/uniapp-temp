@@ -11,13 +11,13 @@ export const typeSelect = ref(0)
 export const printTypeCheck = ref(0)
 export const showPrintContent = ref(false)
 // 参照生产订单工序派工资料情况
-export const processSendDocSelected = ref<Obj[]>([])
+export const processSendDocSelected = ref<Objs>([])
 // 参照领料申请单情况
-export const materielApplyDocSelected = ref<Obj[]>([])
+export const materielApplyDocSelected = ref<Objs>([])
 // 日期
 export const dateSelected = ref<string[]>([])
 // table实际展示的数据, 表格由前端自己维护
-export const tableData = ref<Obj[]>([])
+export const tableData = ref<Objs>([])
 // 表格操作
 export const operateData = ref<Obj>({
 	index: "",
@@ -81,7 +81,7 @@ const getOutSrList = async (api : PageListApi, param : Obj) => {
 	}
 }
 // 参照生产订单工序派工资料情况
-export const processSendDocSelect = (res : Obj[]) => {
+export const processSendDocSelect = (res : Objs) => {
 	if (res.length > 0) {
 		// todo请求列表
 		getOutSrList(getOutSrListApiByDispatchProcessInfo, {
@@ -95,7 +95,7 @@ export const processSendDocSelect = (res : Obj[]) => {
 
 }
 // 参照领料申请单情况
-export const materielApplyDocSelect = (res : Obj[]) => {
+export const materielApplyDocSelect = (res : Objs) => {
 	if (res.length > 0) {
 		// todo请求列表
 		getOutSrList(getOutSrListApiByMaterialAppVouch, {

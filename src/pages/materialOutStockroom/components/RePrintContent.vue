@@ -68,8 +68,8 @@
 	}
 
 	// 工序
-	const processSelected = ref < Obj[] > ([])
-	const processSelect = (res: Obj[]) => {
+	const processSelected = ref < Objs > ([])
+	const processSelect = (res: Objs) => {
 		if (res.length > 0) {
 			searchParam.value.copdesc = res[0].id
 		} else {

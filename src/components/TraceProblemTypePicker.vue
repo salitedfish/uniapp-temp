@@ -13,11 +13,11 @@
 	} from "@/api/anDon"
 
 	const props = defineProps < {
-		selected ? : Obj[]
+		selected ? : Objs
 	} > ()
 	const emit = defineEmits < {
-		(event: "select", result: Obj[]): void;
-		(event: "update:selected", result: Obj[]): void;
+		(event: "select", result: Objs): void;
+		(event: "update:selected", result: Objs): void;
 	} > ()
 
 	onMounted(() => {
@@ -42,13 +42,13 @@
 	// input显示的字符串
 	const inputText = ref("")
 	const show = ref(false);
-	const columns = ref < Obj[] > ([]);
+	const columns = ref < Objs > ([]);
 
 	const open = () => {
 		show.value = true
 	}
 	const select = (res: {
-		value: Obj[]
+		value: Objs
 	}) => {
 		inputText.value = res.value[0].problemTypeName
 		show.value = false

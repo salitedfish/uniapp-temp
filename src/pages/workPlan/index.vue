@@ -156,4 +156,13 @@
 	.common-table {
 		margin-top: 10px;
 	}
+
+	.page-box {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding-bottom: 10px;
+		background-color: #fff;
+	}
 </style>

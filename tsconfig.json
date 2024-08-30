@@ -15,5 +15,8 @@
 			"@ttou/uview-typings/refs"
 		]
 	},
-	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/main.uts"]
+	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/main.uts"],
+
+	"moduleResolution": "node",
+	"ignoreDeprecations": "5.0",
 }

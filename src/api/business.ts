@@ -5,7 +5,7 @@ import type { BusinessParams, Business, LdProcessParams, LdProcess } from "@/typ
 // 获取各种业务列表
 export const getBusiness = async (data : BusinessParams) => {
 	return await uRequest.post<Return<ReturnList<Business>>>({
-		url: "dictionary/listChild",
+		url: "dictionary2/listChild",
 		data,
 	})
 }
@@ -35,7 +35,7 @@ export const listCurrentStock = async (data : Paging & Obj) => {
 // 根据货位编码获取货位信息
 export const getPositionInfo = async (data : { cPosCode : string }) => {
 	return await uRequest.post<Return<Obj>>({
-		url: "dictionary/getPosition",
+		url: "dictionary2/getPosition",
 		data,
 	})
 }

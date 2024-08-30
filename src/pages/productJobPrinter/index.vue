@@ -126,9 +126,9 @@
 	}
 
 	// 标签列表, 标箱数量改变时，重新生成标签列表
-	const labelInfoList = ref < Obj[] > ([])
+	const labelInfoList = ref < Objs > ([])
 	const genLabelInfoList = () => {
-		const list: Obj[] = []
+		const list: Objs = []
 		if (productJobDetail.value.thisNum && form.value.boxNum) {
 			const count = Math.floor(productJobDetail.value.thisNum / form.value.boxNum)
 			const last = productJobDetail.value.thisNum % form.value.boxNum

@@ -9,7 +9,7 @@
 	import MediaUpload from "@/components/MediaUpload.vue"
 
 	const props = defineProps < {
-		items: Obj[]
+		items: Objs
 	} > ()
 
 	const emit = defineEmits < {

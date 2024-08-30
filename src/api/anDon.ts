@@ -10,7 +10,7 @@ export const getAnDonProblemTypeList = async () => {
 
 // 提交按灯
 export const submitAnDon = async (data : Obj) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "ldAndonMessage/add",
 		data
 	})

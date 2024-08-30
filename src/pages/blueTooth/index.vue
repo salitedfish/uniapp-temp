@@ -20,8 +20,8 @@
 	]
 
 	// 分段器数据
-	// const subList = ["设备", "服务", "特征"]
-	const subList = ["设备"]
+	const subList = ["设备", "服务", "特征"]
+	// const subList = ["设备"]
 	const subSelect = ref(0)
 	const subChange = (index : number) => {
 		subSelect.value = index
@@ -39,8 +39,10 @@
 		if (!blueToothStore.hasBlueTooth) {
 			uni.showToast({
 				icon: "none",
-				title: "不支持蓝牙搜索"
+				title: "当前环境不支持蓝牙"
 			})
+		} else if (blueToothStore.searching) {
+			blueTooth.stopDiscoveryPrinter();
 		} else {
 			deviceId = ""
 			blueTooth.discoveryPrinter()
@@ -137,10 +139,12 @@
 		<u-popup :show="show" mode="right" @close="closePopup">
 			<view class="print-option">
 				<view class="btn-box">
-					<up-button class="search-btn" @click="searchClick" type="primary" :loading="blueToothStore.searching"
-						text="开始搜索" loading-text="搜索中" loadingMode="circle"></up-button>
-					<up-button class="search-btn" @click="reConnect" type="primary" text="重新连接"></up-button>
-					<up-button class="search-btn" @click="closeConnect" type="warning" text="断开连接"></up-button>
+					<up-button class="search-btn" @click="searchClick" type="primary"
+						:text="blueToothStore.searching ? '停止搜索' : '开始搜索'"></up-button>
+					<up-button class="search-btn" @click="reConnect" type="primary" text="重新连接"
+						:disabled="!blueToothStore.connected"></up-button>
+					<up-button class="search-btn" @click="closeConnect" type="warning" text="断开连接"
+						:disabled="!blueToothStore.connected"></up-button>
 				</view>
 
 				<u-subsection :list="subList" :current="subSelect" @change="subChange" mode="subsection"></u-subsection>
@@ -171,6 +175,8 @@
 								</view>
 							</view>
 						</u-transition>
+						<up-loading-icon style="margin-top: 10px" text="搜索中" textSize="12" size="12" mode="circle"
+							v-if="blueToothStore.searching"></up-loading-icon>
 					</view>
 
 					<!-- 服务列表 -->

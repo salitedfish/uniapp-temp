@@ -78,7 +78,7 @@
 	// 日期
 	const dateSelected = ref < string[] > ([])
 	// 表格数据
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	// 表格操作
 	const index = ref(0)
 	const count = ref("")
@@ -86,7 +86,7 @@
 	const showPopup = ref(false)
 	// 提交完的弹窗
 	const showCenterPopup = ref(false)
-	const centerPopupTableData = ref < Obj[] > ([])
+	const centerPopupTableData = ref < Objs > ([])
 	// 确认到货
 	const submiting = ref(false)
 

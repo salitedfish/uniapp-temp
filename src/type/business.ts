@@ -120,7 +120,7 @@ export type CheckVouchDetailParams = {
 	id : string
 }
 export type CheckVouchDetail = Obj & {
-	detailList : Obj[]
+	detailList : Objs
 }
 
 // 出库单信息

@@ -14,23 +14,23 @@
 	const props = defineProps<
 		{
 			multiple ?: boolean,
-			selected ?: Obj[]
+			selected ?: Objs
 		}>()
 	const emit = defineEmits<{
-		(event : "select", result : Obj[]) : void;
-		(event : "update:selected", result : Obj[]) : void;
+		(event : "select", result : Objs) : void;
+		(event : "update:selected", result : Objs) : void;
 	}>()
 
 	onMounted(() => {
 		if (props.selected) {
-			emit("select", props.selected as Obj[])
+			emit("select", props.selected as Objs)
 			inputText.value = props.selected.map(item => item.moCode).join(", ")
 		}
 	})
 
 	watch(() => props.selected, () => {
 		if (props.selected) {
-			emit("select", props.selected as Obj[])
+			emit("select", props.selected as Objs)
 			inputText.value = props.selected.map(item => item.moCode).join(", ")
 		}
 	})
@@ -79,7 +79,7 @@
 	const select = () => {
 		close()
 	}
-	const updateSelected = (selected : Obj[]) => {
+	const updateSelected = (selected : Objs) => {
 		emit("update:selected", selected)
 	}
 
@@ -88,8 +88,8 @@
 	//----------------------------下面是这个组件自身依赖的组件数据
 
 	// 工序
-	const processSelected = ref<Obj[]>([])
-	const processSelect = (res : Obj[]) => {
+	const processSelected = ref<Objs>([])
+	const processSelect = (res : Objs) => {
 		if (res.length > 0) {
 			searchParam.value.wcId = res[0].id
 		} else {

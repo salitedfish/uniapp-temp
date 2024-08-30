@@ -68,8 +68,8 @@
 	}, 3000)
 
 	// 保养方案
-	const equipmentSchemeSelected = ref < Obj[] > ([])
-	const equipmentSchemeSelect = (res: Obj[]) => {
+	const equipmentSchemeSelected = ref < Objs > ([])
+	const equipmentSchemeSelect = (res: Objs) => {
 		if (res && res.length > 0) {
 			form.value.instructionVideo = res[0].instructionVideo
 			form.value.schemeId = res[0].id
@@ -83,7 +83,7 @@
 	}
 
 	// 点检项目
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const searching = ref(false)
 	const getSchemeChildList = async () => {
 		searching.value = true

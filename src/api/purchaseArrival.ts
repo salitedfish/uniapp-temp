@@ -53,7 +53,7 @@ export const confirmArrival = async (data : Obj) => {
 
 // 生成来料报检单
 export const createQmInspectVoucher = async (data : { arrivalVouchId : string }) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "erp/createQmInspectVoucher",
 		data,
 		header: {

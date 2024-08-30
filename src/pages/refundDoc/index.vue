@@ -72,8 +72,8 @@
 	})
 
 	// 发货单
-	const deliveryDocSelected = ref < Obj[] > ([])
-	const deliveryDocSelect = (deliveryDocs: Obj[]) => {
+	const deliveryDocSelected = ref < Objs > ([])
+	const deliveryDocSelect = (deliveryDocs: Objs) => {
 		if (deliveryDocs.length > 0) {
 			tableData.value = deliveryDocs
 			tableData.value[0].count = Number(tableData.value[0].iquantity)
@@ -82,7 +82,7 @@
 
 	// 出库单
 	const outSrDocInputValue = ref("")
-	const outSrDocSelected = ref < Obj[] > ([])
+	const outSrDocSelected = ref < Objs > ([])
 	const outSrDocSelect = () => {
 		// todo请求列表
 	}
@@ -123,8 +123,8 @@
 	// 	searchKey: "code",
 	// 	customerCode: ""
 	// })
-	// const materialSelected = ref < Obj[] > ([])
-	// const materialSelect = (res: Obj[]) => {
+	// const materialSelected = ref < Objs > ([])
+	// const materialSelect = (res: Objs) => {
 	// 	if (res.length > 0) {
 	// 		form.value = res[0]
 	// 		form.value.cinvcode = form.value.cInvCode
@@ -147,7 +147,7 @@
 	}
 
 	// table实际展示的数据, 表格由前端自己维护
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 
 	// 表格操作
 	const operateData = ref < Obj > ({

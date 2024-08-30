@@ -93,8 +93,8 @@
 		searchKey: "code"
 	})
 	// 选择的物料
-	const materialSelected = ref < Obj[] > ([])
-	const materialSelect = (materiels: Obj[]) => {
+	const materialSelected = ref < Objs > ([])
+	const materialSelect = (materiels: Objs) => {
 		// 处理form
 		if (materiels.length > 0) {
 			const item = materiels[0]
@@ -189,7 +189,7 @@
 
 	// -------------------------------------------------------------------------------------表格
 	// table实际展示的数据, 表格由前端自己维护
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const deleteTable = (key: number) => {
 		uni.showModal({
 			content: "确定要删除吗？",

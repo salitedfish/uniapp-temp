@@ -454,12 +454,12 @@
 				"text": "蓝牙"
 			},
 
-			{
-				"pagePath": "pages/moldLink/index",
-				"iconPath": "static/tabbar/mold.png",
-				"selectedIconPath": "static/tabbar/mold_active.png",
-				"text": "工模"
-			},
+			// {
+			// 	"pagePath": "pages/moldLink/index",
+			// 	"iconPath": "static/tabbar/mold.png",
+			// 	"selectedIconPath": "static/tabbar/mold_active.png",
+			// 	"text": "工模"
+			// },
 			{
 				"pagePath": "pages/home/index",
 				"iconPath": "static/tabbar/home.png",

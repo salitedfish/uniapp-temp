@@ -6,6 +6,18 @@ import directive from "./util/directive"
 
 import "./assets/css/global.scss"
 
+// #ifndef MP
+// 处理 wx.connectSocket promisify 兼容问题，强制返回 SocketTask
+uni.connectSocket = (function (connectSocket : Obj) {
+	return function (options : Obj) {
+		console.log(options)
+		options.success = options.success || function () { }
+		// @ts-ignore
+		return connectSocket.call(this, options)
+	}
+})(uni.connectSocket)
+// #endif
+
 // 初始化导航拦截器
 initInterceptor()
 

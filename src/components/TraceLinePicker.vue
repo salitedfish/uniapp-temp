@@ -9,24 +9,24 @@
 	const props = defineProps<
 		{
 			multiple ?: boolean,
-			selected ?: Obj[]
+			selected ?: Objs
 		}>()
 
 	const emit = defineEmits<{
-		(event : "select", result : Obj[]) : void;
-		(event : "update:selected", result : Obj[]) : void;
+		(event : "select", result : Objs) : void;
+		(event : "update:selected", result : Objs) : void;
 	}>()
 
 	onMounted(() => {
 		if (props.selected) {
-			emit("select", props.selected as Obj[])
+			emit("select", props.selected as Objs)
 			inputText.value = props.selected.map(item => item.lineName).join(", ")
 		}
 	})
 
 	watch(() => props.selected, () => {
 		if (props.selected) {
-			emit("select", props.selected as Obj[])
+			emit("select", props.selected as Objs)
 			inputText.value = props.selected.map(item => item.lineName).join(", ")
 		}
 	})
@@ -51,11 +51,11 @@
 	// 生成分页所需的数据和方法
 	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getLineList)
 
-	const select = (selected : Obj[]) => {
+	const select = (selected : Objs) => {
 		// emit("select", selected)
 		close()
 	}
-	const updateSelected = (selected : Obj[]) => {
+	const updateSelected = (selected : Objs) => {
 		emit("update:selected", selected)
 	}
 

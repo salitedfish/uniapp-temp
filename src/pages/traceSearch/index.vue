@@ -27,8 +27,8 @@
 	}
 	const form = ref(initForm())
 
-	const lineSelected = ref < Obj[] > ([])
-	const lineSelect = (res: Obj[]) => {
+	const lineSelected = ref < Objs > ([])
+	const lineSelect = (res: Objs) => {
 		if (res.length > 0) {
 			form.value.lineId = res[0].lineId
 			form.value.lineName = res[0].lineName
@@ -42,7 +42,7 @@
 		form.value.barcode = res
 	}
 
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const searchDisabled = computed(() => {
 		return !form.value.lineId || !form.value.barcode
 	})

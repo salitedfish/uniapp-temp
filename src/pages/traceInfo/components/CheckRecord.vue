@@ -7,7 +7,7 @@
 	import TraceFailureModPicker from "@/components/TraceFailureModePicker.vue"
 
 	const props = defineProps < {
-			checkItems: Obj[],
+			checkItems: Objs,
 			form: Obj
 		} >
 		()
@@ -41,7 +41,7 @@
 		emit("setFormResult")
 	}
 
-	const failuerModSelect = (item: Obj, mods: Obj[]) => {
+	const failuerModSelect = (item: Obj, mods: Objs) => {
 		if (mods.length > 0) {
 			item.failureModeId = mods[0].id
 			item.failureModeName = mods[0].failureModeName
@@ -171,7 +171,7 @@
 				</template>
 				<template #value>
 					<TraceFailureModPicker v-model:selected="item.failureModSelected"
-						@select="(mods: Obj[]) => failuerModSelect(item, mods)" :processId="item.processId" :orgIds="form.orgIds"
+						@select="(mods: Objs) => failuerModSelect(item, mods)" :processId="item.processId" :orgIds="form.orgIds"
 						readonly border="none" placeholder="请选择失效模式">
 					</TraceFailureModPicker>
 				</template>

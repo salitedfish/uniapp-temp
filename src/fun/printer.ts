@@ -85,6 +85,8 @@ export class Printer {
 				icon: "none",
 				title: `打印失败:${err}`,
 			})
+		} finally {
+			uni.hideLoading()
 		}
 	}
 	// 分包打印每条指令

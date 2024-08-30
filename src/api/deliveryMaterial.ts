@@ -51,7 +51,7 @@ export const deliveryMaterialInsert = async (data : OutSrDocDetail) => {
 
 // 获取出库单附件列表
 export const deliveryMaterialFileList = async (data : { id : string }) => {
-	return await uRequest.post<Return<Obj[]>>({
+	return await uRequest.post<Return<Objs>>({
 		url: "deliveryMaterial/listPlanAnnex",
 		data,
 	})
