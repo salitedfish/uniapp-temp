@@ -108,7 +108,7 @@ export class URequest {
 					// })
 					uni.showModal({
 						title: '异常',
-						content: res.data ? (res.data as any).msg : (res as any).errMsg,
+						content: res.data ? (res.data as any).msg || (res.data as any).error : (res as any).errMsg,
 						success: function (res) {
 						}
 					});

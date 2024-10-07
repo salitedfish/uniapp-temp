@@ -78,7 +78,7 @@
 		<view class="logo_container">
 			<image src="../../static/yinlun_logo.jpg" class="login_logo"></image>
 		</view>
-		<up-text :text="`银信数字化管理系统 v${manifestJson.versionName}`" class="grid-title" bold align="center" size="24"
+		<up-text :text="`银申数字化管理系统 v${manifestJson.versionName}`" class="grid-title" bold align="center" size="24"
 			style="text-align: center;"></up-text>
 
 		<up-form labelPosition="left">
@@ -88,7 +88,7 @@
 			</up-form-item>
 
 			<up-form-item class="form-item" label="密码:" borderBottom labelWidth="50">
-				<up-input v-model="loginForm.password" border="surround" placeholder="请输入密码" clearable
+				<up-input v-model="loginForm.password" border="surround" placeholder="请输入密码" clearable password
 					class="input-item"></up-input>
 			</up-form-item>
 		</up-form>

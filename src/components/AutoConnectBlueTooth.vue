@@ -11,8 +11,8 @@
 	} from "@/store/route"
 
 	const checkBlueTooth = () => {
-		// 如果是app并且未连接
-		if (!blueToothStore.connected && Platform.isApp()) {
+		// 如果是app并且未连接并且没在搜索中
+		if (!blueToothStore.connected && Platform.isApp() && !blueToothStore.searching) {
 			// 查看是否之前有连接过
 			const blueToothDeviceId = uni.getStorageSync("blueToothDeviceId")
 			// 如果连接过，自动连接

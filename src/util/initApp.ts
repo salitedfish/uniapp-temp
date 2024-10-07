@@ -6,7 +6,6 @@ import { setUserInfo } from "@/store/auth"
 
 export const initApp = async () => {
 	try {
-
 		// 打包隐藏测试页面
 		if (process.env.NODE_ENV === Env.PROD) {
 			uni.setTabBarItem({

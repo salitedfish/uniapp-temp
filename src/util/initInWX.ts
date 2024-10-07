@@ -43,7 +43,7 @@ export const initInWX = async () => {
 	}
 }
 
-// 每次网址变化，微信sdk都必须重新config
+// 如果需要使用wx-sdk，则页面要配置wx-config
 export const setWxConfig = async (data : Obj) => {
 	const ree = await wxSignature({
 		url: data.url || window.location.href

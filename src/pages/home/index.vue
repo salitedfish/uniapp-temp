@@ -167,6 +167,12 @@
 				icon: "/static/home/out_sr_doc_upload.svg",
 				route: routes.outSrDocFlieUpload,
 			},
+			{
+				name: routes.board.name,
+				title: routes.board.style.navigationBarTitleText,
+				icon: "/static/home/out_sr_doc_upload.svg",
+				route: routes.board,
+			},
 		] : []
 	})
 

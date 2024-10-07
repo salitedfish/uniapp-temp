@@ -111,9 +111,11 @@ export class Printer {
 				// 这里的value是ArrayBuffer类型
 				value: buffer,
 				success: (res) => {
+					console.log("蓝牙写入成功", res)
 					setTimeout(resolve, 100)
 				},
 				fail: (res) => {
+					console.log("蓝牙写入失败", res)
 					setTimeout(reject, 100, res.errMsg)
 				},
 			})

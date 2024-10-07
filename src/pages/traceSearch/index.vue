@@ -59,6 +59,18 @@
 		}
 
 	}
+
+	const detail = ref("")
+	const detailDialogVisible = ref(false)
+	const showDetail = (detailString: string) => {
+		detail.value = detailString || ""
+		detailDialogVisible.value = true
+		console.log(detail)
+	}
+	const hideDetail = () => {
+		detail.value = ""
+		detailDialogVisible.value = false
+	}
 </script>
 
 <template>
@@ -97,8 +109,11 @@
 					<uni-td class="nowrap">{{ item.procedureName }}</uni-td>
 					<uni-td class="nowrap">
 						<view v-if="item.isFile == 0">
-							<view style="text-align: left;" v-for="row, index in item.contentList" :key="index">
+							<!-- 							<view style="text-align: left;" v-for="row, index in item.contentList" :key="index">
 								{{row}}
+							</view> -->
+							<view style="text-align: left;" class="link" @click="showDetail(item.contentList[0])">
+								查看详情
 							</view>
 						</view>
 						<view v-if="item.isFile == 1 && item.ldTraceList.length>0" style="text-align: left;">
@@ -111,6 +126,12 @@
 				</uni-tr>
 			</uni-table>
 		</view>
+
+		<up-popup :show="detailDialogVisible" mode="center" @close="hideDetail" :round="10">
+			<view style="padding: 10px 15px; width: 85vw; min-height: 20vh;">
+				<view v-for="item, key in detail.split(';')" :key="key">{{ item }}</view>
+			</view>
+		</up-popup>
 	</view>
 </template>
 

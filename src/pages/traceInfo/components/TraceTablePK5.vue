@@ -1,4 +1,8 @@
 <script lang='ts' setup>
+	import {
+		ref,
+		reactive
+	} from "vue"
 	// hook
 	import {
 		useTable
@@ -16,6 +20,11 @@
 		form: Obj,
 		codeRules: Objs
 	} > ()
+
+	const detail = reactive({
+		visible: false,
+		content: ""
+	})
 
 	// 生成分页所需的数据和方法
 	const {
@@ -38,6 +47,15 @@
 		searchList()
 	}
 
+	const showDetail = (content: string) => {
+		detail.content = content
+		detail.visible = true
+	}
+	const hideDetail = () => {
+		detail.visible = false
+		detail.content = ""
+	}
+
 	defineExpose({
 		searchList,
 		reSetPage,
@@ -47,7 +65,7 @@
 
 <template>
 	<view class="common-table">
-		<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
+		<uni-table class="table-box" border stripe emptyText="暂无更多数据" :loading="searching">
 			<!-- 表头行 -->
 			<uni-tr>
 				<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
@@ -64,9 +82,17 @@
 				<uni-td class="nowrap">{{ key + 1 }}</uni-td>
 				<uni-td class="nowrap">{{ item.barcode1 }}</uni-td>
 				<uni-td class="nowrap">{{ item.barcode2 }}</uni-td>
-				<uni-td class="nowrap">{{ item.remark }}</uni-td>
+				<uni-td class="nowrap">
+					<view style="text-align: left;" class="link" @click="showDetail(item.remark)">
+						查看详情
+					</view>
+				</uni-td>
 				<uni-td class="nowrap" v-if="[P.条码自配].includes(form.procedureCode)">{{ item.equipmentCode }}</uni-td>
-				<uni-td class="nowrap" v-if="[P.条码自配].includes(form.procedureCode)">{{ item.equipmentContent }}</uni-td>
+				<uni-td class="nowrap" v-if="[P.条码自配].includes(form.procedureCode)">
+					<view style="text-align: left;" class="link" @click="showDetail(item.equipmentContent)">
+						查看详情
+					</view>
+				</uni-td>
 				<uni-td class="nowrap"
 					v-if="[P.条码自配].includes(form.procedureCode)">{{ item.result === 1 ? '合格' : '不合格' }}</uni-td>
 				<uni-td class="nowrap">{{ item.createTime }}</uni-td>
@@ -75,9 +101,17 @@
 
 		<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount" :current="searchParam.currentPage"
 			:pageSize="searchParam.pageSize" @change="pageSearch"></uni-pagination>
+
+		<up-popup :show="detail.visible" mode="center" @close="hideDetail" :round="10">
+			<view style="padding: 10px 15px; width: 85vw; min-height: 20vh;">
+				<view v-for="item, key in detail.content.split(';')" :key="key">{{ item }}</view>
+			</view>
+		</up-popup>
 	</view>
 </template>
 
 <style scoped lang='less'>
-
+	.table-box {
+		/* padding-bottom: 40px; */
+	}
 </style>

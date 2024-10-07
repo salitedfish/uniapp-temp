@@ -101,8 +101,8 @@
 		searchKey: "code"
 	})
 	// 选择的物料
-	const materialSelected = ref < Obj[] > ([])
-	const materialSelect = (materiels: Obj[]) => {
+	const materialSelected = ref < Objs > ([])
+	const materialSelect = (materiels: Objs) => {
 		// 处理form
 		if (materiels.length > 0) {
 			const item = materiels[0]
@@ -194,7 +194,7 @@
 
 	// -------------------------------------------------------------------------------------表格
 	// table实际展示的数据, 表格由前端自己维护
-	const tableData = ref < Obj[] > ([])
+	const tableData = ref < Objs > ([])
 	const deleteTable = (key: number) => {
 		uni.showModal({
 			content: "确定要删除吗？",
@@ -240,10 +240,6 @@
 				if (res && res.data) {
 					if (res.data.cWhCode !== config.value.stockroomSelected[0].code) {
 						resetOriginDataShelf()
-						// uni.showToast({
-						// 	title: "所选仓库不存在此货位",
-						// 	icon: "none"
-						// })
 						uni.showModal({
 							title: '提示',
 							content: "所选仓库不存在此货位",
@@ -255,10 +251,6 @@
 					}
 				} else {
 					resetOriginDataShelf()
-					// uni.showToast({
-					// 	title: "未查询到货位",
-					// 	icon: "none"
-					// })
 					uni.showModal({
 						title: '提示',
 						content: "未查询到货位",
@@ -274,10 +266,6 @@
 		const max = Number(originData.value.quantity)
 		const min = 0
 		if (value > max) {
-			// uni.showToast({
-			// 	icon: "none",
-			// 	title: "调整数量不能大于库存数量"
-			// })
 			uni.showModal({
 				title: '提示',
 				content: "调整数量不能大于库存数量",
@@ -285,10 +273,6 @@
 			return
 		}
 		if (value <= min) {
-			// uni.showToast({
-			// 	icon: "none",
-			// 	title: "调整数量不能小于0"
-			// })
 			uni.showModal({
 				title: '提示',
 				content: "调整数量不能小于0",
@@ -387,7 +371,6 @@
 		</CustomNavBar>
 
 		<view>
-
 
 			<view class="common-section-title">
 				基本信息

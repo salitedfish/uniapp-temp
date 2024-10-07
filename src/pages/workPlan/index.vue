@@ -83,7 +83,7 @@
 			url: `${routes.TraceInfo.path}?lineDetailId=${item.lineDetailId}&procedureName=${item.processName}&planCode=${item.planCode}`,
 		})
 	}
-
+	// 双击开工
 	const goWorkDouble = useTimesClick(goWork)
 </script>
 
@@ -126,7 +126,7 @@
 					<uni-th class="nowrap table-fixed-right" align="left" width="100rpx">操作</uni-th>
 				</uni-tr>
 				<!-- 表格数据行 -->
-				<uni-tr v-for="item,key in resultData?.list" :key="key" @click='goWorkDouble(item)'>
+				<uni-tr v-for="item,key in resultData?.list" :key="key" @click='goWork(item)'>
 					<uni-td class="nowrap">{{ key + 1 }}</uni-td>
 					<uni-td class="nowrap">{{ item.planCode }}</uni-td>
 					<uni-td class="nowrap">{{ item.planDate }}</uni-td>
@@ -155,14 +155,5 @@
 
 	.common-table {
 		margin-top: 10px;
-	}
-
-	.page-box {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		padding-bottom: 10px;
-		background-color: #fff;
 	}
 </style>

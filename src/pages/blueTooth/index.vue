@@ -44,14 +44,10 @@
 		} else if (blueToothStore.searching) {
 			blueTooth.stopDiscoveryPrinter();
 		} else {
-			deviceId = ""
 			blueTooth.discoveryPrinter()
 		}
 
 	}
-
-	// 保存之前连接的设备信息
-	let deviceId = blueToothStore.deviceId
 
 	// 重新连接
 	const reConnect = useThrottle(() => {
@@ -60,7 +56,6 @@
 	// 断开连接
 	const closeConnect = useThrottle(() => {
 		blueTooth.closeConnect()
-		deviceId = ""
 		blueToothStore.deviceId = ""
 		blueToothStore.servers = []
 		blueToothStore.serviceId = ""
@@ -69,18 +64,17 @@
 	})
 	// 设备列表选择改变
 	const radioChange = useThrottle(async (value : string) => {
-		if (deviceId === value) return
+		if (blueToothStore.deviceId === value) return
 		try {
 			// 改变设备选择时先断开原先的设备
 			if (blueToothStore.connected) {
-				await blueTooth.closeConnect(deviceId)
+				await blueTooth.closeConnect(blueToothStore.deviceId)
 			}
 			// 选择设备后关闭搜索
 			if (blueToothStore.searching) {
 				blueTooth.stopDiscoveryPrinter()
 			}
 		} catch (err) { } finally {
-			deviceId = value
 			blueToothStore.deviceId = value
 			blueToothStore.servers = []
 			blueToothStore.serviceId = ""

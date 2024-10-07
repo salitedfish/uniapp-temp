@@ -11,7 +11,7 @@ type DefaultSetRouteName = "pADefaultSetPage" | "pSDefaultSetPage" | "mOSDefault
 // 追溯管理的路由
 type TraceManagerRouteName = "LdOnDuty" | "EquipmentCheck" | "LdWorkPlan" | "LdAndon" | "Trace" | "TraceProcess" | "TraceInfo" | "TraceSearch" | "ProductJobList" | "ProductJobPrinter"
 // 外链路由
-type LinkRouteName = "moldLink"
+type LinkRouteName = "moldLink" | "board"
 
 export type RouteName = TabRouteName | StockroomManagerName | TraceManagerRouteName | DefaultSetRouteName | LinkRouteName
 // 从json中获取路由类型

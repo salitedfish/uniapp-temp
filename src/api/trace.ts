@@ -17,6 +17,14 @@ export const getTraceList = async (data : Obj = {}) => {
 	})
 }
 
+// 追溯查询2
+export const getTraceList2 = async (data : Obj = {}) => {
+	return await uRequest.post<Return<Objs>>({
+		url: "trace/search2",
+		data
+	})
+}
+
 // 通过编号获取卡片
 export const getTmlmByCode = async (data : Obj = {}) => {
 	return await uRequest.post<Return<Obj>>({
@@ -191,3 +199,19 @@ export const findCardByUrl = async (data : Obj) => {
 		data,
 	});
 };
+
+// 重置设备开关
+export const traceResetPlc = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "trace/resetPlc",
+		data
+	})
+}
+
+// 获取终检两个设备的数据
+export const getTwoEquipmentDataApi = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "trace/otherToZj",
+		data
+	})
+}

@@ -18,20 +18,22 @@
 
 	// 扫码枪输入
 	const changeSuccess = useDebounce((res : string) => {
-		// 如果配置了手动输入，则不处理
-		if (props.manInput) return
-		emit("scanSuccess", res)
-
+		// 如果不是手动输入
+		if (!props.manInput) {
+			emit("scanSuccess", res)
+		}
 	})
 	// 如果是手动输入
 	const blurSuccess = useDebounce((res : string) => {
-		// 如果配置了不是手动输入，则不处理
-		if (!props.manInput) return
-		emit("scanSuccess", res)
+		// 如果是手动输入
+		if (props.manInput) {
+			emit("scanSuccess", res)
+		}
 	})
 </script>
 
 <template>
+	<!-- 有些手机输入完加回车才会触发change，有些不用加回车就能触发change，看情况而定 -->
 	<up-input @change="changeSuccess" @blur="blurSuccess">
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess"></ScanCode>

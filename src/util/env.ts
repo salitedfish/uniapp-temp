@@ -4,6 +4,9 @@ import * as dingding from "dingtalk-jsapi";
 export class Platform {
 	static platform = ""
 	static webPlatform = ""
+	static deviceId = ""
+	static windowWidth = 0
+	static windowHeight = 0
 
 	// 纯app
 	static isApp() {
@@ -29,6 +32,10 @@ export class Platform {
 	static isAndrodWeb() {
 		return Platform.webPlatform === 'android'
 	}
+	// 判断是否是大屏且宽要大于高
+	static isBigScreen() {
+		return Platform.windowWidth > 1200 && Platform.windowWidth > Platform.windowHeight
+	}
 
 	// 判断使用的公司是否是内部公司
 	static isInterCompany() {
@@ -39,8 +46,13 @@ export class Platform {
 
 uni.getSystemInfo({
 	success(res) {
-		console.log("systemInfo:", res)
+		console.log("系统信息:", res)
 		Platform.platform = res.uniPlatform
 		Platform.webPlatform = res.platform
+
+		Platform.deviceId = res.deviceId
+
+		Platform.windowWidth = res.windowWidth
+		Platform.windowHeight = res.windowHeight
 	}
 })

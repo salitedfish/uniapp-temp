@@ -1,9 +1,9 @@
 {
     "name" : "银申数字化管理系统",
-    "appid" : "__UNI__2546FE0",
+    "appid" : "__UNI__AF68D50",
     "description" : "",
-    "versionName" : "1.0.0",
-    "versionCode" : 100,
+    "versionName" : "1.0.5",
+    "versionCode" : 105,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -14,13 +14,16 @@
             "alwaysShowBeforeRender" : true,
             "waiting" : true,
             "autoclose" : true,
-            "delay" : 0
+            "delay" : 0,
+            /*配置占满手机屏幕*/
+            "fullScreen" : true
         },
         /* 模块配置 */
         "modules" : {
             "Bluetooth" : {},
             "Barcode" : {},
-            "Camera" : {}
+            "Camera" : {},
+            "Contacts" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -42,9 +45,12 @@
                     "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.UPDATE_DEVICE_STATS\"/>",
                     "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
-                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.BLUETOOTH\"/>",
+                    "<uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\"/>"
                 ],
-                "minSdkVersion" : 21
+                "minSdkVersion" : 21,
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ]
             },
             /* ios打包配置 */
             "ios" : {
@@ -118,8 +124,11 @@
     },
     "vueVersion" : "3",
     "orientation" : [
-        //竖屏正方向
-        "portrait-primary"
+        "portrait-primary",
+        "portrait-secondary",
+        "landscape-primary",
+        "landscape-secondary",
+        "default"
     ],
     "h5" : {
         "router" : {

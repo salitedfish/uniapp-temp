@@ -66,7 +66,7 @@
 		emit("update:selected", selected)
 	}
 
-	const colums = [{ label: "失效模式id", key: "id" }, { label: "失效模式名称", key: "failureModeName" }]
+	const colums = [{ label: "失效模式名称", key: "failureModeName" }]
 </script>
 
 <template>

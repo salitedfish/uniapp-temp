@@ -1,8 +1,14 @@
 import { blueToothStore } from "@/store/blueTooth"
-// import type { BlueToothDevice } from "@/type/blueTooth"
-import { useDebounce } from "@ultra-man/noa"
 
 export class BlueTooth {
+
+	constructor() {
+		//@ts-ignore
+		if (uni.openBluetoothAdapter) {
+			this.onConnectStateChange()
+		}
+	}
+
 	// 开启蓝牙
 	public openBluetoothAdapter() {
 		uni.openBluetoothAdapter({
@@ -86,6 +92,7 @@ export class BlueTooth {
 		uni.createBLEConnection({
 			deviceId: blueToothStore.deviceId,
 			success: (res) => {
+				console.log("蓝牙连接成功", res)
 				uni.showLoading({
 					mask: true,
 					title: "蓝牙连接成功，开始获取服务",
@@ -93,22 +100,25 @@ export class BlueTooth {
 				blueToothStore.connected = true
 				// 如果连接成功了，则保存连接的设备id
 				uni.setStorageSync("blueToothDeviceId", blueToothStore.deviceId)
-				this.onConnectStateChange(blueToothStore.deviceId)
 				// 获取服务列表
 				setTimeout(() => {
 					this.getBLEDeviceServices()
 				}, 2000)
 			},
 			fail: (res) => {
+				console.log("蓝牙连接失败", res)
 				// 如果当前没在连接状态则报个连接错误
 				if (!blueToothStore.connected) {
 					uni.showToast({
 						icon: "none",
 						title: `蓝牙连接失败:${res.errMsg}`,
 					})
+					blueToothStore.deviceId = ""
 				}
-
 			},
+			complete: () => {
+
+			}
 		})
 	}
 	// 重新连接蓝牙
@@ -233,12 +243,18 @@ export class BlueTooth {
 	}
 
 	// 监听某个设备连接状态改变
-	private onConnectStateChange(deviceId : string) {
+	private onConnectStateChange() {
 		uni.onBLEConnectionStateChange((res) => {
 			console.log("蓝牙连接状态改变", res)
-			if (res.deviceId === deviceId && !res.connected) {
+			if (res.deviceId === blueToothStore.deviceId && !res.connected) {
 				blueToothStore.connected = false
 			}
+			uni.getConnectedBluetoothDevices({
+				services: [],
+				success: (res) => {
+					console.log('已连接的蓝牙设备', res)
+				}
+			})
 		})
 	}
 
