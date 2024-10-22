@@ -27,6 +27,11 @@
 					border="none"></up-input>
 			</up-form-item>
 
+			<up-form-item class="common-form-item" label="客户件号:" borderBottom labelWidth="80" style="padding: 0">
+				<up-input v-model="form.cusProductCode" placeholder="计划单号自动带出" clearable class="input-item" readonly
+					border="none"></up-input>
+			</up-form-item>
+
 			<up-form-item class="common-form-item" label="计划数量:" borderBottom labelWidth="80" style="padding: 0">
 				<up-input v-model="form.planNum" placeholder="计划单号自动带出" clearable class="input-item" readonly
 					border="none"></up-input>
@@ -34,6 +39,12 @@
 
 			<up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0">
 				<up-input v-model="form.realNum" placeholder="计划单号自动带出" clearable class="input-item" readonly
+					border="none"></up-input>
+			</up-form-item>
+
+			<up-form-item class="common-form-item" label="装箱数量:" borderBottom labelWidth="80" style="padding: 0"
+				v-if="[P.打包].includes(form.procedureCode)">
+				<up-input v-model="form.packageNum" placeholder="自动带出" clearable class="input-item" readonly
 					border="none"></up-input>
 			</up-form-item>
 
@@ -150,7 +161,7 @@
 
 			<!-- 设备选择 -->
 			<up-form-item class="common-form-item" label="设备编码:" borderBottom labelWidth="80" style="padding: 0"
-				v-if="[P.条码自配, PK.数据采集].includes(form.procedureCode)">
+				v-if="[P.条码自配, PK.数据采集].includes(form.procedureCode) && equipments && equipments.length > 0">
 				<up-input v-model="form.equipmentCode" @change="equipmentCodeChange" placeholder="请选择设备" class="input-item"
 					clearable>
 					<template #suffix>
@@ -162,15 +173,15 @@
 				</up-input>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="设备名称:" borderBottom labelWidth="80" style="padding: 0"
-				v-if="[P.条码自配].includes(form.procedureCode)">
+				v-if="[P.条码自配].includes(form.procedureCode) && equipments && equipments.length > 0">
 				<up-input v-model="form.equipmentName" placeholder="自动带出" readonly class="input-item" border="none"></up-input>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="设备数据:" borderBottom labelWidth="80" style="padding: 0"
-				v-if="[P.条码自配].includes(form.procedureCode)">
+				v-if="[P.条码自配].includes(form.procedureCode) && equipments && equipments.length > 0">
 				<up-textarea v-model="form.equipmentContent" placeholder="自动带出" class="input-item" disabled></up-textarea>
 			</up-form-item>
 			<up-form-item class="common-form-item" label="结果:" borderBottom labelWidth="80" style="padding: 0"
-				v-if="[P.条码自配].includes(form.procedureCode)">
+				v-if="[P.条码自配].includes(form.procedureCode) && equipments && equipments.length > 0">
 				<up-input :modelValue="ResultMap[form.result]" placeholder="自动带出" readonly class="input-item"
 					border="none"></up-input>
 			</up-form-item>
@@ -275,6 +286,8 @@
 			v-if="form.procedureKindCode === PK.定制流程 && ![P.条码自配, P.打包, P.终检].includes(form.procedureCode)"> </TraceTablePK4>
 		<TraceTablePK5 ref="traceTableRef" :form="form" :codeRules="codeRules" style="margin-top: 10px"
 			v-if="[P.条码自配, P.打包, P.终检].includes(form.procedureCode)"> </TraceTablePK5>
+
+		<CustomModal></CustomModal>
 	</view>
 </template>
 
@@ -283,7 +296,6 @@
 	// 类型
 	import type { UploadMedia } from "@/type/file"
 	// 组件
-	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import TraceTablePK1 from "./components/TraceTablePK1.vue"
 	import TraceTablePK2 from "./components/TraceTablePK2.vue"
 	import TraceTablePK3 from "./components/TraceTablePK3.vue"
@@ -297,6 +309,7 @@
 	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
 	import BoxBarcodePrinter from "./components/boxBarcodePrinter.vue"
 	import BoxBarcodeRePrinter from "./components/boxBarcodeRePrinter.vue"
+	import { setCustomModal } from "@/store/customModal"
 	// 数据
 	import { routes } from "@/store/route"
 	import { printPage } from "@/store/print"
@@ -311,11 +324,11 @@
 	// @ts-ignore
 	import mqtt from "mqtt/dist/mqtt.js"
 	// 接口
-	import { getProcessDetail, getLineDetail, getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, productJobDel, checkHeadTail, codeCheckInfoApi, findCardByUrl, getTraceList2, getTraceLineDetail, traceResetPlc, getTwoEquipmentDataApi } from "@/api/trace"
+	import { getPackageNumApi, getProcessDetail, getLineDetail, getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, productJobDel, checkHeadTail, codeCheckInfoApi, findCardByUrl, getTraceList2, getTraceLineDetail, traceResetPlc, getTwoEquipmentDataApi } from "@/api/trace"
 	import { getWorkPlan } from "@/api/workPlan"
 	import { getProductByCode } from "@/api/product"
 	// 静态数据
-	import { P, PK, BarcodeNames, ResultMap, resetEquipmentList } from "./enum"
+	import { P, PK, BarcodeNames, ResultMap } from "./enum"
 
 	const props = defineProps<{
 		lineDetailId ?: string
@@ -324,10 +337,20 @@
 	}>()
 
 	onMounted(async () => {
+		// app端隐藏虚拟键盘
+		if (Platform.isApp()) {
+			hideKeyboardInterval = setInterval(() => {
+				uni.hideKeyboard()
+			}, 60)
+		}
 		// 获取产线详情
-		await getLine()
+		if (props.lineDetailId) {
+			await getLine()
+		}
 		// 获取计划详情
-		await getPlanInfo(props.planCode)
+		if (props.planCode) {
+			await getPlanInfo(props.planCode)
+		}
 		// 获取工序详情
 		// await getProcess()
 		// 打包这一步需要蓝牙打印标签，自动连接蓝牙
@@ -337,6 +360,9 @@
 	})
 	onBeforeUnmount(() => {
 		clearInterval(Number(airtightnessInterval))
+		if (Platform.isApp()) {
+			clearInterval(Number(hideKeyboardInterval))
+		}
 		if (mqttClient) {
 			mqttClient.end()
 			mqttClient = null
@@ -356,6 +382,7 @@
 			cusProductCode: "",
 			planNum: null as Num,
 			realNum: null as Num,
+			packageNum: null as Num,
 			// 提交数量
 			thisNum: 1,
 			// 是否需要检验单
@@ -416,6 +443,8 @@
 			// 是否显示返工按钮
 			reworked: 0,
 			activeNum: null as Num,
+			// 是否控制设备
+			resetPlc: 0,
 		}
 	}
 	const oriCodeCheckInfo = () => {
@@ -429,6 +458,7 @@
 	const codeRules = ref<Objs>([])
 	// const processDetail = ref < Obj > ({})
 	let airtightnessInterval : undefined | number = undefined
+	let hideKeyboardInterval : undefined | number = undefined
 	const equipments = ref<Objs[]>([])
 	const checkRecords = ref<Objs>([])
 	const failureModSelected = ref<Objs>([])
@@ -463,7 +493,7 @@
 			const res = await getLineDetail({
 				lineDetailId: props.lineDetailId,
 			})
-			const { lineId, procedureCode, procedureKindCode, processId, factoryId, submitType = "1", statistics, relation1, relation2, unbind, scanCode, checked, checkFirstFinal, codeRules, reworked } = res.data
+			const { resetPlc, lineId, procedureCode, procedureKindCode, processId, factoryId, submitType = "1", statistics, relation1, relation2, unbind, scanCode, checked, checkFirstFinal, codeRules, reworked } = res.data
 			form.value.processId = processId
 			form.value.lineId = lineId
 			form.value.orgIds = factoryId
@@ -479,6 +509,7 @@
 			form.value.codeRules = codeRules ? JSON.parse(codeRules) : []
 			form.value.reworked = reworked
 			form.value.checked = checked || ""
+			form.value.resetPlc = resetPlc
 
 			// 获取当前工序在此产线当中的步骤序号
 			const ree = await getTraceLineDetail({
@@ -556,8 +587,8 @@
 					}
 				}
 			} catch (err) {
-				uni.showModal({
-					title: "提示",
+				setCustomModal({
+					visiable: true,
 					content: err && String(err),
 				})
 			}
@@ -573,8 +604,8 @@
 				if (!err) {
 					console.log("mqtt订阅成功")
 				} else {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: `mqtt订阅失败：${err}`,
 					})
 				}
@@ -593,8 +624,9 @@
 					equipmentName: item.moldName,
 				}
 			})
-			form.value.equipmentCode = equipments.value[0][0]?.equipmentCode
-			form.value.equipmentName = equipments.value[0][0]?.equipmentName
+			const equipment = JSON.parse(uni.getStorageSync("traceEquipment") || "{}")
+			form.value.equipmentCode = equipment.equipmentCode
+			form.value.equipmentName = equipment.equipmentName
 		}
 	}
 	// 打开设备选择项
@@ -644,6 +676,10 @@
 			if (item.equipmentCode === code) {
 				form.value.equipmentCode = item.equipmentCode
 				form.value.equipmentName = item.equipmentName
+				uni.setStorageSync("traceEquipment", JSON.stringify({
+					equipmentCode: form.value.equipmentCode,
+					equipmentName: form.value.equipmentName
+				}))
 				return
 			}
 		}
@@ -700,7 +736,7 @@
 				}
 				// 终检默认为2
 				else if ([P.终检].includes(form.value.procedureCode)) {
-					form.value.result = "0"
+					form.value.result = "1"
 					form.value.result1 = "2"
 					form.value.result2 = "2"
 				}
@@ -751,7 +787,6 @@
 						}
 					}
 				}
-
 				// 定位到第一个输入框
 				nextTick(() => {
 					if (codeRules.value[0]) {
@@ -772,31 +807,60 @@
 		form.value.barcode2 = res
 	}
 	// 条码规则扫码成功
-	const codeRuleScanSuccess = (res : string, item : Obj, index : number) => {
-		item.barCode = res
-		// 打包条码扫码成功时，进行追溯查询
-		if ([P.打包].includes(form.value.procedureCode) && index == 0 && res) {
-			traceSearch(res)
+	const codeRuleScanSuccess = async (res : string, item : Obj, index : number) => {
+		// 如果扫到的码是http开头的，则就去查工装码
+		if (res && res.indexOf("http") !== -1) {
+			try {
+				uni.showLoading({
+					mask: true,
+					title: "工装获取中",
+				})
+				let ree = await findCardByUrl({
+					url: res,
+				})
+				if (ree.data) {
+					ree = ree.data.split(",")[0]
+				}
+				item.barCode = ree
+			} catch (err) {
+				console.log(err)
+			} finally {
+				uni.hideLoading()
+			}
+		} else {
+			item.barCode = res
 		}
-		// 如果是终检并且扫的是第一个码并且有值，则获取后端设备数据
-		if ([P.终检].includes(form.value.procedureCode) && index == 0 && res) {
-			getTwoEquipmentData(res)
+		// 打包条码扫码成功时，进行追溯查询
+		if ([P.打包].includes(form.value.procedureCode) && res) {
+			if (index == 0) {
+				traceSearch(res)
+			}
+			if (index == 1) {
+				getPackageNum(res)
+			}
+		}
+		// 如果是终检
+		if ([P.终检].includes(form.value.procedureCode) && item.barCode) {
+			// 扫的是第一个码
+			if (index == 0) {
+				await getTwoEquipmentData(item.barCode)
+			}
 		}
 
-		// 每次输入完，如果不是清空，光标定位到空的那格
 		if (item.barCode) {
+			// 每次输入完，光标定位到空的那格
 			for (const codeRule of codeRules.value) {
 				if (!codeRule.barCode) {
 					nextTick(() => {
 						codeRule.inputFocus = true
 					})
-					break
+					return
 				}
 			}
-		}
 
-		// 如果都填完了，则直接提交
-		// submit()
+			// 如果都填完了，则直接提交
+			submit()
+		}
 	}
 	// 获取终检两个设备的数据
 	const getTwoEquipmentData = async (barcode : string) => {
@@ -824,18 +888,18 @@
 					form.value.result2 = res.data.ret2.result === "OK" ? "1" : "0"
 				}
 
-				if (form.value.result1 === "1" && form.value.result2 === "1") {
-					form.value.result = "1"
-				} else {
-					form.value.result = "0"
-				}
+				// if (form.value.result1 === "1" && form.value.result2 === "1") {
+				// 	form.value.result = "1"
+				// } else {
+				// 	form.value.result = "0"
+				// }
 
-				if (!res.data.ret1 || !res.data.ret2) {
-					uni.showModal({
-						title: "提示",
-						content: "该产品未获取到检测数据",
-					})
-				}
+				// if (!res.data.ret1 || !res.data.ret2) {
+				// 	uni.showModal({
+				// 		title: "提示",
+				// 		content: "该产品未获取到检测数据",
+				// 	})
+				// }
 			}
 		} catch (err) {
 			console.log(err)
@@ -864,8 +928,27 @@
 			})
 			if (res.data) {
 				processList.value = res.data
+				// 第一道和第二道直接改成成功
 				processList.value[0].result = 1
 				processList.value[0].resultName = "ok"
+				processList.value[1].result = 1
+				processList.value[1].resultName = "ok"
+			} else {
+				processList.value = []
+			}
+		} catch (err) {
+			console.log(err)
+		}
+	}
+	// 打包提交成功时，查询装箱数量
+	const getPackageNum = async (barcode : string) => {
+		try {
+			const res = await getPackageNumApi({
+				barcode,
+				lineDetailId: form.value.lineDetailId
+			})
+			if (res) {
+				form.value.packageNum = res.data
 			}
 		} catch (err) {
 			console.log(err)
@@ -932,11 +1015,12 @@
 		form.value.barcode1 = ""
 		form.value.barcode2 = ""
 		form.value.thisNum = 1
+		form.value.packageNum = 0
 		// 条码自配的重置所有条码
 		if ([P.条码自配, P.打包, P.终检].includes(form.value.procedureCode)) {
 			getCodeRules(true)
-			// 有些设备需要重置设备状态
-			if (resetEquipmentList.includes(form.value.equipmentCode)) {
+			// 如果工序需要重置设备
+			if (form.value.resetPlc) {
 				traceResetPlc({
 					equipmentCode: form.value.equipmentCode
 				})
@@ -951,8 +1035,8 @@
 	// 提交前校验
 	const preSubmit = (type : P) => {
 		if (!form.value.planId) {
-			uni.showModal({
-				title: "提示",
+			setCustomModal({
+				visiable: true,
 				content: "请先填写计划id",
 			})
 			return false
@@ -960,38 +1044,43 @@
 		if ([P.条码自配, P.打包, P.终检].includes(type)) {
 			for (const item of codeRules.value) {
 				if (!item.barCode) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "条码未填写完",
 					})
 					return false
 				}
 			}
-			if ([P.终检].includes(type) && (form.value.result1 != '1' || form.value.result2 != '1')) {
-				uni.showModal({
-					title: "提示",
-					content: "设备结果存在不合格",
-				})
-				return false
-			}
-			if ([P.打包].includes(type)) {
+
+			// if ([P.终检].includes(type) && (form.value.result1 != '1' || form.value.result2 != '1')) {
+			// 	uni.showModal({
+			// 		title: "提示",
+			// 		content: "设备结果存在不合格",
+			// 	})
+			// 	return false
+			// }
+
+			if ([P.打包].includes(type) && form.value.checked == "1") {
 				for (const key in processList.value) {
 					const item = processList.value[key]
 					const length = processList.value.length
 					if (item.result !== 1 && Number(key) !== length - 1) {
-						uni.showModal({
-							title: "提示",
+						setCustomModal({
+							visiable: true,
 							content: "前工序存在未提交或不合格，请确认",
 						})
 						return false
 					}
 				}
 			}
+
+
+
 		}
 		if (type === P.定制流程3) {
 			if (form.value.barcode1 != form.value.barcode2) {
-				uni.showModal({
-					title: "提示",
+				setCustomModal({
+					visiable: true,
 					content: "标签码不一致",
 				})
 				return false
@@ -999,8 +1088,8 @@
 		}
 		// 如果提交的数量大于计划数量并且不是返工的，则不能提交
 		if (Number(form.value.realNum) + form.value.thisNum > Number(form.value.planNum) && form.value.submitType == "1") {
-			uni.showModal({
-				title: "提示",
+			setCustomModal({
+				visiable: true,
 				content: "不能超过计划数量",
 			})
 			return false
@@ -1010,51 +1099,51 @@
 			for (const item of checkRecords.value) {
 				if (item.needSurvey == "1") {
 					if (item.surveyValue === "" || item.surveyValue === undefined || item.surveyValue === null) {
-						uni.showModal({
-							title: "提示",
+						setCustomModal({
+							visiable: true,
 							content: "请填写测量值",
 						})
 						return false
 					}
 				}
 				if (item.needPicture && item.images.length <= 0) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "请上传检验单图片",
 					})
 					return false
 				}
 				if (!item.result) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "请选择检验单是否合格",
 					})
 					return false
 				}
 				if (item.result === "0" && item.failureModSelected.length <= 0) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "请选择检验单失效模式",
 					})
 					return false
 				}
 				if (item.result === "0" && !item.reason) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "请填写不合格理由",
 					})
 					return false
 				}
 				if (item.result === "0" && form.value.result === "1") {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "检测项目存在不合格，最终结果不能为合格",
 					})
 					return false
 				}
 				if (form.value.result == "0" && failureModSelected.value.length < 0) {
-					uni.showModal({
-						title: "提示",
+					setCustomModal({
+						visiable: true,
 						content: "请选择失效模式",
 					})
 					return false
@@ -1069,8 +1158,8 @@
 		if (form.value.checkFirstFinal) {
 			// 如果没设置首末件数量，则提示
 			if (!form.value.firstNum || !form.value.finalNum) {
-				uni.showModal({
-					title: "提示",
+				setCustomModal({
+					visiable: true,
 					content: "请先进行首末件检查设置",
 				})
 				return false
@@ -1118,13 +1207,13 @@
 				if (res.data.checkCodeMsg) {
 					message = res.data.checkCodeMsg
 				}
-				// 没有返回消息，潘都是不是上道工序检查未通过
+				// 没有返回消息，都是上道工序检查未通过
 				else if (res.data.prevCheck && !res.data.prevResult) {
 					message = "上道工序检查未通过"
 				}
 				// 提示消息
-				uni.showModal({
-					title: "提示",
+				setCustomModal({
+					visiable: true,
 					content: message,
 				})
 				return false
@@ -1182,6 +1271,10 @@
 				icon: "none",
 				title: "提交成功",
 			})
+			// 
+			if ([P.打包].includes(form.value.procedureCode)) {
+				await getPackageNum(params.barcodeList[1]?.barCode)
+			}
 			// 提交完重新获取计划
 			await getPlanInfo(form.value.planCode)
 			// 重置数据

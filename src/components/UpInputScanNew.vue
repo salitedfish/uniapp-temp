@@ -33,8 +33,8 @@
 </script>
 
 <template>
-	<!-- 有些手机输入完加回车才会触发change，有些不用加回车就能触发change，看情况而定 -->
 	<up-input @change="changeSuccess" @blur="blurSuccess">
+		<!-- 有些手机输入完加回车才会触发change，有些不用加回车就能触发change，看情况而定 -->
 		<template #suffix>
 			<ScanCode @scanSuccess="scanSuccess"></ScanCode>
 		</template>

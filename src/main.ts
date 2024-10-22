@@ -3,7 +3,7 @@ import uviewPlus from "uview-plus"
 import App from "./App.vue"
 import { initInterceptor } from "./util/interceptor"
 import directive from "./util/directive"
-
+import defineGlobalComponents from "./util/defineGlobalComponents"
 import "./assets/css/global.scss"
 
 // #ifndef MP
@@ -33,6 +33,7 @@ export const createApp = () => {
 	const app = createSSRApp(App)
 	app.use(uviewPlus)
 	directive(app)
+	defineGlobalComponents(app)
 	return {
 		app,
 	}

@@ -20,7 +20,8 @@ export const printBoxBarcode = (data : Obj) => {
 	tsplTemplate = tsplTemplate + `TEXT ${20},${120},"TSS24.BF2",0,1,1,"物料编码：${data.productCode}"\n `
 	tsplTemplate = tsplTemplate + `TEXT ${20},${160},"TSS24.BF2",0,1,1,"客户件号：${data.cusProductCode}"\n `
 	tsplTemplate = tsplTemplate + `TEXT ${20},${200},"TSS24.BF2",0,1,1,"每箱数量：${data.maxNum}"\n `
-	tsplTemplate = tsplTemplate + `QRCODE ${350},${40},L,${9},A,0,"${data.barcode}"\n `
+	tsplTemplate = tsplTemplate + `QRCODE ${340},${40},L,${9},A,0,"${data.barcode}"\n `
+	tsplTemplate = tsplTemplate + `TEXT ${200},${300},"TSS24.BF2",0,1,1,"${data.barcode}"\n `
 	tsplTemplate = tsplTemplate + `PRINT 1\n `
 	printer.print([tsplTemplate])
 }

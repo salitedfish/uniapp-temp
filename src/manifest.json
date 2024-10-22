@@ -2,8 +2,8 @@
     "name" : "银申数字化管理系统",
     "appid" : "__UNI__AF68D50",
     "description" : "",
-    "versionName" : "1.0.5",
-    "versionCode" : 105,
+    "versionName" : "1.0.3",
+    "versionCode" : 103,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {

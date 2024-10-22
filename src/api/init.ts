@@ -1,6 +1,7 @@
 
 import { routes } from "@/store/route"
 import { useGenParamsUrl } from "@ultra-man/noa"
+import { setCustomModal, customModalStore } from "@/store/customModal"
 
 // 生成请求头
 export const genHeader = () => {
@@ -60,17 +61,18 @@ export class URequest {
 					// 请求成功
 					if ((res.data as any).status === 200) {
 						if ((res.data as any).data && (res.data as any).data.errMsg) {
-							// uni.showToast({
-							// 	icon: "none",
-							// 	title: (res.data as any).data.errMsg,
-							// 	duration: 3000,
-							// })
-							uni.showModal({
-								title: '异常',
-								content: (res.data as any).data.errMsg,
-								success: function (res) {
-								}
-							});
+							if (customModalStore.exist) {
+								setCustomModal({
+									visiable: true,
+									title: "异常",
+									content: (res.data as any).data.errMsg,
+								})
+							} else {
+								uni.showModal({
+									title: '异常',
+									content: (res.data as any).data.errMsg,
+								});
+							}
 							uni.hideLoading()
 						}
 						// 请求成功，数据也正常
@@ -85,50 +87,53 @@ export class URequest {
 							uni.removeStorageSync("userInfo")
 						}
 						// 请求成功，数据不正常
-						// uni.showToast({
-						// 	icon: "none",
-						// 	title: (res.data as any).msg,
-						// 	duration: 3000,
-						// })
-						uni.showModal({
-							title: '异常',
-							content: (res.data as any).msg,
-							success: function (res) {
-							}
-						});
+						if (customModalStore.exist) {
+							setCustomModal({
+								visiable: true,
+								title: "异常",
+								content: (res.data as any).msg,
+							})
+						} else {
+							uni.showModal({
+								title: '异常',
+								content: (res.data as any).msg,
+							});
+						}
 						uni.hideLoading()
 						reject(res)
 					}
 				} else {
 					// 请求失败
-					// uni.showToast({
-					// 	icon: "none",
-					// 	title: res.data ? (res.data as any).msg : (res as any).errMsg,
-					// 	duration: 3000,
-					// })
-					uni.showModal({
-						title: '异常',
-						content: res.data ? (res.data as any).msg || (res.data as any).error : (res as any).errMsg,
-						success: function (res) {
-						}
-					});
+					if (customModalStore.exist) {
+						setCustomModal({
+							visiable: true,
+							title: "异常",
+							content: res.data ? (res.data as any).msg || (res.data as any).error : (res as any).errMsg,
+						})
+					} else {
+						uni.showModal({
+							title: '异常',
+							content: res.data ? (res.data as any).msg || (res.data as any).error : (res as any).errMsg,
+						});
+					}
 					uni.hideLoading()
 					reject(res)
 				}
 			}
 			config.fail = (err) => {
 				console.log("请求返回err：", err)
-				// uni.showToast({
-				// 	icon: "none",
-				// 	title: err.errMsg,
-				// 	duration: 3000,
-				// })
-				uni.showModal({
-					title: '异常',
-					content: err.errMsg,
-					success: function (res) {
-					}
-				});
+				if (customModalStore.exist) {
+					setCustomModal({
+						visiable: true,
+						title: "异常",
+						content: err.errMsg,
+					})
+				} else {
+					uni.showModal({
+						title: '异常',
+						content: err.errMsg,
+					});
+				}
 				uni.hideLoading()
 				reject(err)
 			}

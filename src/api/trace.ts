@@ -215,3 +215,11 @@ export const getTwoEquipmentDataApi = async (data : Obj) => {
 		data
 	})
 }
+
+// 获取包装码装箱数量
+export const getPackageNumApi = async (data : Obj) => {
+	return await uRequest.post<Return<number>>({
+		url: "trace/findPackageNum",
+		data
+	})
+}

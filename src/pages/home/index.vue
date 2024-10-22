@@ -211,7 +211,7 @@
 		</template>
 	</u-navbar>
 
-	<up-text text="追溯管理" class="grid-title" bold></up-text>
+	<up-text text="追溯管理" class="grid-title" bold v-if="traceManagerList.filter(item => !!item.auth).length"></up-text>
 	<u-grid :border="true" class="grid-box">
 		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList.filter(item => !!item.auth)"
 			:key="index" class="grid-item">
@@ -220,9 +220,8 @@
 		</u-grid-item>
 	</u-grid>
 
-	<up-text text="仓储管理" class="grid-title" bold></up-text>
+	<up-text text="仓储管理" class="grid-title" bold v-if="stockroomManagerList.filter(item => !!item.auth).length"></up-text>
 	<u-grid :border="true" class="grid-box">
-		<!-- .filter(item => item.auth) -->
 		<u-grid-item @click="itemClick(item)" v-for="(item,index) in stockroomManagerList.filter(item => !!item.auth)"
 			:key="index" class="grid-item" :name="item.title">
 			<image :src="item.icon" class="grid-icon"></image>

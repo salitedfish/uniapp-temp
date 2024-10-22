@@ -12,6 +12,9 @@
 	import {
 		routes
 	} from "@/store/route"
+	import {
+		nowFormat
+	} from "@/store/common"
 	// 工具
 	import {
 		useThrottle,
@@ -61,7 +64,7 @@
 	}, 3000)
 
 	// 单据日期选择相关
-	const dateSelected = ref([])
+	const dateSelected = ref([nowFormat, nowFormat])
 	const dateSelect = (dates: string[]) => {
 		if (dates.length > 0) {
 			searchParam.value.planDateStart = dates[0]
@@ -122,6 +125,7 @@
 					<uni-th class="nowrap" align="left" width="100rpx">产线</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">产品编号</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">产品名称</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">规格型号</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">计划数量</uni-th>
 					<uni-th class="nowrap table-fixed-right" align="left" width="100rpx">操作</uni-th>
 				</uni-tr>
@@ -134,8 +138,9 @@
 					<uni-td class="nowrap">{{ item.lineName }}</uni-td>
 					<uni-td class="nowrap">{{ item.productCode }}</uni-td>
 					<uni-td class="nowrap">{{ item.productName }}</uni-td>
+					<uni-td class="nowrap">{{ item.productModel }}</uni-td>
 					<uni-td class="nowrap">{{ item.planNum }}</uni-td>
-					<uni-td class="nowrap primary table-fixed-right" @click="goWork(item)">开工</uni-td>
+					<uni-td class="nowrap primary table-fixed-right">开工</uni-td>
 				</uni-tr>
 			</uni-table>
 		</view>

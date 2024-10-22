@@ -40,13 +40,13 @@
 		codeRule: Obj
 	} > ()
 
-	const maxNum = ref(10)
+	const maxNum = ref(27)
 	const dialog = ref(false)
 
 	// 取消打印
 	const hideDialog = () => {
 		dialog.value = false
-		maxNum.value = 10
+		maxNum.value = 27
 	}
 	// 打印前操作
 	const prePrintHandle = () => {
