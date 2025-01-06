@@ -3,8 +3,12 @@ import type { Return, ReturnList, Paging } from "@/type/common"
 
 // 查询按灯问题列表
 export const getAnDonProblemTypeList = async () => {
+	const data = {
+		parentId: 605255985643589
+	}
 	return await uRequest.post<Return<Obj>>({
-		url: "ldAndonSet/problemTypeList",
+		url: "ldDictionary/listByParentId",
+		data
 	})
 }
 

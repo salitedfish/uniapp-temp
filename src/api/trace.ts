@@ -223,3 +223,11 @@ export const getPackageNumApi = async (data : Obj) => {
 		data
 	})
 }
+
+// 获取工序列表
+export const getTraceProcessList = async (data : Paging & Obj) => {
+	return await uRequest.post<Return<ReturnList<Obj>>>({
+		url: "ldLine/pageListDetail",
+		data
+	})
+}

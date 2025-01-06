@@ -24,13 +24,13 @@
 		initData()
 		if (props.selected) {
 			emit("select", props.selected)
-			inputText.value = props.selected.map(item => item.problemTypeName).join(", ")
+			inputText.value = props.selected.map(item => item.label).join(", ")
 		}
 	})
 	watch(() => props.selected, () => {
 		if (props.selected) {
 			emit("select", props.selected)
-			inputText.value = props.selected.map(item => item.problemTypeName).join(", ")
+			inputText.value = props.selected.map(item => item.label).join(", ")
 		}
 	})
 
@@ -50,21 +50,23 @@
 	const select = (res: {
 		value: Objs
 	}) => {
-		inputText.value = res.value[0].problemTypeName
+		inputText.value = res.value[0].label
 		show.value = false
 		emit("select", res.value)
 	}
 </script>
 
 <template>
-	<up-input v-model="inputText" placeholder="请选择问题类型" class="input-item" readonly border="none">
-		<template #suffix>
-			<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary"
-				@click="open"></uni-icons>
-			<up-picker :show="show" :columns="columns" @confirm="select" @cancel="show = false"
-				keyName="problemTypeName"></up-picker>
-		</template>
-	</up-input>
+	<view @click="open" style="width: 100%;">
+		<up-input v-model="inputText" placeholder="请选择问题类型" class="input-item" readonly border="none"
+			style="pointer-events: none">
+			<template #suffix>
+				<uni-icons custom-prefix="custom-icon" type="icon-chaxun" size="18" :color="globalColor.primary"></uni-icons>
+			</template>
+		</up-input>
+	</view>
+
+	<up-picker :show="show" :columns="columns" @confirm="select" @cancel="show = false" keyName="label"></up-picker>
 </template>
 
 <style scoped lang='less'>

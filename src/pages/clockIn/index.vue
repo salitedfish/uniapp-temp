@@ -7,6 +7,7 @@
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
+	import TraceProcessPicker from "@/components/TraceProcessPicker.vue"
 	// 数据
 	import {
 		routes
@@ -39,6 +40,7 @@
 			personName: userInfo.value.jobName,
 			personId: userInfo.value.orgId,
 			lineDetailId: "",
+			processCode: "",
 			processName: "",
 		}
 	}
@@ -84,6 +86,20 @@
 		searchParam.value.currentPage = page.current
 		searchList()
 	}
+
+	// 工序
+	const processSelected = ref < Objs > ([])
+	const processSelect = (res: Objs) => {
+		if (res.length > 0) {
+			form.value.processCode = res[0].processCode
+			form.value.processName = res[0].processName
+			form.value.lineDetailId = res[0].lineDetailId
+		} else {
+			form.value.processCode = ""
+			form.value.processName = ""
+			form.value.lineDetailId = ""
+		}
+	}
 </script>
 
 <template>
@@ -95,10 +111,15 @@
 				<up-input border="none" placeholder="自动带出" clearable class="input-item" v-model="form.personName" readonly>
 				</up-input>
 			</up-form-item>
-
+			<!-- 
 			<up-form-item class="common-form-item" label="工序二维码:" borderBottom labelWidth="90" style="padding: 0" required>
 				<up-input-scan v-model="form.processName" placeholder="请扫工序二维码" clearable class="input-item"
 					@scanSuccess="scanSuccess" focus></up-input-scan>
+			</up-form-item> -->
+
+			<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="90" style="padding: 0">
+				<TraceProcessPicker v-model:selected="processSelected" @select="processSelect">
+				</TraceProcessPicker>
 			</up-form-item>
 		</up-form>
 

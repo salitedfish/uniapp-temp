@@ -8,6 +8,7 @@
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import TraceProblemTypePicker from "@/components/TraceProblemTypePicker.vue"
+	import TraceProcessPicker from "@/components/TraceProcessPicker.vue"
 	// 数据
 	import {
 		routes
@@ -34,6 +35,7 @@
 	const initForm = () => {
 		return {
 			lineDetailId: "",
+			processCode: "",
 			processName: "",
 			problemTypeCode: "",
 			problemTypeName: "",
@@ -60,8 +62,8 @@
 	const problemSelected = ref < Objs > ([])
 	const problemSelect = (res: Objs) => {
 		if (res.length > 0) {
-			form.value.problemTypeCode = res[0].problemTypeCode
-			form.value.problemTypeName = res[0].problemTypeName
+			form.value.problemTypeCode = res[0].code
+			form.value.problemTypeName = res[0].label
 		}
 	}
 
@@ -99,6 +101,20 @@
 		searchParam.value.currentPage = page.current
 		searchList()
 	}
+
+	// 工序
+	const processSelected = ref < Objs > ([])
+	const processSelect = (res: Objs) => {
+		if (res.length > 0) {
+			form.value.processCode = res[0].processCode
+			form.value.processName = res[0].processName
+			form.value.lineDetailId = res[0].lineDetailId
+		} else {
+			form.value.processCode = ""
+			form.value.processName = ""
+			form.value.lineDetailId = ""
+		}
+	}
 </script>
 
 <template>
@@ -106,9 +122,14 @@
 		<CustomNavBar :title="routes.LdAndon.style.navigationBarTitleText"></CustomNavBar>
 
 		<up-form class="common-form" labelPosition="left">
-			<up-form-item class="common-form-item" label="工序二维码:" borderBottom labelWidth="90" style="padding: 0" required>
+			<!-- 			<up-form-item class="common-form-item" label="工序二维码:" borderBottom labelWidth="90" style="padding: 0" required>
 				<up-input-scan v-model="form.processName" placeholder="请扫工序二维码" clearable class="input-item"
 					@scanSuccess="scanSuccess" focus></up-input-scan>
+			</up-form-item> -->
+
+			<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="90" style="padding: 0" required>
+				<TraceProcessPicker v-model:selected="processSelected" @select="processSelect">
+				</TraceProcessPicker>
 			</up-form-item>
 
 			<up-form-item class="common-form-item" label="问题类型:" borderBottom labelWidth="90" style="padding: 0" required>

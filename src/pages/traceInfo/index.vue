@@ -4,13 +4,13 @@
 
 		<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="[P.打包].includes(form.procedureCode)"></AutoConnectBlueTooth>
 
-		<up-steps :current="form.activeNum" style="margin-top: 10px; overflow-x: scroll;">
-			<up-steps-item v-for="item, key in processList" :key="key" :title="item.procedureName"
+		<up-steps :current="form.activeNum" style="margin-top: 10px; overflow-x: scroll">
+			<up-steps-item v-for="(item, key) in processList" :key="key" :title="item.procedureName"
 				:error="item.result != 1 && key != form.activeNum"></up-steps-item>
 		</up-steps>
 
 		<!-- 基础数据表单 -->
-		<up-form class="common-form" :class="{'common-form-next': form.procedureCode === P.打包 && Platform.isApp()}"
+		<up-form class="common-form" :class="{ 'common-form-next': form.procedureCode === P.打包 && Platform.isApp() }"
 			labelPosition="left">
 			<!-- 			<up-form-item class="common-form-item" label="指导书:" borderBottom labelWidth="80" style="padding: 0">
 				<up-button type="primary" class="btn" size="small" @click="useDownloadByURL(processDetail.fileUrl)('作业指导书')">
@@ -72,7 +72,7 @@
 				style="padding: 0" required v-if="[P.条码自配, P.打包, P.终检].includes(form.procedureCode)"
 				v-for="(item, key) in codeRules" :key="key">
 				<up-input-scan :focus="item.inputFocus" v-model="item.barCode" placeholder="请输入条码" clearable class="input-item"
-					@scanSuccess="(str: string) => codeRuleScanSuccess(str, item, key)"
+					@focus="customInputFocus" @scanSuccess="(str: string) => codeRuleScanSuccess(str, item, key)"
 					@blur="item.inputFocus = false"></up-input-scan>
 			</up-form-item>
 
@@ -267,12 +267,12 @@
 		</view>
 
 		<!-- 打印操作 -->
-		<view class="btn-box" v-if="form.procedureCode === P.打包 ">
+		<view class="btn-box" v-if="form.procedureCode === P.打包">
 			<BoxBarcodePrinter :productCode="form.productCode" :cusProductCode="form.cusProductCode" :codeRule="codeRules[1]"
-				v-if="codeRules[1]">
+				v-if="codeRules[1]" @genSuccess="boxBarcodeGenSuccess">
 			</BoxBarcodePrinter>
-			<BoxBarcodeRePrinter style="margin-left: 5px">
-			</BoxBarcodeRePrinter>
+			<!-- @startHideKeyboard="startHideKeyboard" @stopHideKeyboard="stopHideKeyboard" -->
+			<BoxBarcodeRePrinter style="margin-left: 5px"> </BoxBarcodeRePrinter>
 		</view>
 
 		<!-- 表格 -->
@@ -283,7 +283,8 @@
 		<TraceTablePK3 ref="traceTableRef" :form="form" style="margin-top: 10px" v-if="form.procedureKindCode === PK.扫码登记">
 		</TraceTablePK3>
 		<TraceTablePK4 ref="traceTableRef" :form="form" style="margin-top: 10px"
-			v-if="form.procedureKindCode === PK.定制流程 && ![P.条码自配, P.打包, P.终检].includes(form.procedureCode)"> </TraceTablePK4>
+			v-if="form.procedureKindCode === PK.定制流程 && ![P.条码自配, P.打包, P.终检].includes(form.procedureCode)">
+		</TraceTablePK4>
 		<TraceTablePK5 ref="traceTableRef" :form="form" :codeRules="codeRules" style="margin-top: 10px"
 			v-if="[P.条码自配, P.打包, P.终检].includes(form.procedureCode)"> </TraceTablePK5>
 
@@ -307,8 +308,8 @@
 	import CheckRecord from "./components/CheckRecord.vue"
 	import PrintTypeCheck from "@/components/PrintTypeCheck.vue"
 	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
-	import BoxBarcodePrinter from "./components/boxBarcodePrinter.vue"
-	import BoxBarcodeRePrinter from "./components/boxBarcodeRePrinter.vue"
+	import BoxBarcodePrinter from "./components/BoxBarcodePrinter.vue"
+	import BoxBarcodeRePrinter from "./components/BoxBarcodeRePrinter.vue"
 	import { setCustomModal } from "@/store/customModal"
 	// 数据
 	import { routes } from "@/store/route"
@@ -316,17 +317,36 @@
 	import { blueToothStore } from "@/store/blueTooth"
 	import { Printer } from "@/fun/printer"
 	import { globalColor } from "@/store/theme"
-	import {
-		Platform
-	} from '@/util/env';
+	import { Platform } from "@/util/env"
 	// 工具
 	import { useThrottle, useDebounce, useRmRepeat, useDownloadByURL } from "@ultra-man/noa"
+	import {
+		printBoxBarcode
+	} from "./util"
 	// @ts-ignore
 	import mqtt from "mqtt/dist/mqtt.js"
 	// 接口
-	import { getPackageNumApi, getProcessDetail, getLineDetail, getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, productJobDel, checkHeadTail, codeCheckInfoApi, findCardByUrl, getTraceList2, getTraceLineDetail, traceResetPlc, getTwoEquipmentDataApi } from "@/api/trace"
+	import {
+		getPackageNumApi,
+		getProcessDetail,
+		getLineDetail,
+		getEquipmentByLineDetailId,
+		getCheckItemListApi,
+		productJobSubmit,
+		productJobDel,
+		checkHeadTail,
+		codeCheckInfoApi,
+		findCardByUrl,
+		getTraceList2,
+		getTraceLineDetail,
+		traceResetPlc,
+		getTwoEquipmentDataApi,
+	} from "@/api/trace"
 	import { getWorkPlan } from "@/api/workPlan"
 	import { getProductByCode } from "@/api/product"
+	import {
+		getBarcodeList
+	} from "@/api/codeRule"
 	// 静态数据
 	import { P, PK, BarcodeNames, ResultMap } from "./enum"
 
@@ -336,13 +356,28 @@
 		planCode ?: string
 	}>()
 
-	onMounted(async () => {
-		// app端隐藏虚拟键盘
+	// app端有些输入框禁止人员手动输入，只能用扫码枪
+	const customInputFocus = () => {
 		if (Platform.isApp()) {
-			hideKeyboardInterval = setInterval(() => {
-				uni.hideKeyboard()
-			}, 60)
+			uni.hideKeyboard()
 		}
+	}
+
+	// // 隐藏和显示小键盘
+	// const startHideKeyboard = () => {
+	// 	hideKeyboardInterval = setInterval(() => {
+	// 		uni.hideKeyboard()
+	// 	}, 60)
+	// }
+	// const stopHideKeyboard = () => {
+	// 	clearInterval(hideKeyboardInterval)
+	// }
+
+	onMounted(async () => {
+		// // app端隐藏虚拟键盘
+		// if (Platform.isApp()) {
+		// 	startHideKeyboard()
+		// }
 		// 获取产线详情
 		if (props.lineDetailId) {
 			await getLine()
@@ -360,9 +395,9 @@
 	})
 	onBeforeUnmount(() => {
 		clearInterval(Number(airtightnessInterval))
-		if (Platform.isApp()) {
-			clearInterval(Number(hideKeyboardInterval))
-		}
+		// if (Platform.isApp()) {
+		// 	stopHideKeyboard()
+		// }
 		if (mqttClient) {
 			mqttClient.end()
 			mqttClient = null
@@ -493,7 +528,24 @@
 			const res = await getLineDetail({
 				lineDetailId: props.lineDetailId,
 			})
-			const { resetPlc, lineId, procedureCode, procedureKindCode, processId, factoryId, submitType = "1", statistics, relation1, relation2, unbind, scanCode, checked, checkFirstFinal, codeRules, reworked } = res.data
+			const {
+				resetPlc,
+				lineId,
+				procedureCode,
+				procedureKindCode,
+				processId,
+				factoryId,
+				submitType = "1",
+				statistics,
+				relation1,
+				relation2,
+				unbind,
+				scanCode,
+				checked,
+				checkFirstFinal,
+				codeRules,
+				reworked,
+			} = res.data
 			form.value.processId = processId
 			form.value.lineId = lineId
 			form.value.orgIds = factoryId
@@ -518,9 +570,9 @@
 			if (ree.data && ree.data.list) {
 				ree.data.list.forEach((row : Obj, index : number) => {
 					if (row.lineDetailId == form.value.lineDetailId) {
-						form.value.activeNum = index;
+						form.value.activeNum = index
 					}
-				});
+				})
 			}
 
 			// 如果是数据采集
@@ -559,18 +611,18 @@
 		// 监听消息
 		mqttClient.on("message", (topic : Obj, message : string) => {
 			try {
-				const servies = JSON.parse(message.toString()).body.things;
-				console.log("所选择的设备编码：", form.value.equipmentCode);
-				console.log("mqtt推送数据：", servies);
+				const servies = JSON.parse(message.toString()).body.things
+				console.log("所选择的设备编码：", form.value.equipmentCode)
+				console.log("mqtt推送数据：", servies)
 
 				// 监听到数据后，mqtt会返回所有设备的数据，需要通过对应的设备筛选
-				let equipmentData : Obj | null = null;
+				let equipmentData : Obj | null = null
 				for (const item of servies) {
 					// 找到工序对应的设备,获取对应数据
 					if (form.value.equipmentCode == item.id) {
 						if (item.items[0]) {
-							equipmentData = item.items[0].properties;
-							console.log("mqtt匹配到的设备数据：", equipmentData);
+							equipmentData = item.items[0].properties
+							console.log("mqtt匹配到的设备数据：", equipmentData)
 						}
 					}
 				}
@@ -578,18 +630,18 @@
 				// 如果匹配到数据，则赋值到form中
 				if (equipmentData) {
 					// 赋值存储数据
-					form.value.equipmentContent = equipmentData.equipment_parameters;
+					form.value.equipmentContent = equipmentData.equipment_parameters
 					// 赋值最终的结果,如果结果是空的则默认合格
-					if (!equipmentData.result || equipmentData.result === 'OK') {
-						form.value.result = "1";
-					} else if (equipmentData.result === 'NG') {
-						form.value.result = "0";
+					if (!equipmentData.result || equipmentData.result === "OK") {
+						form.value.result = "1"
+					} else if (equipmentData.result === "NG") {
+						form.value.result = "0"
 					}
 				}
 			} catch (err) {
 				setCustomModal({
 					visiable: true,
-					content: err && String(err),
+					content: String(err),
 				})
 			}
 		})
@@ -676,10 +728,13 @@
 			if (item.equipmentCode === code) {
 				form.value.equipmentCode = item.equipmentCode
 				form.value.equipmentName = item.equipmentName
-				uni.setStorageSync("traceEquipment", JSON.stringify({
-					equipmentCode: form.value.equipmentCode,
-					equipmentName: form.value.equipmentName
-				}))
+				uni.setStorageSync(
+					"traceEquipment",
+					JSON.stringify({
+						equipmentCode: form.value.equipmentCode,
+						equipmentName: form.value.equipmentName,
+					})
+				)
 				return
 			}
 		}
@@ -710,7 +765,7 @@
 
 				// 获取产品详情
 				const ree = await getProductByCode({
-					productCode
+					productCode,
 				})
 				if (ree && ree.data) {
 					form.value.cusProductCode = ree.data.cusProductCode
@@ -724,7 +779,7 @@
 				}
 				// 如果需要检验单的则获取检验单
 				if (form.value.checked == "1") {
-					getCheckItemList()
+					await getCheckItemList()
 				}
 				// 如果是条码自配，则获取条码规则
 				if ([P.条码自配, P.打包, P.终检].includes(form.value.procedureCode)) {
@@ -833,10 +888,10 @@
 		// 打包条码扫码成功时，进行追溯查询
 		if ([P.打包].includes(form.value.procedureCode) && res) {
 			if (index == 0) {
-				traceSearch(res)
+				await traceSearch(res)
 			}
 			if (index == 1) {
-				getPackageNum(res)
+				await getPackageNum(res)
 			}
 		}
 		// 如果是终检
@@ -862,15 +917,21 @@
 			submit()
 		}
 	}
+	// 包装码生成成功，自动填到包装码位置，并触发扫码成功事件
+	const boxBarcodeGenSuccess = (res : string) => {
+		const item = codeRules.value[1]
+		item.barCode = res
+		codeRuleScanSuccess(res, item, 1)
+	}
 	// 获取终检两个设备的数据
 	const getTwoEquipmentData = async (barcode : string) => {
 		try {
 			uni.showLoading({
 				mask: true,
-				title: "获取设备数据中"
+				title: "获取设备数据中",
 			})
 			const params = {
-				barcode
+				barcode,
 			}
 			const res = await getTwoEquipmentDataApi(params)
 			if (res && res.data) {
@@ -924,7 +985,7 @@
 		try {
 			const res = await getTraceList2({
 				lineId: form.value.lineId,
-				barcode
+				barcode,
 			})
 			if (res.data) {
 				processList.value = res.data
@@ -945,14 +1006,47 @@
 		try {
 			const res = await getPackageNumApi({
 				barcode,
-				lineDetailId: form.value.lineDetailId
+				lineDetailId: form.value.lineDetailId,
 			})
 			if (res) {
 				form.value.packageNum = res.data
+				await checkPackageFull(barcode, res.data)
 			}
 		} catch (err) {
 			console.log(err)
 		}
+	}
+	// 检查码是否打包完了
+	const checkPackageFull = async (barcode : string, packageNum : number) => {
+		try {
+			const res = await getBarcodeList({
+				pageSize: 1,
+				currentPage: 1,
+				barcode
+			})
+			// 查询包装码详情
+			if (res && res.data.list.length > 0) {
+				const codeInfo = res.data.list[0]
+				// 如果包装码已满，则打印码
+				if (codeInfo.maxNum <= packageNum) {
+					printBoxBarcode({
+						barcode: codeInfo.barcode,
+						codeName: codeInfo.codeName,
+						productCode: codeInfo.barcode.split(",")[0],
+						cusProductCode: codeInfo.cusProductCode,
+						maxNum: codeInfo.maxNum,
+					})
+				}
+			} else {
+				setCustomModal({
+					visiable: true,
+					content: "未查询到此包装码",
+				})
+			}
+		} catch (err) {
+			console.log(err)
+		}
+
 	}
 	// 检验单
 	const getCheckItemList = async () => {
@@ -1022,7 +1116,7 @@
 			// 如果工序需要重置设备
 			if (form.value.resetPlc) {
 				traceResetPlc({
-					equipmentCode: form.value.equipmentCode
+					equipmentCode: form.value.equipmentCode,
 				})
 			}
 			resetTwoEquipmentData()
@@ -1073,9 +1167,6 @@
 					}
 				}
 			}
-
-
-
 		}
 		if (type === P.定制流程3) {
 			if (form.value.barcode1 != form.value.barcode2) {
@@ -1271,7 +1362,7 @@
 				icon: "none",
 				title: "提交成功",
 			})
-			// 
+			//
 			if ([P.打包].includes(form.value.procedureCode)) {
 				await getPackageNum(params.barcodeList[1]?.barCode)
 			}
@@ -1363,7 +1454,6 @@
 		.btn+.btn {
 			margin-left: 5px;
 		}
-
 	}
 
 	.radio-group {

@@ -40,7 +40,7 @@
 			uni.showModal({
 				title: '提示',
 				content: `此设备未配置看板
-设备id: ${data.deviceId}`,
+	设备id: ${data.deviceId}`,
 			})
 		} catch (err) {
 			console.log(err)
@@ -52,18 +52,20 @@
 	// 操作看板循环显示
 	const boardIframeHandler = (index: number) => {
 		data.boardAddress = data.boards[index].boardAddress
-		// 如果看板数量大于1一个，则要循环展示
+		// 如果看板数量大于1，则要循环展示
 		if (data.boards.length > 1) {
+			// 当前看板持续时间（毫秒）
+			const boardTime = data.boards[index].boardTime * 1000
 			setTimeout(() => {
 				// 如果是最后一个了，则展示第一个
-				if (index + 1 >= data.boards.length) {
+				if (index >= data.boards.length - 1) {
 					boardIframeHandler(0)
 				}
 				// 展示下一个
 				else {
 					boardIframeHandler(index + 1)
 				}
-			}, data.boards[index].boardTime * 1000)
+			}, boardTime)
 		}
 	}
 
@@ -82,7 +84,6 @@
 </script>
 
 <template>
-	<!-- 目前只能内嵌网页主动操作框架 -->
 	<iframe name="moldLinkWindow" :src="data.boardAddress" class="iframe-box"></iframe>
 </template>
 

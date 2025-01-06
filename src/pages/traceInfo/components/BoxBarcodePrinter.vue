@@ -1,6 +1,6 @@
 <template>
 	<view class="box">
-		<up-button type="primary" class="btn" shape="circle" @click="prePrintHandle">打 印</up-button>
+		<up-button type="primary" class="btn" shape="circle" @click="prePrintHandle">生成包装码</up-button>
 
 		<up-popup :show="dialog" mode="center" @close="hideDialog" :round="10">
 			<view style="padding: 10px 15px; width: 85vw; min-height: 10vh;">
@@ -33,6 +33,9 @@
 	import {
 		nowFormat1
 	} from "@/store/common"
+	import {
+		Platform
+	} from "@/util/env"
 
 	const props = defineProps < {
 		productCode: string,
@@ -40,16 +43,29 @@
 		codeRule: Obj
 	} > ()
 
-	const maxNum = ref(27)
+	const emit = defineEmits < {
+		(event: "startHideKeyboard"): void,
+		(event: "stopHideKeyboard"): void,
+		(event: "genSuccess", barcode: string): void,
+	} > ()
+
+	const maxNum = ref(Number(uni.getStorageSync("printMaxNum") || 27))
 	const dialog = ref(false)
 
 	// 取消打印
 	const hideDialog = () => {
 		dialog.value = false
-		maxNum.value = 27
+		uni.setStorageSync("printMaxNum", maxNum.value)
+		// if (Platform.isApp()) {
+		// 	emit("startHideKeyboard")
+		// }
+
 	}
 	// 打印前操作
 	const prePrintHandle = () => {
+		// if (Platform.isApp()) {
+		// 	emit("stopHideKeyboard")
+		// }
 		dialog.value = true
 	}
 	// 打印操作
@@ -75,13 +91,16 @@
 
 		if (res.data && res.data.length > 0) {
 			hideDialog()
-			printBoxBarcode({
-				barcode: res.data[0].barcode,
-				codeName: res.data[0].codeName,
-				productCode: props.productCode,
-				cusProductCode: props.cusProductCode,
-				maxNum: maxNum.value
-			})
+			// printBoxBarcode({
+			// 	barcode: res.data[0].barcode,
+			// 	codeName: res.data[0].codeName,
+			// 	productCode: props.productCode,
+			// 	cusProductCode: props.cusProductCode,
+			// 	maxNum: maxNum.value
+			// })
+			// 改动：不直接打印码，生成码自动填到对应的位置
+			emit("genSuccess", res.data[0].barcode)
+
 		}
 	}
 </script>

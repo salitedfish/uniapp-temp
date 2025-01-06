@@ -8,6 +8,7 @@
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import UpInputScan from "@/components/UpInputScanNew.vue"
 	import UpInputDatePicker from "@/components/UpInputDatePicker.vue"
+	import TraceProcessPicker from "@/components/TraceProcessPicker.vue"
 	// 数据
 	import {
 		routes
@@ -48,20 +49,27 @@
 		const arr = res.split("*")
 		if (!res) {
 			searchParam.value.lineDetailId = ""
+			searchParam.value.processCode = ""
 			return
 		}
 		if (arr.length === 2) {
 			searchParam.value.lineDetailId = arr[0]
-			searchParam.value.processName = arr[1]
+			searchParam.value.processCode = arr[1]
 		} else {
-			uni.showModal({
-				title: '提示',
-				content: "工序二维码不正确"
-			});
-			searchParam.value.lineDetailId = ""
-			searchParam.value.processName = ""
+			searchParam.value.lineDetailId = arr[0]
+			searchParam.value.processCode = arr[0]
 		}
 	}, 3000)
+
+	// 工序
+	const processSelected = ref < Objs > ([])
+	const processSelect = (res: Objs) => {
+		if (res.length > 0) {
+			searchParam.value.processCode = res[0].processCode
+		} else {
+			searchParam.value.processCode = ""
+		}
+	}
 
 	// 单据日期选择相关
 	const dateSelected = ref([nowFormat, nowFormat])
@@ -101,9 +109,14 @@
 				</UpInputDatePicker>
 			</up-form-item>
 
-			<up-form-item class="common-form-item" label="工序二维码:" borderBottom labelWidth="90" style="padding: 0">
-				<up-input-scan v-model="searchParam.processName" placeholder="请扫工序二维码" clearable class="input-item"
+			<!-- 			<up-form-item class="common-form-item" label="工序二维码:" borderBottom labelWidth="90" style="padding: 0">
+				<up-input-scan v-model="searchParam.processCode" placeholder="请扫工序二维码" clearable class="input-item"
 					@scanSuccess="scanSuccess"></up-input-scan>
+			</up-form-item> -->
+
+			<up-form-item class="common-form-item" label="工序:" borderBottom labelWidth="90" style="padding: 0">
+				<TraceProcessPicker v-model:selected="processSelected" @select="processSelect">
+				</TraceProcessPicker>
 			</up-form-item>
 
 			<up-form-item class="common-form-item" label="计划单号:" borderBottom labelWidth="90" style="padding: 0">

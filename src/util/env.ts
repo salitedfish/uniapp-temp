@@ -34,7 +34,7 @@ export class Platform {
 	}
 	// 判断是否是大屏且宽要大于高
 	static isBigScreen() {
-		return Platform.windowWidth > 1200 && Platform.windowWidth > Platform.windowHeight
+		return Platform.windowWidth > 1000 && Platform.windowWidth > Platform.windowHeight
 	}
 
 	// 判断使用的公司是否是内部公司

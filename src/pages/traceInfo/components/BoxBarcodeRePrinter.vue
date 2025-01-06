@@ -41,6 +41,11 @@
 		printBoxBarcode
 	} from "../util"
 
+	const emit = defineEmits < {
+		(event: "startHideKeyboard"): void,
+		(event: "stopHideKeyboard"): void
+	} > ()
+
 	// 数据
 	const data = reactive({
 		printList: [] as Obj[],
@@ -90,12 +95,14 @@
 
 	// 显示历史条码弹窗
 	const printHandle = () => {
+		emit("stopHideKeyboard")
 		data.visible = true
 		searchList()
 	}
 
 	// 隐藏历史条码弹窗
 	const hide = () => {
+		emit("startHideKeyboard")
 		data.visible = false
 	}
 
