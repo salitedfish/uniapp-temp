@@ -1,7 +1,7 @@
 // H5模式
 VITE_RUN_TIME = production
 
-VITE_BASE_API_URL_WEB = /api/
+VITE_BASE_API_URL_WEB = https://tmlmcloud.cn/productApi/
 
 VITE_BASE_PAGE_PATH_WEB = h5
 

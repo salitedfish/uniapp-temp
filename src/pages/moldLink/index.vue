@@ -78,7 +78,7 @@
 		window.onmessage = async (e : { origin : string, data : string }) => {
 			// 无论那个子页面派发message都会触发这个函数，所有需要通过子页面地址过滤出对应的页面操作
 			console.log("收到：" + e.origin + "的message")
-			if (e.origin === linkOrigin) {
+			if (linkOrigin.indexOf(e.origin) >= 0) {
 				const res = JSON.parse(e.data)
 				// 扫码操作
 				if (res.action === IframeAction.SCAN_CODE) {
