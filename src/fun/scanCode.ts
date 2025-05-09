@@ -17,6 +17,10 @@ export class ScanCode {
 		else if (Platform.isInDD()) {
 			return await ScanCode.ddRun(runConfig)
 		}
+		// 微信内嵌H5
+		else if (Platform.isInWx()) {
+			// to do
+		}
 		// 纯H5
 		else if (Platform.isWeb()) {
 			return await ScanCode.webRun(runConfig)
