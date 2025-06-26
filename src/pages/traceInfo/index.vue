@@ -2,7 +2,7 @@
 	<view class="common-page-container">
 		<CustomNavBar :title="procedureName"></CustomNavBar>
 
-		<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="[P.打包].includes(form.procedureCode)"></AutoConnectBlueTooth>
+		<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="[P.打包].includes(form.procedureCode) || form.printed == 1"></AutoConnectBlueTooth>
 
 		<up-steps :current="form.activeNum" style="margin-top: 10px; overflow-x: scroll">
 			<up-steps-item v-for="(item, key) in processList" :key="key" :title="item.procedureName"
@@ -274,6 +274,12 @@
 			<!-- @startHideKeyboard="startHideKeyboard" @stopHideKeyboard="stopHideKeyboard" -->
 			<BoxBarcodeRePrinter style="margin-left: 5px"> </BoxBarcodeRePrinter>
 		</view>
+		<view class="btn-box" v-if="form.printed == 1">
+			<BoxBarcodePrinter1 :productCode="form.productCode" :cusProductCode="form.cusProductCode" :codeRule="codeRules[1]"
+				v-if="codeRules[1]" @genSuccess="boxBarcodeGenSuccess">
+			</BoxBarcodePrinter1>
+			<BoxBarcodeRePrinter style="margin-left: 5px"> </BoxBarcodeRePrinter>
+		</view>
 
 		<!-- 表格 -->
 		<TraceTablePK1 ref="traceTableRef" :form="form" style="margin-top: 10px" v-if="form.procedureKindCode === PK.条码关联">
@@ -309,6 +315,7 @@
 	import PrintTypeCheck from "@/components/PrintTypeCheck.vue"
 	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
 	import BoxBarcodePrinter from "./components/BoxBarcodePrinter.vue"
+	import BoxBarcodePrinter1 from "./components/BoxBarcodePrinter1.vue"
 	import BoxBarcodeRePrinter from "./components/BoxBarcodeRePrinter.vue"
 	import { setCustomModal } from "@/store/customModal"
 	// 数据
@@ -480,6 +487,8 @@
 			activeNum: null as Num,
 			// 是否控制设备
 			resetPlc: 0,
+			// 是否打印
+			printed: 0
 		}
 	}
 	const oriCodeCheckInfo = () => {
@@ -545,6 +554,7 @@
 				checkFirstFinal,
 				codeRules,
 				reworked,
+				printed
 			} = res.data
 			form.value.processId = processId
 			form.value.lineId = lineId
@@ -561,7 +571,8 @@
 			form.value.codeRules = codeRules ? JSON.parse(codeRules) : []
 			form.value.reworked = reworked
 			form.value.checked = checked || ""
-			form.value.resetPlc = resetPlc
+			form.value.resetPlc = resetPlc;
+			form.value.printed = printed;
 
 			// 获取当前工序在此产线当中的步骤序号
 			const ree = await getTraceLineDetail({

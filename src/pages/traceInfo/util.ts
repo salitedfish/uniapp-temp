@@ -25,3 +25,17 @@ export const printBoxBarcode = (data : Obj) => {
 	tsplTemplate = tsplTemplate + `PRINT 1\n `
 	printer.print([tsplTemplate])
 }
+
+export const printBoxBarcode1 = (data : Obj) => {
+	console.log("开始打印")
+	const printer = new Printer()
+	printer.setPrinterParams(blueToothStore)
+	let tsplTemplate = ""
+	tsplTemplate = tsplTemplate +
+		`SIZE ${printPage.value.width} mm, ${printPage.value.height} mm\n GAP ${printPage.value.gap} mm, 0 mm\n DIRECTION 0\n DENSITY 8\n CLS\n `
+	tsplTemplate = tsplTemplate + `QRCODE ${340},${40},L,${9},A,0,"${data.barcode}"\n `
+	tsplTemplate = tsplTemplate + `TEXT ${200},${300},"TSS24.BF2",0,1,1,"${data.barcode}"\n `
+	tsplTemplate = tsplTemplate + `PRINT 1\n `
+	printer.print([tsplTemplate])
+}
+
