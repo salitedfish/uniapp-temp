@@ -38,7 +38,7 @@
 	} from "@/hook/usePageTable"
 	import TablePicker from "@/components/TablePicker.vue"
 	import {
-		printBoxBarcode
+		printBoxBarcode1
 	} from "../util"
 
 	const emit = defineEmits < {
@@ -109,12 +109,12 @@
 	// 点击选择历史条码
 	const select = (selected: Obj[]) => {
 		if (selected && selected.length > 0) {
-			printBoxBarcode({
+			printBoxBarcode1({
 				barcode: selected[0].barcode,
-				codeName: selected[0].codeName,
-				productCode: selected[0].barcode.split(",")[0],
-				cusProductCode: selected[0].cusProductCode,
-				maxNum: selected[0].maxNum,
+				// codeName: selected[0].codeName,
+				// productCode: selected[0].barcode.split(",")[0],
+				// cusProductCode: selected[0].cusProductCode,
+				// maxNum: selected[0].maxNum,
 			})
 		}
 	}
