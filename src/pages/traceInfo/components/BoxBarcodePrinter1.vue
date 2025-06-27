@@ -4,7 +4,7 @@
 
 		<up-popup :show="dialog" mode="center" @close="hideDialog" :round="10">
 			<view style="padding: 10px 15px; width: 85vw; min-height: 10vh;">
-				<up-text text="确认打印？" class="grid-title" style="margin-bottom: 10px" bold></up-text>
+				<up-text text="确认生成二维码并打印？" class="grid-title" style="margin-bottom: 10px" bold></up-text>
 				<!-- <up-form class="common-form">
 					<up-form-item class="common-form-item" label="每箱数量:" borderBottom labelWidth="80" style="padding: 0">
 						<up-input v-model="maxNum" placeholder="请输入每箱数量" clearable class="input-item"></up-input>
