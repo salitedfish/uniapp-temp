@@ -278,7 +278,7 @@
 			<BoxBarcodePrinter1 :productCode="form.productCode" :cusProductCode="form.cusProductCode" :codeRule="codeRules[1]"
 				v-if="codeRules[1]" @genSuccess="boxBarcodeGenSuccess">
 			</BoxBarcodePrinter1>
-			<BoxBarcodeRePrinter style="margin-left: 5px"> </BoxBarcodeRePrinter>
+			<BoxBarcodeRePrinter1 style="margin-left: 5px"> </BoxBarcodeRePrinter1>
 		</view>
 
 		<!-- 表格 -->
@@ -317,6 +317,7 @@
 	import BoxBarcodePrinter from "./components/BoxBarcodePrinter.vue"
 	import BoxBarcodePrinter1 from "./components/BoxBarcodePrinter1.vue"
 	import BoxBarcodeRePrinter from "./components/BoxBarcodeRePrinter.vue"
+	import BoxBarcodeRePrinter1 from "./components/BoxBarcodeRePrinter1.vue"
 	import { setCustomModal } from "@/store/customModal"
 	// 数据
 	import { routes } from "@/store/route"
@@ -773,7 +774,7 @@
 				form.value.realNum = realNum
 				form.value.firstNum = firstNum
 				form.value.finalNum = finalNum
-
+				console.log(2,productCode)
 				// 获取产品详情
 				const ree = await getProductByCode({
 					productCode,

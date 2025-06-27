@@ -31,7 +31,7 @@
 		printBoxBarcode1
 	} from "../util"
 	import {
-		nowFormat1
+		batchFormat
 	} from "@/store/common"
 	import {
 		Platform
@@ -72,7 +72,8 @@
 			res = await getBoxBarcode({
 				codeRuleId: props.codeRule.codeRuleId,
 				cusProductCode: props.cusProductCode,
-				prefix: `${props.productCode},${nowFormat1},`,
+				prefix: `TC${batchFormat}`,
+				dig:5,
 				maxNum: 1
 			});
 			console.log("条码生成结果", res)
