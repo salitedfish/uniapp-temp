@@ -2,7 +2,8 @@
 	<view class="common-page-container">
 		<CustomNavBar :title="procedureName"></CustomNavBar>
 
-		<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="[P.打包].includes(form.procedureCode) || form.printed == 1"></AutoConnectBlueTooth>
+		<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="[P.打包].includes(form.procedureCode) || form.printed == 1">
+		</AutoConnectBlueTooth>
 
 		<up-steps :current="form.activeNum" style="margin-top: 10px; overflow-x: scroll">
 			<up-steps-item v-for="(item, key) in processList" :key="key" :title="item.procedureName"
@@ -774,7 +775,7 @@
 				form.value.realNum = realNum
 				form.value.firstNum = firstNum
 				form.value.finalNum = finalNum
-				console.log(2,productCode)
+				console.log(2, productCode)
 				// 获取产品详情
 				const ree = await getProductByCode({
 					productCode,
@@ -1124,12 +1125,17 @@
 		form.value.packageNum = 0
 		// 条码自配的重置所有条码
 		if ([P.条码自配, P.打包, P.终检].includes(form.value.procedureCode)) {
+			const bzCode = codeRules.value[1]?.barCode
 			getCodeRules(true)
 			// 如果工序需要重置设备
 			if (form.value.resetPlc) {
 				traceResetPlc({
 					equipmentCode: form.value.equipmentCode,
 				})
+			}
+			// 打包不重置包装码
+			if ([P.打包].includes(form.value.procedureCode)) {
+				codeRules.value[1].barCode = bzCode
 			}
 			resetTwoEquipmentData()
 		}
