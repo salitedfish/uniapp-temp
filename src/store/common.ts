@@ -12,6 +12,7 @@ export let nowFormat = ""
 export let nowFormat1 = ""
 export let nextDayFormat = ""
 export let preMonthFormat = ""
+export let preWeekFormat = ""
 
 export let batchFormat = ""
 
@@ -20,6 +21,7 @@ export const updateAllDate = () => {
 	nowFormat1 = format2(Date.now()).format
 	nextDayFormat = format(Date.now() + 24 * 60 * 60 * 1000).format
 	preMonthFormat = format(Date.now() - 24 * 60 * 60 * 1000 * 30).format
+	preWeekFormat = format(Date.now() - 24 * 60 * 60 * 1000 * 7).format
 
 	batchFormat = format1(Date.now()).format
 }

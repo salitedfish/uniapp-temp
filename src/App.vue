@@ -36,6 +36,7 @@
 				initApp()
 			}
 		}
+
 	})
 	onShow(() => {
 		console.log("App Show")

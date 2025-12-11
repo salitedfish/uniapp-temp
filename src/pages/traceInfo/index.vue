@@ -295,7 +295,9 @@
 		<TraceTablePK5 ref="traceTableRef" :form="form" :codeRules="codeRules" style="margin-top: 10px"
 			v-if="[P.条码自配, P.打包, P.终检].includes(form.procedureCode)"> </TraceTablePK5>
 
-		<CustomModal></CustomModal>
+		<CustomModal>
+			<up-input v-model="unlockCode" placeholder="请输入验证码" class="input-item"></up-input>
+		</CustomModal>
 	</view>
 </template>
 
@@ -516,6 +518,8 @@
 	const autoConnectBlueTooth = ref<Obj | undefined>()
 	let mqttClient : mqtt.MqttClient | null = null
 	const processList = ref<Objs>([])
+	// 报错后的弹窗解锁码
+	const unlockCode = ref()
 
 	// 是否打印
 	watch(printTypeCheck, (newV : number) => {
@@ -1324,6 +1328,23 @@
 				setCustomModal({
 					visiable: true,
 					content: message,
+					showSlot: true,
+					// 有些报错提示需要解锁码解锁
+					success: () => {
+						return true
+
+						// if (unlockCode.value == "123") {
+						// 	unlockCode.value == null
+						// 	return true
+						// } else {
+						// 	return false
+						// }
+					},
+					cancel: () => {
+						return true
+
+						// return false
+					}
 				})
 				return false
 			}

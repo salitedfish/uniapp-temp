@@ -6,6 +6,11 @@
 			<view class="content">
 				{{ customModalStore.content }}
 			</view>
+			<div v-show="customModalStore.showSlot">
+				<slot>
+
+				</slot>
+			</div>
 			<view class="btn-box">
 				<view class="btn" @click="cancel">取消</view>
 				<view class="btn" @click="confirm">确认</view>
@@ -20,17 +25,23 @@
 	import { globalColor } from "@/store/theme"
 
 	const confirm = async () => {
+		let next = true
 		if (customModalStore.success) {
-			await customModalStore.success()
+			next = await customModalStore.success()
 		}
-		customModalStore.visiable = false
+		if (next) {
+			customModalStore.visiable = false
+		}
 	}
 
 	const cancel = async () => {
+		let next = true
 		if (customModalStore.cancel) {
-			await customModalStore.cancel()
+			next = await customModalStore.cancel()
 		}
-		customModalStore.visiable = false
+		if (next) {
+			customModalStore.visiable = false
+		}
 	}
 
 	// 用于判断页面中是否存在自定义modal，如果不存在则使用uni.modal
