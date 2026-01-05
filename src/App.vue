@@ -11,6 +11,11 @@
 
 	onLaunch(async () => {
 		console.log("App Launch")
+		// uni.navigateTo({
+		// 	url: `${routes.board.path}?deviceId=${Platform.deviceId}`
+		// })
+		// return
+
 		// 大屏则进入看板页面
 		if (Platform.isBigScreen()) {
 			uni.navigateTo({
