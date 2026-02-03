@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-	import { ref, computed } from "vue"
+	import { ref, onMounted } from "vue"
 	// 组件
 	import CustomNavBar from "@/components/CustomNavBar.vue"
 	import TraceLinePicker from "@/components/TraceLinePicker.vue"
@@ -9,48 +9,33 @@
 	// 数据
 	import { routes } from "@/store/route"
 	// 接口
-	import { getTraceList } from "@/api/trace"
+	import { getProductJobHistory } from "@/api/trace"
 
 	const relationArry = ["壳体条码", "中间条码", "临时条码", "客供条码"]
 
+	const props = defineProps<{
+	}>()
+
+	onMounted(() => {
+		search()
+	})
+
 	const initForm = () => {
 		return {
-			lineId: "",
-			lineName: "",
-			barcode: "",
+			...props
 		}
 	}
 	const form = ref(initForm())
 
-	const lineSelected = ref<Objs>([])
-	const detailDialogVisible = ref(false)
 	const tableData = ref<Objs>([])
-	const historyData = ref<Objs>([])
-	const detail = ref("")
-	const searchDisabled = computed(() => {
-		return !form.value.lineId || !form.value.barcode
-	})
 	const searching = ref(false)
-
-	const lineSelect = (res : Objs) => {
-		if (res.length > 0) {
-			form.value.lineId = res[0]?.lineId
-			form.value.lineName = res[0]?.lineName
-		} else {
-			form.value.lineId = ""
-			form.value.lineName = ""
-		}
-	}
-
-	const scanSuccess = (res : string) => {
-		form.value.barcode = res
-	}
-
+	const detail = ref("")
+	const detailDialogVisible = ref(false)
 	const search = async () => {
 		try {
 			searching.value = true
-			const res = await getTraceList(form.value)
-			tableData.value = res.data
+			const res = await getProductJobHistory(form.value)
+			tableData.value = res.data.list
 		} catch (err) {
 			console.log(err)
 		} finally {
@@ -67,45 +52,13 @@
 		detail.value = ""
 		detailDialogVisible.value = false
 	}
-
-	const printHandler = (item : Obj) => {
-		console.log("打印")
-		printBoxBarcode(item)
-	}
-	const reworkHandler = (item : Obj) => {
-		console.log("返工")
-		// uni.navigateTo({
-		// 	url: `${routes.TraceInfo.path}?lineDetailId=${item.lineDetailId}&procedureName=${item.procedureName}&procedureKindCode=${item.procedureKindCode}&procedureCode=${item.procedureCode}&lineId=${item.lineId}&traceReworkId=${item.traceReworkId}&submitType=2`,
-		// })
-	}
-	const historyHandler = (item : Obj) => {
-
-		uni.navigateTo({
-			url: `${routes.HistorySearch.path}?`,
-		})
-	}
 </script>
 
 <template>
 	<view class="common-page-container">
-		<CustomNavBar :title="routes.TraceSearch.style.navigationBarTitleText"></CustomNavBar>
+		<CustomNavBar :title="routes.HistorySearch.style.navigationBarTitleText"></CustomNavBar>
 
-		<AutoConnectBlueTooth ref="autoConnectBlueTooth"> </AutoConnectBlueTooth>
-
-		<up-form class="common-form common-form-next" labelPosition="left">
-			<up-form-item class="common-form-item" label="产线名称:" borderBottom labelWidth="90" style="padding: 0" required>
-				<TraceLinePicker v-model:selected="lineSelected" @select="lineSelect" border="none" placeholder="请选择产线" readonly
-					clearable> </TraceLinePicker>
-			</up-form-item>
-
-			<up-form-item class="common-form-item" label="条码号:" borderBottom labelWidth="90" style="padding: 0" required>
-				<up-input-scan v-model="form.barcode" @scanSuccess="scanSuccess" placeholder="请输入条码号" clearable
-					class="input-item" focus></up-input-scan>
-			</up-form-item>
-		</up-form>
-
-		<up-button type="primary" text="确定" class="bottom-button" @click="search" shape="circle"
-			:disabled="searchDisabled"></up-button>
+		<!-- <AutoConnectBlueTooth ref="autoConnectBlueTooth"> </AutoConnectBlueTooth> -->
 
 		<view class="common-table">
 			<uni-table border stripe emptyText="暂无更多数据" :loading="searching">
@@ -115,9 +68,6 @@
 					<uni-th class="nowrap" align="left" width="80rpx">工序编号</uni-th>
 					<uni-th class="nowrap" align="left" width="80rpx">流程名称</uni-th>
 					<uni-th class="nowrap" align="left" width="80rpx">数据信息</uni-th>
-					<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
-					<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
-					<uni-th class="nowrap" align="left" width="80rpx">操作</uni-th>
 				</uni-tr>
 				<!-- 表格数据行 -->
 				<uni-tr v-for="(item, key) in tableData" :key="key">
@@ -135,9 +85,6 @@
 							<span> - {{ item.ldTraceList[0].createName }}</span>
 						</view>
 					</uni-td>
-					<uni-td class="nowrap link" @click="printHandler(item)">打印</uni-td>
-					<uni-td class="nowrap link" @click="reworkHandler(item)">返工</uni-td>
-					<uni-td class="nowrap link" @click="historyHandler(item)">历史记录</uni-td>
 				</uni-tr>
 			</uni-table>
 		</view>

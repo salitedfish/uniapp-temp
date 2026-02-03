@@ -62,249 +62,6 @@
 			},
 			"type": "nav"
 		},
-
-		{
-			"name": "moldLink",
-			"path": "pages/moldLink/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "工模"
-			},
-			"type": "tab",
-			"needLogin": true
-		},
-		// 仓库管理
-		{
-			"name": "purchaseArrival",
-			"path": "pages/purchaseArrival/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "采购到货"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "pADefaultSetPage",
-			"path": "pages/purchaseArrival/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "采购到货-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "purchaseStockroom",
-			"path": "pages/purchaseStockroom/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "采购入库"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "pSDefaultSetPage",
-			"path": "pages/purchaseStockroom/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "采购入库-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "materialOutStockroom",
-			"path": "pages/materialOutStockroom/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "材料出库"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "mOSDefaultSetPage",
-			"path": "pages/materialOutStockroom/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "材料出库-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "productionStockroom",
-			"path": "pages/productionStockroom/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "成品入库"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "prSDefaultSetPage",
-			"path": "pages/productionStockroom/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "成品入库-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "deliveryMaterial",
-			"path": "pages/deliveryMaterial/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "发货备料"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "shelfChange",
-			"path": "pages/shelfChange/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "货位调整"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "sCDefaultSetPage",
-			"path": "pages/shelfChange/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "货位调整-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "stockroomChange",
-			"path": "pages/stockroomChange/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "调拨入库"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "srCDefaultSetPage",
-			"path": "pages/stockroomChange/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "调拨入库-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "codeCheck",
-			"path": "pages/codeCheck/index",
-			"style": {
-				// "navigationStyle": "custom",
-				// "backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "条码盘点"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "otherStockDoc",
-			"path": "pages/otherStockDoc/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "其他入库单"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "oSDDefaultSetPage",
-			"path": "pages/otherStockDoc/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "其他入库单-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "otherOutStockDoc",
-			"path": "pages/otherOutStockDoc/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "其他出库单"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "oOSDDefaultSetPage",
-			"path": "pages/otherOutStockDoc/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "其他出库单-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "refundDoc",
-			"path": "pages/refundDoc/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "退货单"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "rDDefaultSetPage",
-			"path": "pages/refundDoc/defaultSetPage",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "退货单-默认值"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "outSrDocFlieUpload",
-			"path": "pages/outSrDocFlieUpload/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "附件回传"
-			},
-			"type": "nav"
-		},
 		{
 			"name": "board",
 			"path": "pages/board/index",
@@ -316,50 +73,6 @@
 			"type": "nav"
 		},
 		// 追溯管理
-		{
-			"name": "LdOnDuty",
-			"path": "pages/clockIn/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "上岗打卡"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		// {
-		// 	"name": "EquipmentCheck",
-		// 	"path": "pages/checkout/index",
-		// 	"style": {
-		// 		"navigationStyle": "custom",
-		// 		"backgroundColor": "#f8f8f8",
-		// 		"navigationBarTitleText": "点检"
-		// 	},
-		// 	"type": "nav",
-		// 	"needLogin": true
-		// },
-		{
-			"name": "LdWorkPlan",
-			"path": "pages/workPlan/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "工作计划"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "LdAndon",
-			"path": "pages/anDon/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "按灯预警"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
 		{
 			"name": "Trace",
 			"path": "pages/traceManager/index",
@@ -394,34 +107,23 @@
 			"needLogin": true
 		},
 		{
-			"name": "ProductJobList",
-			"path": "pages/productJobList/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "报工记录"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
-			"name": "ProductJobPrinter",
-			"path": "pages/productJobPrinter/index",
-			"style": {
-				"navigationStyle": "custom",
-				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "报工打印"
-			},
-			"type": "nav",
-			"needLogin": true
-		},
-		{
 			"name": "TraceSearch",
 			"path": "pages/traceSearch/index",
 			"style": {
 				"navigationStyle": "custom",
 				"backgroundColor": "#f8f8f8",
 				"navigationBarTitleText": "追溯查询"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "HistorySearch",
+			"path": "pages/historySearch/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "历史记录"
 			},
 			"type": "nav",
 			"needLogin": true

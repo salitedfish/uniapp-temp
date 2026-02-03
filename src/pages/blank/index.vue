@@ -3,7 +3,7 @@
 	import { versionCheck } from "@/util/app"
 	import { logged } from "@/util/common"
 	if (logged()) {
-		versionCheck({})
+		// versionCheck({})
 	}
 	// #endif
 </script>

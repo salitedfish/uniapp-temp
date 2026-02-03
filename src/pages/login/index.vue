@@ -78,8 +78,7 @@
 		<view class="logo_container">
 			<image src="../../static/yinlun_logo.jpg" class="login_logo"></image>
 		</view>
-		<up-text :text="`银申数字化管理系统 v${manifestJson.versionName}`" class="grid-title" bold align="center" size="24"
-			style="text-align: center;"></up-text>
+		<up-text :text="`银和晶科追溯系统`" class="grid-title" bold align="center" size="24" style="text-align: center;"></up-text>
 
 		<up-form labelPosition="left">
 			<up-form-item class="form-item" label="账号:" borderBottom labelWidth="50">

@@ -26,7 +26,7 @@ export default ({ mode }) => defineConfig({
 				// 达虎
 				// target: 'http://192.168.157.12:18097/',
 				// target: 'http://192.168.157.37:18097/',
-				target: 'http://192.168.0.67:8097/',
+				target: 'http://10.62.1.181:8096/',
 				// 晓楠
 				// target: 'http://192.168.0.98:8097/',
 				// 测试环境

@@ -11,6 +11,7 @@
 	import LoadMore from "@/components/LoadMore.vue"
 	import type { UploadMedia, UploadFile } from "@/type/file"
 	import { onReachBottom, onPullDownRefresh } from "@dcloudio/uni-app";
+	import blueTooth from "./blueTooth.vue"
 	// @ts-ignore
 	import TempPrinter from "@/components/TempPrinter.vue"
 	import PrintTemp from "@/components/PrintTemp.vue"
@@ -303,6 +304,7 @@
 				<text>中间选择列表</text>
 			</view>
 		</u-popup>
+		<blueTooth></blueTooth>
 		<!-- 原生dom上传图片 -->
 		<up-input type="file" accept="image/*" multiple="multiple" />
 

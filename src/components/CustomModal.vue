@@ -60,7 +60,7 @@
 		right: 0;
 		top: 0;
 		bottom: 0;
-		z-index: 999;
+		z-index: 99999;
 		background-color: v-bind("globalColor.error");
 		opacity: 0.5
 	}
@@ -73,7 +73,7 @@
 		width: 80vw;
 		min-height: 320rpx;
 		transform: translate(-50%, -60%);
-		z-index: 9999;
+		z-index: 99999;
 		border-radius: 10px;
 		color: #fff;
 		display: flex;

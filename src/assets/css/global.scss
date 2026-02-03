@@ -101,3 +101,10 @@
 		left: 0;
 		background: $bg-color-table;
 	}
+	
+	// 小屏页面隐藏，大屏页面展示
+	@media (max-width: 600px) {
+	  .pc-screen-only {
+	    display: none !important;
+	  }
+	}

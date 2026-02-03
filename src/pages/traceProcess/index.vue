@@ -50,7 +50,7 @@
 
 	const goTraceProcessInfo = (process: Obj) => {
 		uni.navigateTo({
-			url: `${routes.TraceInfo.path}?lineDetailId=${process.lineDetailId}&procedureName=${process.procedureName}`,
+			url: `${routes.TraceInfo.path}?lineDetailId=${process.lineDetailId}&procedureName=${process.procedureName}&procedureKindCode=${process.procedureKindCode}&procedureCode=${process.procedureCode}&lineId=${process.lineId}&submitType=1`,
 		})
 	}
 </script>
@@ -77,6 +77,7 @@
 
 		.grid-item {
 			padding: 35rpx 0;
+			/* height: 260rpx; */
 
 			.grid-icon {
 				width: 120rpx;
@@ -88,7 +89,7 @@
 				width: 100%;
 				padding: 0 10rpx;
 				color: $u-info;
-				font-size: 24rpx;
+				font-size: 22rpx;
 				word-wrap: break-word;
 				text-align: center;
 			}

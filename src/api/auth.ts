@@ -5,8 +5,8 @@ import { Platform } from "@/util/env"
 // 登录
 export const login = async (data : { jobNo : string, password : string }) => {
 	return await uRequest.post<Return<string>>({
-		// url: "token/login",
-		url: "token/login3",
+		url: "token/login",
+		// url: "token/login3",
 		data: {
 			jobNo: data.jobNo,
 			password: data.password,

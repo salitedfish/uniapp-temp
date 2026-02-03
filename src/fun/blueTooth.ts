@@ -75,7 +75,7 @@ export class BlueTooth {
 		uni.onBluetoothDeviceFound((devices) => {
 			console.log(devices)
 			// 很多没有名字的蓝牙不知道啥东西，直接忽略
-			if (devices.devices[0].name) {
+			if (devices.devices[0]?.name) {
 				blueToothStore.devices.push(devices.devices[0])
 				if (cb) {
 					cb()

@@ -1,28 +1,31 @@
 <script lang="ts" setup>
-	import { ref, onMounted, } from "vue"
+	import { ref, onMounted } from "vue"
 	import { globalColor } from "@/store/theme"
 	import { useDeepInclude } from "@ultra-man/noa"
 
 	// 基础数据
-	const props = withDefaults(defineProps<
-		{
-			selected : Objs,
-			selectKey : string,
-			colums : { label : string, key : string }[],
-			tableData ?: Objs,
-			searching ?: boolean,
-			multiple ?: boolean,
-			multipleSelectCondition ?: (target : Obj, list : Objs) => boolean,
-			withIndex ?: boolean,
+	const props = withDefaults(
+		defineProps<{
+			selected : Objs
+			selectKey : string
+			colums : { label : string; key : string }[]
+			tableData ?: Objs
+			searching ?: boolean
+			multiple ?: boolean
+			multipleSelectCondition ?: (target : Obj, list : Objs) => boolean
+			withIndex ?: boolean
 			// 如果有值说明每行还能展示子列表
-			subSearching ?: boolean,
-			subKey ?: string,
-			subColums ?: { label : string, key : string }[],
-		}>(), {
-		tableData: () => []
-	})
+			subSearching ?: boolean
+			subKey ?: string
+			subColums ?: { label : string; key : string }[]
+		}>(),
+		{
+			tableData: () => [],
+			subKey: "",
+		},
+	)
 	const emit = defineEmits<{
-		(event : "select", result : Objs) : void;
+		(event : "select", result : Objs) : void
 		(event : "update:selected", selected : Objs) : void
 		(event : "searchList") : void
 		(event : "singleClick", result : Obj) : void
@@ -53,7 +56,7 @@
 	// 获取在选择列表中的index
 	const getSelectedIndex = (item : Obj) => {
 		return useDeepInclude(selectItems.value, {
-			condition: i => i[props.selectKey] === item[props.selectKey]
+			condition: (i) => i[props.selectKey] === item[props.selectKey],
 		})
 	}
 	// 多选中触发
@@ -126,43 +129,45 @@
 			<!-- 表头 -->
 			<uni-tr>
 				<uni-th class="nowrap primary" align="left" width="50rpx" v-if="props.multiple">
-					<span style="margin-right: 10px" @click="allSelect">全选</span>
-					<span @click="clearSelect">清空</span>
+					<view style="display: flex; justify-content: space-around; width: 100%">
+						<span @click="allSelect">全选</span>
+						<span @click="clearSelect">清空</span>
+					</view>
+
 				</uni-th>
 				<uni-th class="nowrap" v-if="subKey">详情</uni-th>
 				<uni-th class="nowrap" align="left" width="50rpx" v-if="withIndex">序号</uni-th>
-				<uni-th class="nowrap" align="left" width="100rpx" v-for="item, key in colums"
-					:key="key">{{item.label}}</uni-th>
+				<uni-th class="nowrap" align="left" width="100rpx" v-for="(item, key) in colums"
+					:key="key">{{ item.label }}</uni-th>
 			</uni-tr>
-			<uni-tr v-for="item,key in tableData" :key="key" @click="singleConfirm(item)"
-				:class="{selected: !multiple && (singleSelectKey === item[selectKey])}">
-				<uni-td class="nowrap" v-if="props.multiple" style="display: flex; justify-content: center;">
+			<uni-tr v-for="(item, key) in tableData" :key="key" @click="singleConfirm(item)"
+				:class="{ selected: !multiple && singleSelectKey === item[selectKey] }">
+				<uni-td class="nowrap" v-if="props.multiple">
 					<uni-icons custom-prefix="custom-icon" type="icon-xuanze" size="18" :color="globalColor.primary"
-						@click="select(item, false)" v-if="getSelectedIndex(item) !== false"></uni-icons>
+						@click="select(item, false)" v-if="getSelectedIndex(item) !== false"
+						style="margin: 0 auto; display: block;"></uni-icons>
 					<uni-icons custom-prefix="custom-icon" type="icon-mei-xuanze" size="18" :color="globalColor.default"
-						@click="select(item, true)" v-else></uni-icons>
+						@click="select(item, true)" v-else style="margin: 0 auto; display: block;"></uni-icons>
 				</uni-td>
 				<uni-td class="nowrap primary" v-if="subKey" @click.stop="showSubList(item)">展开</uni-td>
 				<uni-td class="nowrap" v-if="withIndex">{{ key + 1 }}</uni-td>
-				<uni-td class="nowrap" v-for="i, k in colums" :key="k">{{ item[i.key]}}</uni-td>
+				<uni-td class="nowrap" v-for="(i, k) in colums" :key="k">{{ item[i.key] }}</uni-td>
 			</uni-tr>
 		</uni-table>
 
 		<u-popup :show="showPopup" @close="close" mode="bottom" style="">
-			<view style="padding-top: 10px; padding-bottom: 10px;" class="common-table common-page-container popup-content">
-				<view class="common-section-title">
-					详情
-				</view>
-				<view style="height: 50vh; overflow-y: scroll;">
+			<view style="padding-top: 10px; padding-bottom: 10px" class="common-table common-page-container popup-content">
+				<view class="common-section-title"> 详情 </view>
+				<view style="height: 50vh; overflow-y: scroll">
 					<uni-table ref="table" border stripe emptyText="暂无更多数据" :loading="subSearching">
 						<uni-tr>
 							<uni-th class="nowrap" align="left" width="50rpx" v-if="withIndex">序号</uni-th>
-							<uni-th class="nowrap" align="left" width="100rpx" v-for="item, key in subColums"
-								:key="key">{{item.label}}</uni-th>
+							<uni-th class="nowrap" align="left" width="100rpx" v-for="(item, key) in subColums"
+								:key="key">{{ item.label }}</uni-th>
 						</uni-tr>
-						<uni-tr v-for="item,key in showSubListItem[subKey]" :key="key">
-							<uni-td class="nowrap" v-if="withIndex">{{ key + 1 }}</uni-td>
-							<uni-td class="nowrap" v-for="i, k in subColums" :key="k">{{ item[i.key]}}</uni-td>
+						<uni-tr v-for="(item, key) in showSubListItem[subKey]" :key="key">
+							<uni-td class="nowrap" v-if="withIndex">{{ Number(key) + 1 }}</uni-td>
+							<uni-td class="nowrap" v-for="(i, k) in subColums" :key="k">{{ item[i.key] }}</uni-td>
 						</uni-tr>
 					</uni-table>
 				</view>

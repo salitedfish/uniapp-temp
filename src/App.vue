@@ -9,6 +9,7 @@
 	import { initApp } from "@/util/initApp"
 	import { routes } from "@/store/route"
 
+
 	onLaunch(async () => {
 		console.log("App Launch")
 		// uni.navigateTo({
@@ -17,9 +18,10 @@
 		// return
 
 		// 大屏则进入看板页面
-		if (Platform.isBigScreen()) {
+		// if (Platform.isBigScreen()) {
+		if (false) {
 			uni.navigateTo({
-				url: `${routes.board.path}?deviceId=${Platform.deviceId}`
+				url: `${routes.board.path}?deviceId=${Platform.deviceId}`,
 			})
 		}
 		// 小屏则正常初始化
@@ -41,12 +43,10 @@
 				initApp()
 			}
 		}
-
 	})
 	onShow(() => {
 		console.log("App Show")
 		updateAllDate()
-
 	})
 	onHide(() => {
 		console.log("App Hide")

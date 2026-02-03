@@ -2,7 +2,7 @@
 	<lsj-upload ref="lsjUpload" childId="upload1" :width="width" :height="height" :option="option" :size="size"
 		:formats="formats" :debug="debug" :instantly="instantly" @uploadEnd="onuploadEnd" @progress="onprogre"
 		@change="change" :count="count">
-		<uni-icons custom-prefix="custom-icon" type="icon-folder" size="18" :color="globalColor.primary"></uni-icons>
+		<uni-icons custom-prefix="custom-icon" type="icon-folder" size="20" :color="globalColor.primary"></uni-icons>
 		<!-- <image class="icon" src="../assets/fileSelect.svg" alt="" /> -->
 	</lsj-upload>
 

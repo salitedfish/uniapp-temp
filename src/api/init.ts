@@ -49,6 +49,11 @@ export class URequest {
 		// config.withCredentials = true          
 		config.url = this.baseConfig.baseUrl + config.url
 
+		config.params = {
+			...config.params,
+			t: Date.now()
+		}
+
 		if (config.params) {
 			config.url = useGenParamsUrl(config.url, config.params)
 		}
