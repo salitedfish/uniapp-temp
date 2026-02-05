@@ -25,10 +25,10 @@
 
 	const types = ref([{
 		name: "打印",
-		value: 0
+		value: 1
 	}, {
 		name: "不打印",
-		value: 1
+		value: 0
 	}])
 
 	const updateModelValue = (value: number) => {

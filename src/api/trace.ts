@@ -144,7 +144,7 @@ export const getProductSubmitDataApi = async (data : Obj) => {
 
 export const getBoxInfoApi = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({
-		url: "trace/",
+		url: "trackBack/obtainPackagingData",
 		data,
 	})
 }

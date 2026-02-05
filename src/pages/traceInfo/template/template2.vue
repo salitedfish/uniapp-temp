@@ -136,7 +136,7 @@
 	const productSelected = ref<Objs>([])
 	const traceTableRef = ref<Obj | null>(null)
 	const failureModSelected = ref<Objs>([])
-	const boxInfo = ref<Obj>({
+	const boxInfo = ref({
 		totalCount: 0,
 		leftCount: 0,
 	})
@@ -248,7 +248,7 @@
 		// 扫完码之后要进行特殊处理
 		// 如果是第2个条码，则获取装箱信息
 		if (index == 1) {
-			getBoxInfo(res)
+			getBoxInfo()
 		}
 		// ...
 		if (item.barCode) {
@@ -263,15 +263,22 @@
 			}
 			// 如果都填完了，则直接提交
 			// submit()
+			uni.hideKeyboard()
 		}
 	}
 
 	// 获取箱码信息
-	const getBoxInfo = async (code : string) => {
+	const getBoxInfo = async () => {
 		const res = await getBoxInfoApi({
-			code,
+			barcodeList: codeRules.value
 		})
-		boxInfo.value = res.data
+		if (res && res.data) {
+			boxInfo.value.boxInfo = res.data.boxInfo
+			boxInfo.value.leftCount = res.data.leftCount
+		} else {
+			boxInfo.value.boxInfo = 0
+			boxInfo.value.leftCount = 0
+		}
 	}
 
 	// 提交前前端校验
@@ -361,7 +368,7 @@
 			await getTableList()
 
 			// 获取装箱信息
-			await getBoxInfo(params.barcodeList[1]?.barCode)
+			await getBoxInfo()
 
 			// 重置数据
 			await reset()

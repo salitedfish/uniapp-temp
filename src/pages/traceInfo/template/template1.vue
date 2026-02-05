@@ -1,5 +1,5 @@
 <template>
-	<AutoConnectBlueTooth ref="autoConnectBlueTooth"> </AutoConnectBlueTooth>
+	<AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="form.isPrint"> </AutoConnectBlueTooth>
 
 	<!-- 基础数据表单 -->
 	<up-form class="common-form" :class="{ 'common-form-next': true }" labelPosition="left">
@@ -28,7 +28,7 @@
 	</up-form>
 
 	<!-- 设备选择 -->
-	<up-form class="common-form common-form-next" labelPosition="left" v-show="equipments && equipments.length">
+	<up-form class="common-form common-form-next" labelPosition="left" v-if="equipments && equipments.length">
 		<up-form-item class="common-form-item" label="设备编码:" borderBottom labelWidth="80" style="padding: 0">
 			<up-input v-model="form.equipmentCode" placeholder="请选择设备" class="input-item" readonly border="none">
 				<template #suffix>
@@ -55,7 +55,7 @@
 
 	<up-form class="common-form common-form-next" labelPosition="left">
 		<up-form-item class="common-form-item" label="是否合格:" borderBottom labelWidth="80" style="padding: 0" required>
-			<u-radio-group placement="row" class="radio-group" v-model="form.result">
+			<u-radio-group placement="row" class="radio-group" v-model="form.result" @change="failureModSelected = []">
 				<u-radio :name="'1'" label="是"></u-radio>
 				<u-radio :name="'0'" label="否" style="margin-left: 10px"></u-radio>
 			</u-radio-group>
@@ -202,6 +202,15 @@
 	const autoConnectBlueTooth = ref<Obj | undefined>()
 	const getEquipmentDataTimer = ref<number | undefined>()
 
+	// 监听
+	watch(() => form.value.result, () => {
+		if (form.value.result == 0) {
+			printTypeCheck.value = 1
+		} else {
+			printTypeCheck.value = 0
+		}
+	})
+
 	// 获取工序详情
 	const getProcessDetail = async () => {
 		try {
@@ -302,7 +311,6 @@
 		console.log(`构建完条码规则：`, codeRules.value)
 		codeRules.value = []
 	}
-
 	// 条码自配扫码成功
 	const codeRuleScanSuccess = async (res : string, item : Obj, index : number) => {
 		item.barCode = res
@@ -321,6 +329,7 @@
 			}
 			// 如果都填完了，则直接提交
 			// submit()
+			uni.hideKeyboard()
 		}
 	}
 
@@ -331,12 +340,14 @@
 		})
 		if (res.data && res.data.length > 0) {
 			equipments.value[0] = res.data
-			const equipment = JSON.parse(uni.getStorageSync("traceEquipment") || "{}")
+			const equipment = JSON.parse(uni.getStorageSync(form.value.lineDetailId + "traceEquipment") || "{}")
 			if (equipment && equipment.equipmentCode) {
 				form.value.equipmentCode = equipment.equipmentCode
+				form.value.equipmentMac = equipment.equipmentMac
 				form.value.equipmentName = equipment.equipmentName
 			} else if (equipments.value[0].length > 0) {
 				form.value.equipmentCode = equipments.value[0][0]?.equipmentCode
+				form.value.equipmentMac = equipments.value[0][0]?.equipmentMac
 				form.value.equipmentName = equipments.value[0][0]?.equipmentName
 			}
 
@@ -362,11 +373,14 @@
 		for (const item of equipments.value[0] || []) {
 			if (item.equipmentCode === code) {
 				form.value.equipmentCode = item.equipmentCode
+				form.value.equipmentMac = item.equipmentMac
 				form.value.equipmentName = item.equipmentName
 				uni.setStorageSync(
+					form.value.lineDetailId +
 					"traceEquipment",
 					JSON.stringify({
 						equipmentCode: form.value.equipmentCode,
+						equipmentMac: form.value.equipmentMac,
 						equipmentName: form.value.equipmentName,
 					}),
 				)
@@ -457,6 +471,13 @@
 				})
 				return false
 			}
+		}
+		if (form.value.result == 0 && !form.value.failureModeIds) {
+			setCustomModal({
+				visiable: true,
+				content: "请选择失效模式",
+			})
+			return false
 		}
 		return true
 	}
