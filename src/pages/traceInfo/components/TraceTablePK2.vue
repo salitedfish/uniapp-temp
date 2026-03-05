@@ -32,7 +32,7 @@
 			<!-- 表头行 -->
 			<uni-tr>
 				<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
-				<uni-th class="nowrap" align="left" width="100rpx">产品二维码</uni-th>
+				<uni-th class="nowrap" align="left" width="100rpx">二维码</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">包装箱二维码</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">时间</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">操作人</uni-th>

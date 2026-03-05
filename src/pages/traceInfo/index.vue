@@ -23,7 +23,7 @@
 	import template1 from "./template/template1.vue"
 	import template2 from "./template/template2.vue"
 
-	// 工序码 -> 模版组件映射，新增工序需在此扩展
+	// 工序码 -> 模版组件映射，新增模版需在此扩展
 	const PROCEDURE_TEMPLATES : Record<string, Obj> = {
 		[P.银和晶科条码自配]: markRaw(template1),
 		[P.银和晶科打包]: markRaw(template2),

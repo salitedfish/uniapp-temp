@@ -13,6 +13,7 @@ export class BlueTooth {
 	public openBluetoothAdapter() {
 		uni.openBluetoothAdapter({
 			complete: (e) => {
+				console.log("蓝牙开启结果", e)
 				if (!e.code) {
 					console.log("蓝牙初始化完成")
 					blueToothStore.openBlueTooth = true
@@ -32,7 +33,7 @@ export class BlueTooth {
 		})
 	}
 	// 开始搜寻附近的蓝牙外围设备,获取设备列表
-	public discoveryPrinter(cb ?: Function) {
+	public async discoveryPrinter(cb ?: Function) {
 		// 搜之前先关闭之前的连接，否则搜不到原来的设备
 		if (blueToothStore.connected) {
 			this.closeConnect()
@@ -51,8 +52,13 @@ export class BlueTooth {
 		blueToothStore.deviceId = ""
 		blueToothStore.devices = []
 		blueToothStore.searching = true
+
+		const res = uni.getSystemSetting()
+		console.log("定位服务", res.locationEnabled)
+
 		uni.startBluetoothDevicesDiscovery({
 			complete: (e) => {
+				console.log("蓝牙搜索状态", e)
 				if (
 					e.errMsg == "startBluetoothDevicesDiscovery:ok" &&
 					!blueToothStore.startFound
@@ -62,6 +68,8 @@ export class BlueTooth {
 				}
 			},
 		})
+
+
 	}
 	// 停止搜寻附近的蓝牙外围设备
 	public stopDiscoveryPrinter() {
@@ -71,9 +79,10 @@ export class BlueTooth {
 	}
 	// 发现蓝牙设备就推入列表
 	public printerFound(cb ?: Function) {
+		console.log("开始搜索蓝牙")
 		// ArrayBuffer转16进度字符串示例
 		uni.onBluetoothDeviceFound((devices) => {
-			console.log(devices)
+			console.log("蓝牙搜索到", devices)
 			// 很多没有名字的蓝牙不知道啥东西，直接忽略
 			if (devices.devices[0]?.name) {
 				blueToothStore.devices.push(devices.devices[0])

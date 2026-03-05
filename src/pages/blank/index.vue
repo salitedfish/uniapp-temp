@@ -1,15 +1,13 @@
 <script lang="ts" setup>
-	// #ifdef APP-PLUS
-	import { versionCheck } from "@/util/app"
-	import { logged } from "@/util/common"
-	if (logged()) {
-		// versionCheck({})
-	}
-	// #endif
+// #ifdef APP-PLUS
+import { versionCheck } from "@/util/app"
+import { logged } from "@/util/common"
+if (logged()) {
+  versionCheck({})
+}
+// #endif
 </script>
 
-<template>
-</template>
+<template></template>
 
-<style>
-</style>
+<style></style>

@@ -40,7 +40,8 @@
 			</up-input>
 		</up-form-item>
 		<up-form-item class="common-form-item" label="设备数据:" borderBottom labelWidth="80" style="padding: 0">
-			<up-textarea v-model="form.equipmentContent" placeholder="自动带出" class="input-item" disabled></up-textarea>
+			<up-button type="primary" class="btn" @click="showEquipmentDetail">查看详情</up-button>
+			<!-- <up-textarea v-model="form.equipmentContent" placeholder="自动带出" class="input-item" disabled></up-textarea> -->
 		</up-form-item>
 		<up-form-item class="common-form-item" label="结果:" borderBottom labelWidth="80" style="padding: 0">
 			<up-input :modelValue="ResultMap[form.equipmentResult]" placeholder="自动带出" readonly class="input-item"
@@ -55,7 +56,8 @@
 
 	<up-form class="common-form common-form-next" labelPosition="left">
 		<up-form-item class="common-form-item" label="是否合格:" borderBottom labelWidth="80" style="padding: 0" required>
-			<u-radio-group placement="row" class="radio-group" v-model="form.result" @change="failureModSelected = []">
+			<u-radio-group placement="row" class="radio-group" v-model="form.result"
+				@change="failureModSelected = []; manSelectResult = true; failuerModSelect()">
 				<u-radio :name="'1'" label="是"></u-radio>
 				<u-radio :name="'0'" label="否" style="margin-left: 10px"></u-radio>
 			</u-radio-group>
@@ -66,6 +68,15 @@
 			<TraceFailureModPicker v-model:selected="failureModSelected" @select="failuerModSelect"
 				:processId="form.processId" :orgIds="form.orgIds" readonly border="none" placeholder="请选择失效模式" :multiple="true">
 			</TraceFailureModPicker>
+		</up-form-item>
+	</up-form>
+
+	<up-form class="common-form common-form-next" labelPosition="left">
+		<up-form-item class="common-form-item" label="是否返工:" borderBottom labelWidth="80" style="padding: 0" required>
+			<u-radio-group placement="row" class="radio-group" v-model="form.rework">
+				<u-radio :name="'1'" label="是"></u-radio>
+				<u-radio :name="'0'" label="否" style="margin-left: 10px"></u-radio>
+			</u-radio-group>
 		</up-form-item>
 	</up-form>
 
@@ -81,6 +92,13 @@
 
 	<!-- 表格 -->
 	<TraceTablePK1 ref="traceTableRef" :form="form" style="margin-top: 10px"> </TraceTablePK1>
+
+	<!-- 设备数据详情 -->
+	<up-popup :show="detailDialogVisible" mode="center" @close="hideDetail" :round="10">
+		<view style="padding: 10px 15px; width: 90vw; min-height: 20vh; max-height: 80vh; overflow-y: scroll;">
+			<tableDetail :detailData="form"></tableDetail>
+		</view>
+	</up-popup>
 </template>
 
 <script lang="ts" setup>
@@ -95,6 +113,7 @@
 	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
 	import { setCustomModal } from "@/store/customModal"
 	import CheckRecord from "../components/CheckRecord.vue"
+	import tableDetail from "@/pages/traceInfo/components/tableDetail.vue"
 	// 数据
 	import { globalColor } from "@/store/theme"
 	// 工具
@@ -178,12 +197,12 @@
 			// 模版
 			procedureCode: "" as P,
 			procedureKindCode: 0 as PK,
-			// 是否显示返工按钮
-			reworked: 0,
 			// 是否打印
 			printed: 0,
 			codeRules: [] as Objs,
 			...obj,
+			// 是否返工
+			rework: "0",
 			// submitType: props.submitType,
 			// traceReworkId: props.traceReworkId
 		}
@@ -201,6 +220,8 @@
 	const showEquipmentPicker = ref(false)
 	const autoConnectBlueTooth = ref<Obj | undefined>()
 	const getEquipmentDataTimer = ref<number | undefined>()
+	const detailDialogVisible = ref(false)
+	const manSelectResult = ref(false)
 
 	// 监听
 	watch(() => form.value.result, () => {
@@ -354,7 +375,7 @@
 			// // 获取设备数据
 			getEquipmentDataTimer.value = setInterval(() => {
 				getEquipmentData()
-			}, 3000)
+			}, 2000)
 		}
 	}
 	// 打开设备选择项
@@ -366,7 +387,6 @@
 		// 选择设备后重置设备数据和结果
 		form.value.equipmentContent = ""
 		form.value.equipmentResult = "-1"
-		// 扫的码有可能是url地址，要通过地址来获取设备编码
 		let code = res.value[0]?.equipmentCode
 		// 通过设备编码来获取设备名称
 		showEquipmentPicker.value = false
@@ -393,19 +413,31 @@
 	})
 	// 获取设备数据
 	const getEquipmentData = async () => {
-		if (form.value.equipmentCode) {
+		if (form.value.equipmentCode && form.value.barcode1) {
 			const res = await getEquipmentDataApi({
 				...form.value
 			})
 			if (res.data) {
-				form.value.equipmentContent = res.data.equipmentContent
-				form.value.equipmentResult = res.data.equipmentResult
+				form.value.equipmentContent = res.data
+				form.value.equipmentResult = res.data.result
+				if (!manSelectResult.value) {
+					form.value.result = res.data.result.toString()
+				}
+				console.log("设备数据：", form.value.equipmentContent)
 				return
 			}
 		}
 
 		form.value.equipmentContent = ""
 		form.value.equipmentResult = ""
+	}
+	// 展示设备数据
+	const showEquipmentDetail = async () => {
+		detailDialogVisible.value = true
+	}
+	// 隐藏设备数据
+	const hideDetail = () => {
+		detailDialogVisible.value = false
 	}
 
 	// 检验单
@@ -472,6 +504,13 @@
 				return false
 			}
 		}
+		// if (!!form.value.equipmentCode && !form.value.equipmentContent) {
+		// 	setCustomModal({
+		// 		visiable: true,
+		// 		content: "没有获取到设备数据",
+		// 	})
+		// 	return false
+		// }
 		if (form.value.result == 0 && !form.value.failureModeIds) {
 			setCustomModal({
 				visiable: true,
@@ -547,7 +586,7 @@
 			})
 			// 如果打印，则打印条码
 			if (form.value.isPrint == 1 && printTypeCheck.value === 1) {
-				printBoxBarcode({})
+				printBoxBarcode(form.value)
 			}
 			// 获取提交记录
 			await getTableList()
@@ -570,6 +609,8 @@
 		// 触发重新选择产品
 		productSelect()
 		failureModSelected.value = []
+		failuerModSelect()
+		manSelectResult.value = false
 	})
 </script>
 

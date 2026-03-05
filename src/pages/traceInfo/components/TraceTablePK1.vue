@@ -4,7 +4,8 @@
 	import { useTable } from "@/hook/usePageTable"
 	// 接口
 	import { getTracePageList } from "@/api/trace"
-	import { ResultMap } from "../enum"
+	import { ResultMap } from "@/pages/traceInfo/enum"
+	import tableDetail from "@/pages/traceInfo/components/tableDetail.vue"
 
 	const props = defineProps<{
 		form : Obj
@@ -21,15 +22,17 @@
 		searchList()
 	}
 
-	const detail = ref("")
+	const detailData = ref<Obj>({})
 	const detailDialogVisible = ref(false)
-	const showDetail = (detailString : string) => {
-		detail.value = detailString || ""
+	const showDetail = (data : Obj) => {
+		if (data.equipmentContent && typeof data.equipmentContent == "string") {
+			data.equipmentContent = JSON.parse(data.equipmentContent)
+		}
+		detailData.value = data
 		detailDialogVisible.value = true
-		console.log(detail)
 	}
 	const hideDetail = () => {
-		detail.value = ""
+		detailData.value = {}
 		detailDialogVisible.value = false
 	}
 
@@ -46,9 +49,9 @@
 			<!-- 表头行 -->
 			<uni-tr>
 				<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
-				<uni-th class="nowrap" align="left" width="100rpx">产品二维码</uni-th>
+				<uni-th class="nowrap" align="left" width="100rpx">二维码</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">设备编码</uni-th>
-				<uni-th class="nowrap" align="left" width="100rpx">设备数据</uni-th>
+				<uni-th class="nowrap" align="left" width="100rpx">数据信息</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">结果</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">时间</uni-th>
 				<uni-th class="nowrap" align="left" width="100rpx">操作人</uni-th>
@@ -59,7 +62,7 @@
 				<uni-td class="nowrap">{{ item.barcode1 }}</uni-td>
 				<uni-td class="nowrap">{{ item.equipmentCode }}</uni-td>
 				<uni-td class="nowrap">
-					<view style="text-align: left" class="link" @click="showDetail(item.equipmentContent)"> 查看详情 </view>
+					<view style="text-align: left" class="link" @click="showDetail(item)"> 查看详情 </view>
 				</uni-td>
 				<uni-td class="nowrap">{{ ResultMap[item.result] }}</uni-td>
 				<uni-td class="nowrap">{{ item.createTime }}</uni-td>
@@ -71,8 +74,8 @@
 			:pageSize="searchParam.pageSize" @change="pageSearch"></uni-pagination>
 
 		<up-popup :show="detailDialogVisible" mode="center" @close="hideDetail" :round="10">
-			<view style="padding: 10px 15px; width: 85vw; min-height: 20vh">
-				<view v-for="(item, key) in detail.split(';')" :key="key">{{ item }}</view>
+			<view style="padding: 10px 15px; width: 90vw; min-height: 20vh; max-height: 80vh; overflow-y: scroll;">
+				<tableDetail :detailData="detailData"></tableDetail>
 			</view>
 		</up-popup>
 	</view>

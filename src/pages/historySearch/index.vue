@@ -6,14 +6,19 @@
 	import UpInputScan from "@/components/UpInputScan.vue"
 	import AutoConnectBlueTooth from "@/components/AutoConnectBlueTooth.vue"
 	import { printBoxBarcode } from "@/util/printUtils"
+	import tableDetail from "@/pages/traceInfo/components/tableDetail.vue"
 	// 数据
 	import { routes } from "@/store/route"
+	import { ResultMap } from "@/pages/traceInfo/enum"
 	// 接口
 	import { getProductJobHistory } from "@/api/trace"
 
 	const relationArry = ["壳体条码", "中间条码", "临时条码", "客供条码"]
 
 	const props = defineProps<{
+		barcode : string,
+		lineId : string,
+		processId : string
 	}>()
 
 	onMounted(() => {
@@ -29,13 +34,13 @@
 
 	const tableData = ref<Objs>([])
 	const searching = ref(false)
-	const detail = ref("")
+	const detailData = ref<Obj>({})
 	const detailDialogVisible = ref(false)
 	const search = async () => {
 		try {
 			searching.value = true
 			const res = await getProductJobHistory(form.value)
-			tableData.value = res.data.list
+			tableData.value = res.data
 		} catch (err) {
 			console.log(err)
 		} finally {
@@ -43,13 +48,15 @@
 		}
 	}
 
-	const showDetail = (detailString : string) => {
-		detail.value = detailString || ""
+	const showDetail = (data : Obj) => {
+		if (data.equipmentContent && typeof data.equipmentContent == "string") {
+			data.equipmentContent = JSON.parse(data.equipmentContent)
+		}
+		detailData.value = data
 		detailDialogVisible.value = true
-		console.log(detail)
 	}
 	const hideDetail = () => {
-		detail.value = ""
+		detailData.value = {}
 		detailDialogVisible.value = false
 	}
 </script>
@@ -65,33 +72,35 @@
 				<!-- 表头行 -->
 				<uni-tr>
 					<uni-th class="nowrap" align="left" width="60rpx">序号</uni-th>
-					<uni-th class="nowrap" align="left" width="80rpx">工序编号</uni-th>
-					<uni-th class="nowrap" align="left" width="80rpx">流程名称</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">二维码</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">工序名称</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">设备编码</uni-th>
 					<uni-th class="nowrap" align="left" width="80rpx">数据信息</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">结果</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">失效模式</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">时间</uni-th>
+					<uni-th class="nowrap" align="left" width="80rpx">操作人</uni-th>
 				</uni-tr>
 				<!-- 表格数据行 -->
 				<uni-tr v-for="(item, key) in tableData" :key="key">
 					<uni-td class="nowrap">{{ key + 1 }}</uni-td>
-					<uni-td class="nowrap">{{ item.processCode }}</uni-td>
+					<uni-td class="nowrap">{{ item.barcode1 }}</uni-td>
 					<uni-td class="nowrap">{{ item.procedureName }}</uni-td>
+					<uni-td class="nowrap">{{ item.equipmentCode }}</uni-td>
 					<uni-td class="nowrap">
-						<view v-if="item.isFile == 0">
-							<view style="text-align: left" class="link" @click="showDetail(item.contentList[0])"> 查看详情 </view>
-						</view>
-						<view v-if="item.isFile == 1 && item.ldTraceList.length > 0" style="text-align: left">
-							<span>{{ relationArry[item.ldTraceList[0].relation1 - 1] }}：</span>
-							<span>{{ item.ldTraceList[0].barcode1 }}</span>
-							<span> ({{ item.ldTraceList[0].createTime }})</span>
-							<span> - {{ item.ldTraceList[0].createName }}</span>
-						</view>
+						<view style="text-align: left" class="link" @click="showDetail(item)"> 查看详情 </view>
 					</uni-td>
+					<uni-td class="nowrap">{{ ResultMap[item.result] }}</uni-td>
+					<uni-td class="nowrap">{{ item.failureModeName }}</uni-td>
+					<uni-td class="nowrap">{{ item.createTime }}</uni-td>
+					<uni-td class="nowrap">{{ item.createName }}</uni-td>
 				</uni-tr>
 			</uni-table>
 		</view>
 
 		<up-popup :show="detailDialogVisible" mode="center" @close="hideDetail" :round="10">
-			<view style="padding: 10px 15px; width: 85vw; min-height: 20vh">
-				<view v-for="(item, key) in detail.split(';')" :key="key">{{ item }}</view>
+			<view style="padding: 10px 15px; width: 90vw; min-height: 20vh; max-height: 80vh; overflow-y: scroll;">
+				<tableDetail :detailData="detailData"></tableDetail>
 			</view>
 		</up-popup>
 	</view>

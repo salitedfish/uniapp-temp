@@ -40,7 +40,14 @@
 				personId: userInfo.value.orgId,
 				lineId: props.lineId
 			})
-			tableData.value = res.data.list
+			if (res.data.list) {
+				tableData.value = res.data.list.filter((i: Obj) => {
+					return i.enabled == 1
+				})
+			} else {
+				tableData.value = []
+			}
+
 		} catch (err) {
 			console.log(err)
 		} finally {

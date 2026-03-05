@@ -24,6 +24,15 @@
 		</up-form-item>
 	</up-form>
 
+	<up-form class="common-form common-form-next" labelPosition="left">
+		<up-form-item class="common-form-item" label="是否返工:" borderBottom labelWidth="80" style="padding: 0" required>
+			<u-radio-group placement="row" class="radio-group" v-model="form.rework">
+				<u-radio :name="'1'" label="是"></u-radio>
+				<u-radio :name="'0'" label="否" style="margin-left: 10px"></u-radio>
+			</u-radio-group>
+		</up-form-item>
+	</up-form>
+
 	<!-- 按钮操作 -->
 	<view class="btn-box">
 		<up-button type="primary" class="btn" shape="circle" @click="submit">提 交</up-button>
@@ -31,7 +40,7 @@
 	</view>
 
 	<!-- 表格 -->
-	<view class="tip">装箱提示：该箱码已装箱{{ boxInfo.totalCount }}件,还可装箱数量{{ boxInfo.leftCount }}件</view>
+	<view class="tip">装箱提示：该箱码已装箱{{ boxInfo.usageQuantity }}件,还可装箱数量{{ boxInfo.remainingQuantity }}件</view>
 	<TraceTablePK2 ref="traceTableRef" :form="form" style="margin-top: 10px"> </TraceTablePK2>
 </template>
 
@@ -119,12 +128,13 @@
 			// 模版
 			procedureCode: "" as P,
 			procedureKindCode: 0 as PK,
-			// 是否显示返工按钮
-			reworked: 0,
+
 			// 是否打印
 			printed: 0,
 			codeRules: [] as Objs,
 			...obj,
+			// 是否返工
+			rework: "0",
 			// submitType: props.submitType,
 			// traceReworkId: props.traceReworkId
 		}
@@ -135,10 +145,9 @@
 	const codeRules = ref<Objs>([])
 	const productSelected = ref<Objs>([])
 	const traceTableRef = ref<Obj | null>(null)
-	const failureModSelected = ref<Objs>([])
 	const boxInfo = ref({
-		totalCount: 0,
-		leftCount: 0,
+		usageQuantity: 0,
+		remainingQuantity: 0,
 	})
 
 	// 获取工序详情
@@ -270,14 +279,15 @@
 	// 获取箱码信息
 	const getBoxInfo = async () => {
 		const res = await getBoxInfoApi({
-			barcodeList: codeRules.value
+			barcodeList: codeRules.value,
+			barCode: form.value.barcode2
 		})
 		if (res && res.data) {
-			boxInfo.value.boxInfo = res.data.boxInfo
-			boxInfo.value.leftCount = res.data.leftCount
+			boxInfo.value.usageQuantity = Number(res.data.usageQuantity)
+			boxInfo.value.remainingQuantity = Number(res.data.remainingQuantity)
 		} else {
-			boxInfo.value.boxInfo = 0
-			boxInfo.value.leftCount = 0
+			boxInfo.value.usageQuantity = 0
+			boxInfo.value.remainingQuantity = 0
 		}
 	}
 
@@ -292,11 +302,12 @@
 				return false
 			}
 		}
-		if (boxInfo.value.leftCount <= 0) {
+		if (boxInfo.value.remainingQuantity <= 0) {
 			setCustomModal({
 				visiable: true,
 				content: "该箱码无可装箱数量",
 			})
+			return false
 		}
 		return true
 	}
@@ -347,8 +358,8 @@
 	const submit = useThrottle(async () => {
 		const ret = preSubmit(form.value.procedureCode)
 		if (!ret) return
-		const ree = await codeCheckInfoHandler()
-		if (!ree) return
+		// const ree = await codeCheckInfoHandler()
+		// if (!ree) return
 		try {
 			uni.showLoading({
 				mask: true,
@@ -387,7 +398,6 @@
 		})
 		// 触发重新选择产品
 		productSelect()
-		failureModSelected.value = []
 	})
 </script>
 

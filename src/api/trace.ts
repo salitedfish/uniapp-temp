@@ -12,7 +12,7 @@ export const getLineList = async (data : Paging & Obj) => {
 // 追溯查询
 export const getTraceList = async (data : Obj = {}) => {
 	return await uRequest.post<Return<Objs>>({
-		url: "trace/search",
+		url: "traceBack/search",
 		data,
 	})
 }
@@ -94,9 +94,9 @@ export const productJobSubmit = async (data : Obj) => {
 
 // 获取历史报工记录
 export const getProductJobHistory = async (data : Paging & Obj) => {
-	return await uRequest.post<Return<ReturnList<Obj>>>({
+	return await uRequest.post<Return<Objs>>({
 		// url: "productJob/list",
-		url: "trace/pageList",
+		url: "/trackBack/history",
 		data,
 	})
 }
@@ -145,6 +145,16 @@ export const getProductSubmitDataApi = async (data : Obj) => {
 export const getBoxInfoApi = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({
 		url: "trackBack/obtainPackagingData",
+		data,
+		header: {
+			"Content-Type": "application/json",
+		},
+	})
+}
+
+export const traceRework = async (data : Obj) => {
+	return await uRequest.post<Return<Obj>>({
+		url: "",
 		data,
 	})
 }

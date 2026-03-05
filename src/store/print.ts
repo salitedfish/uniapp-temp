@@ -1,9 +1,9 @@
 import { ref } from "vue"
 
 export const printPage = ref({
-	width: null,
-	height: null,
-	gap: "3",
+	width: 100,
+	height: 60,
+	gap: "2",
 	QRCodeLevel: null,
 	QRCodeLeftOffset: null,
 	QRCodeTopOffset: null,
@@ -14,10 +14,10 @@ export const savePrintPage = () => {
 	uni.setStorageSync("printPage", printPage.value)
 }
 export const initPrintPage = () => {
-	const printPageOrigin = uni.getStorageSync("printPage") as typeof printPage.value
-	if (printPageOrigin) {
-		printPage.value = printPageOrigin
-	}
+	// const printPageOrigin = uni.getStorageSync("printPage") as typeof printPage.value
+	// if (printPageOrigin) {
+	// 	printPage.value = printPageOrigin
+	// }
 }
 
 // 标签模版取值对应的key
