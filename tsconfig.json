@@ -12,11 +12,13 @@
 		"types": [
 			"@dcloudio/types",
 			"@ttou/uview-typings/v3",
-			"@ttou/uview-typings/refs",
-		]
+			"@ttou/uview-typings/refs"
+		],
+		"preserveValueImports": false,
+		"importsNotUsedAsValues": "remove",
+		"verbatimModuleSyntax": true
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/main.uts"],
-
 	"moduleResolution": "node",
 	"ignoreDeprecations": "5.0"
 }
