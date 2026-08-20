@@ -73,14 +73,6 @@ export const getTraceLineDetail = async (data : Obj) => {
 	})
 }
 
-// 获取流程
-export const getProcessDetail = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "trace/findProcess",
-		data
-	})
-}
-
 // 获取产线详情
 export const getLineDetail = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({
@@ -93,14 +85,6 @@ export const getLineDetail = async (data : Obj) => {
 export const getTracePageList = async (data : Paging & Obj) => {
 	return await uRequest.post<Return<ReturnList<Obj>>>({
 		url: "trace/pageList",
-		data
-	})
-}
-
-// 获取气密报工列表
-export const getAirtightnessTracePageList = async (data : Paging & Obj) => {
-	return await uRequest.post<Return<ReturnList<Obj>>>({
-		url: "airtightness/pageList",
 		data
 	})
 }
@@ -137,14 +121,6 @@ export const productJobSubmit = async (data : Obj) => {
 		header: {
 			"Content-Type": "application/json",
 		}
-	})
-}
-
-// 解绑
-export const productJobDel = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "trace/delete",
-		data
 	})
 }
 
@@ -204,14 +180,6 @@ export const findCardByUrl = async (data : Obj) => {
 export const traceResetPlc = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({
 		url: "trace/resetPlc",
-		data
-	})
-}
-
-// 获取终检两个设备的数据
-export const getTwoEquipmentDataApi = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "trace/otherToZj",
 		data
 	})
 }
