@@ -311,8 +311,8 @@ const getCodeRules = (complete?: boolean) => {
 const initWebSocket = () => {
   mqttClient = mqtt.connect(import.meta.env.VITE_BASE_API_URL_WEB_WEBSOCKET, {
     username: "admin",
-    password: "a@123456",
-    clientId: "YinShenMobile_" + Date.now(),
+    password: "admin123",
+    clientId: "client_yin_shen_app_" + Date.now(),
   })
   mqttClient.on("message", (topic: Obj, message: string) => {
     const servies = JSON.parse(message.toString()).body.things
@@ -332,7 +332,7 @@ const initWebSocket = () => {
       }
     }
   })
-  mqttClient.subscribe("v4/p/post/thing/live/json/1.1", { qos: 0 }, (err: string) => {
+  mqttClient.subscribe("lab_data_hub/get_device_data", { qos: 0 }, (err: string) => {
     if (err) {
       setCustomModal({
         visiable: true,
