@@ -315,16 +315,14 @@ const initWebSocket = () => {
     clientId: "client_yin_shen_app_" + Date.now(),
   })
   mqttClient.on("message", (topic: Obj, message: string) => {
-    const servies = JSON.parse(message.toString()).body.things
+    const payload = JSON.parse(message.toString()).payload
     let equipmentData: Obj | null = null
-    for (const item of servies) {
-      if (form.value.equipmentCode == item.id && item.items[0]) {
-        equipmentData = item.items[0].properties
-        break
-      }
+
+    if (form.value.equipmentCode == payload.deviceSn) {
+      equipmentData = payload.properties
     }
     if (equipmentData) {
-      form.value.equipmentContent = equipmentData.equipment_parameters
+      form.value.equipmentContent = JSON.stringify(equipmentData)
       if (!equipmentData.result || equipmentData.result === "OK") {
         form.value.result = "1"
       } else if (equipmentData.result === "NG") {
