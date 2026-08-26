@@ -316,12 +316,9 @@ const initWebSocket = () => {
   })
   mqttClient.on("message", (topic: Obj, message: string) => {
     const payload = JSON.parse(message.toString()).payload
-    let equipmentData: Obj | null = null
-
+    // 如果收到的mqtt消息和当前选中的设备匹配，才处理
     if (form.value.equipmentCode == payload.deviceSn) {
-      equipmentData = payload.properties
-    }
-    if (equipmentData) {
+      const equipmentData = payload.properties
       form.value.equipmentContent = JSON.stringify(equipmentData)
       if (!equipmentData.result || equipmentData.result === "OK") {
         form.value.result = "1"
