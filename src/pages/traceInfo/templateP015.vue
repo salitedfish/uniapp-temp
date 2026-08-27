@@ -565,12 +565,6 @@ const submit = useThrottle(async () => {
     const params: Obj = Object.assign({}, form.value)
     params.fileUrl = params.images.map((item: Obj) => item.url).join(",")
     params.fileName = params.images.map((item: Obj) => item.name).join(",")
-    if (form.value.checked == "1") {
-      params.checkList = checkRecords.value.map((item: Obj) => ({
-        ...item,
-        imagesUrl: item.images.map((i: Obj) => i.url).join(","),
-      }))
-    }
     params.barcodeList = codeRules.value
     params.barcode1 = params.barcodeList[0]?.barCode
     params.barcode2 = params.barcodeList[1]?.barCode
