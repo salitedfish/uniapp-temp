@@ -363,6 +363,10 @@ const traceSearch = async (barcode: string) => {
       }
     } else {
       processList.value = []
+      setCustomModal({
+        visiable: true,
+        content: "未查询到此条码报工记录",
+      })
     }
   } catch (err) {
     console.log(err)
