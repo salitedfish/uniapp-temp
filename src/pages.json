@@ -425,6 +425,17 @@
 			},
 			"type": "nav",
 			"needLogin": true
+		},
+		{
+			"name": "LabelCheck",
+			"path": "pages/labelCheck/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "标签校验"
+			},
+			"type": "nav",
+			"needLogin": true
 		}
 	],
 

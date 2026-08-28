@@ -9,7 +9,7 @@ type StockroomManagerName = "purchaseArrival" | "purchaseStockroom" | "materialO
 	"refundDoc" | "outSrDocFlieUpload"
 type DefaultSetRouteName = "pADefaultSetPage" | "pSDefaultSetPage" | "mOSDefaultSetPage" | "sCDefaultSetPage" | "prSDefaultSetPage" | "srCDefaultSetPage" | "oSDDefaultSetPage" | "oOSDDefaultSetPage" | "rDDefaultSetPage"
 // 追溯管理的路由
-type TraceManagerRouteName = "LdOnDuty" | "EquipmentCheck" | "LdWorkPlan" | "LdAndon" | "Trace" | "TraceProcess" | "TraceInfo" | "TraceSearch" | "ProductJobList" | "ProductJobPrinter"
+type TraceManagerRouteName = "LdOnDuty" | "EquipmentCheck" | "LdWorkPlan" | "LdAndon" | "Trace" | "TraceProcess" | "TraceInfo" | "TraceSearch" | "ProductJobList" | "ProductJobPrinter" | "LabelCheck"
 // 外链路由
 type LinkRouteName = "moldLink" | "board"
 

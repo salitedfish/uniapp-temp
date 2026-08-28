@@ -66,6 +66,13 @@
 				auth: authList.value.includes(routes.TraceSearch.name)
 			},
 			{
+				name: routes.LabelCheck.name,
+				title: routes.LabelCheck.style.navigationBarTitleText,
+				icon: "/static/home/code_inventory.svg",
+				route: routes.LabelCheck,
+				auth: authList.value.includes(routes.LabelCheck.name)
+			},
+			{
 				name: routes.ProductJobList.name,
 				title: routes.ProductJobList.style.navigationBarTitleText,
 				icon: "/static/home/productJobList.svg",
