@@ -49,8 +49,9 @@
 	}
 
 	const goTraceProcessInfo = (process: Obj) => {
+		// noPlan=1: 追溯入口不依赖工作计划(按产线/产线明细报工), 报工页据此隐藏计划相关项
 		uni.navigateTo({
-			url: `${routes.TraceInfo.path}?lineDetailId=${process.lineDetailId}&procedureName=${process.procedureName}`,
+			url: `${routes.TraceInfo.path}?lineDetailId=${process.lineDetailId}&procedureName=${process.procedureName}&noPlan=1`,
 		})
 	}
 </script>

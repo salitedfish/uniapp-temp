@@ -4,11 +4,11 @@
 
 		<templateP014
 			v-if="templateType === P.条码自配"
-			:lineDetailData="lineDetailData" :lineDetailId="lineDetailId" :procedureName="procedureName" :planCode="planCode"
+			:lineDetailData="lineDetailData" :lineDetailId="lineDetailId" :procedureName="procedureName" :planCode="planCode" :noPlan="noPlan"
 		/>
 		<templateP015
 			v-else-if="templateType === P.打包"
-			:lineDetailData="lineDetailData" :lineDetailId="lineDetailId" :procedureName="procedureName" :planCode="planCode"
+			:lineDetailData="lineDetailData" :lineDetailId="lineDetailId" :procedureName="procedureName" :planCode="planCode" :noPlan="noPlan"
 		/>
 
 	</view>
@@ -25,6 +25,8 @@ const props = defineProps<{
 	lineDetailId?: string
 	procedureName?: string
 	planCode?: string
+	// 追溯入口跳转时带 noPlan=1: 报工页不展示计划相关信息与逻辑(页面 query 参数均为字符串)
+	noPlan?: string
 }>()
 
 const templateType = ref<PK | P | null>(null)

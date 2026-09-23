@@ -8,3 +8,11 @@ export const getProductByCode = async (data : Obj) => {
 		data
 	})
 }
+
+// 分页查询产品列表(报工页产品编码弹窗单选)
+export const getProductList = async (data : Paging & Obj) => {
+	return await uRequest.post<Return<ReturnList<Obj>>>({
+		url: "ldProduct/pageList",
+		data
+	})
+}

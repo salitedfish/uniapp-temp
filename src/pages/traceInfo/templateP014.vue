@@ -4,29 +4,27 @@
   </up-steps>
 
   <up-form class="common-form" labelPosition="left">
-    <up-form-item class="common-form-item" label="计划单号:" borderBottom labelWidth="80" style="padding: 0" required>
+    <up-form-item class="common-form-item" label="计划单号:" borderBottom labelWidth="80" style="padding: 0" required v-if="!isTrace">
       <up-input-scan v-model="form.planCode" placeholder="请输入计划单号" clearable class="input-item" @scanSuccess="getPlanInfo"></up-input-scan>
     </up-form-item>
 
     <up-form-item class="common-form-item" label="产品编码:" borderBottom labelWidth="80" style="padding: 0">
-      <up-input v-model="form.productCode" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
+      <TraceProductPicker v-if="isTrace" v-model:selected="productSelected" @select="productSelect"></TraceProductPicker>
+      <up-input v-else v-model="form.productCode" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
     <up-form-item class="common-form-item" label="客户件号:" borderBottom labelWidth="80" style="padding: 0">
-      <up-input v-model="form.cusProductCode" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
+      <up-input v-model="form.cusProductCode" :placeholder="isTrace ? '选择产品自动带出' : '计划单号自动带出'" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
-    <up-form-item class="common-form-item" label="计划数量:" borderBottom labelWidth="80" style="padding: 0">
+    <up-form-item class="common-form-item" label="计划数量:" borderBottom labelWidth="80" style="padding: 0" v-if="!isTrace">
       <up-input v-model="form.planNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
-    <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0">
+    <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0" v-if="!isTrace">
       <up-input v-model="form.realNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
-    <up-form-item class="common-form-item" label="装箱数量:" borderBottom labelWidth="80" style="padding: 0" v-if="[P.打包].includes(form.procedureCode)">
-      <up-input v-model="form.packageNum" placeholder="自动带出" clearable class="input-item" readonly border="none"></up-input>
-    </up-form-item>
     <up-form-item class="common-form-item" :label="`${item.codeName}:`" borderBottom labelWidth="80" style="padding: 0" required v-for="(item, key) in codeRules" :key="key">
       <up-input-scan
         :focus="item.inputFocus"
@@ -79,12 +77,12 @@
     <up-form-item class="common-form-item" label="设备名称:" borderBottom labelWidth="80" style="padding: 0" v-if="equipments && equipments.length > 0">
       <up-input v-model="form.equipmentName" placeholder="自动带出" readonly class="input-item" border="none"></up-input>
     </up-form-item>
-    <up-form-item class="common-form-item" label="设备数据:" borderBottom labelWidth="80" style="padding: 0" v-if="equipments && equipments.length > 0">
+    <!-- <up-form-item class="common-form-item" label="设备数据:" borderBottom labelWidth="80" style="padding: 0" v-if="equipments && equipments.length > 0">
       <up-textarea v-model="form.equipmentContent" placeholder="自动带出" class="input-item" disabled></up-textarea>
     </up-form-item>
     <up-form-item class="common-form-item" label="结果:" borderBottom labelWidth="80" style="padding: 0" v-if="equipments && equipments.length > 0">
       <up-input :modelValue="ResultMap[form.result]" placeholder="自动带出" readonly class="input-item" border="none"></up-input>
-    </up-form-item>
+    </up-form-item> -->
   </up-form>
 
   <view class="btn-box">
@@ -100,12 +98,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue"
 import type { UploadMedia } from "@/type/file"
 import TraceTablePK5 from "./components/TraceTablePK5.vue"
 import CheckRecord from "./components/CheckRecord.vue"
 import UpInputScan from "@/components/UpInputScanNew.vue"
 import TraceFailureModPicker from "@/components/TraceFailureModePicker.vue"
+import TraceProductPicker from "@/components/TraceProductPicker.vue"
 import { globalColor } from "@/store/theme"
 import { Platform } from "@/util/env"
 import { useThrottle, useDebounce, useRmRepeat } from "@ultra-man/noa"
@@ -121,6 +120,8 @@ const props = defineProps<{
   lineDetailId?: string
   procedureName?: string
   planCode?: string
+  // 追溯入口跳转时带 noPlan=1: 报工页不展示计划相关信息与逻辑(页面 query 参数均为字符串)
+  noPlan?: string
 }>()
 
 const oriForm = () => ({
@@ -196,6 +197,9 @@ const traceTableRef = ref<Obj | null>(null)
 const processList = ref<Objs>([])
 const showEquipmentPicker = ref(false)
 const unlockCode = ref()
+// 追溯入口(从追溯管理进入)不依赖工作计划(页面 query 参数均为字符串)
+const isTrace = computed(() => props.noPlan == "1")
+const productSelected = ref<Objs>([])
 let mqttClient: mqtt.MqttClient | null = null
 
 const customInputFocus = () => {
@@ -226,8 +230,11 @@ onMounted(async () => {
     if (form.value.planCode) {
       getPlanInfo()
     }
+    // 追溯入口: 默认带出上次选的产品(须在产线条码规则解析之后)
+    if (isTrace.value) applyCachedProduct()
     getEquipment()
-    initWebSocket()
+    // pda端不需要实时采集设备数据了
+    // initWebSocket()
   } catch (e) {
     console.error(e)
   }
@@ -239,6 +246,12 @@ onBeforeUnmount(() => {
     mqttClient = null
   }
 })
+
+const refreshTraceTable = () => {
+  if (traceTableRef.value) {
+    traceTableRef.value.searchList({ lineDetailId: form.value.lineDetailId, planId: form.value.planId })
+  }
+}
 
 const getPlanInfo = async () => {
   if (!form.value.planCode) {
@@ -257,9 +270,7 @@ const getPlanInfo = async () => {
     form.value.finalNum = finalNum
     const re = await getProductByCode({ productCode })
     if (re && re.data) form.value.cusProductCode = re.data.cusProductCode
-    if (traceTableRef.value) {
-      traceTableRef.value.searchList({ lineDetailId: form.value.lineDetailId, planId: form.value.planId })
-    }
+    refreshTraceTable()
     if (form.value.checked == "1") await getCheckItemList()
     getCodeRules()
     form.value.result = "1"
@@ -276,6 +287,70 @@ const initFormPlan = () => {
   form.value.planNum = 0
   form.value.realNum = 0
   form.value.checked = ""
+}
+
+// 追溯入口: 产品弹窗单选回调(换产品必须把上一产品的条码与检测状态全部重来)
+const productSelect = async (res: Objs) => {
+  if (res.length <= 0) return
+  const item = res[0]
+  // 回显赋值会触发组件 watch 再 emit 一次, 同产品直接返回防重入
+  if (item.productCode == form.value.productCode) return
+  form.value.productCode = item.productCode
+  form.value.cusProductCode = item.cusProductCode || ""
+  form.value.barcode1 = ""
+  form.value.barcode2 = ""
+  form.value.thisNum = 1
+  form.value.equipmentContent = ""
+  form.value.result = "1"
+  form.value.failureModeIds = ""
+  form.value.failureModeNames = ""
+  failureModSelected.value = []
+  checkRecords.value = []
+  // complete=true: 不继承上一产品的「批次」条码
+  getCodeRules(true)
+  if (codeRules.value.length > 0) {
+    // 只缓存本工序确实配了条码规则的产品, 避免把不可用的选择记下来
+    uni.setStorageSync(
+      "traceProduct",
+      JSON.stringify({
+        productCode: item.productCode,
+        productName: item.productName,
+        cusProductCode: item.cusProductCode,
+      }),
+    )
+  } else {
+    setCustomModal({ visiable: true, content: "该产品在当前工序未配置条码规则，无法报工" })
+  }
+  if (form.value.checked == "1") await getCheckItemList()
+  refreshTraceTable()
+}
+
+// 追溯入口: 进页面默认带出上次选的产品(仅当本工序确实配了该产品的条码规则)
+const applyCachedProduct = () => {
+  let cached: Obj = {}
+  try {
+    cached = JSON.parse(uni.getStorageSync("traceProduct") || "{}")
+  } catch (e) {
+    console.error(e)
+    uni.removeStorageSync("traceProduct")
+    return
+  }
+  if (!cached.productCode) return
+  if (!form.value.codeRules.some((r: Obj) => r.productCode == cached.productCode)) return
+  productSelected.value = [{ productCode: cached.productCode, productName: cached.productName, cusProductCode: cached.cusProductCode }]
+  productSelect(productSelected.value)
+}
+
+// 提交成功后的刷新: 追溯入口没有计划单号, 走 getPlanInfo 会被 initFormPlan 清掉已选产品
+const refreshAfterSubmit = async () => {
+  if (!isTrace.value) {
+    await getPlanInfo()
+    return
+  }
+  getCodeRules()
+  if (form.value.checked == "1") await getCheckItemList()
+  form.value.result = "1"
+  refreshTraceTable()
 }
 
 const getCodeRules = (complete?: boolean) => {
@@ -466,8 +541,17 @@ const resetBarCode1A2 = () => {
 }
 
 const preSubmit = () => {
-  if (!form.value.planId) {
+  // 追溯入口没有计划: 计划id与计划数量都不校验
+  if (!isTrace.value && !form.value.planId) {
     setCustomModal({ visiable: true, content: "请先填写计划id" })
+    return false
+  }
+  if (isTrace.value && !form.value.productCode) {
+    setCustomModal({ visiable: true, content: "请先选择产品编码" })
+    return false
+  }
+  if (isTrace.value && codeRules.value.length == 0) {
+    setCustomModal({ visiable: true, content: "该产品在当前工序未配置条码规则，无法报工" })
     return false
   }
   for (const item of codeRules.value) {
@@ -476,7 +560,7 @@ const preSubmit = () => {
       return false
     }
   }
-  if (Number(form.value.realNum) + form.value.thisNum > Number(form.value.planNum) && form.value.submitType == "1") {
+  if (!isTrace.value && Number(form.value.realNum) + form.value.thisNum > Number(form.value.planNum) && form.value.submitType == "1") {
     setCustomModal({ visiable: true, content: "不能超过计划数量" })
     return false
   }
@@ -512,6 +596,8 @@ const preSubmit = () => {
 }
 
 const headTailCheck = async () => {
+  // 追溯入口没有计划: 首末检依赖计划带出的 firstNum/finalNum, 直接跳过
+  if (isTrace.value) return true
   if (form.value.checkFirstFinal && form.value.firstNum && form.value.finalNum) {
     if (Number(form.value.realNum) >= form.value.firstNum) {
       await checkHeadTail({
@@ -567,7 +653,7 @@ const submit = useThrottle(async () => {
     params.barcode2 = params.barcodeList[1]?.barCode
     await productJobSubmit(params)
     uni.showToast({ icon: "none", title: "提交成功" })
-    await getPlanInfo()
+    await refreshAfterSubmit()
     form.value.thisNum = 1
     form.value.remark = ""
     form.value.toolingCode = ""
