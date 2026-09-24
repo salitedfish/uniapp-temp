@@ -197,7 +197,7 @@ const traceTableRef = ref<Obj | null>(null)
 const processList = ref<Objs>([])
 const showEquipmentPicker = ref(false)
 const unlockCode = ref()
-// 追溯入口(从追溯管理进入)不依赖工作计划(页面 query 参数均为字符串)
+// 追溯入口(从追溯报工进入)不依赖工作计划(页面 query 参数均为字符串)
 const isTrace = computed(() => props.noPlan == "1")
 const productSelected = ref<Objs>([])
 let mqttClient: mqtt.MqttClient | null = null

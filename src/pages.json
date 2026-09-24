@@ -366,7 +366,7 @@
 			"style": {
 				"navigationStyle": "custom",
 				"backgroundColor": "#f8f8f8",
-				"navigationBarTitleText": "追溯管理"
+				"navigationBarTitleText": "追溯报工"
 			},
 			"type": "nav",
 			"needLogin": true

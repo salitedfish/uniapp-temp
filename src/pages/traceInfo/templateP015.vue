@@ -1,8 +1,8 @@
 <template>
   <AutoConnectBlueTooth ref="autoConnectBlueTooth" v-if="form.printed == 1"> </AutoConnectBlueTooth>
 
-  <up-steps :current="form.activeNum" style="margin-top: 10px; overflow-x: scroll" v-if="processList.length > 0">
-    <up-steps-item v-for="(item, key) in processList" :key="key" :title="item.procedureName" :error="item.result != 1 && key != form.activeNum"></up-steps-item>
+  <up-steps :current="traced ? form.activeNum : -1" style="margin-top: 10px; overflow-x: scroll" v-if="processList.length > 0">
+    <up-steps-item v-for="(item, key) in processList" :key="key" :title="item.procedureName" :error="traced && item.result != 1 && key != form.activeNum"></up-steps-item>
   </up-steps>
 
   <up-form class="common-form" :class="{ 'common-form-next': Platform.isApp() }" labelPosition="left">
@@ -196,9 +196,11 @@ const failureModSelected = ref<Objs>([])
 const codeCheckInfo = ref<Obj>(oriCodeCheckInfo())
 const traceTableRef = ref<Obj | null>(null)
 const processList = ref<Objs>([])
+// 是否已按条码查到工序报工结果: 未查之前不判断工序状态(否则会显示假的红叉/已完成)
+const traced = ref(false)
 const unlockCode = ref()
 const autoConnectBlueTooth = ref<Obj | undefined>()
-// 追溯入口(从追溯管理进入)不依赖工作计划(页面 query 参数均为字符串)
+// 追溯入口(从追溯报工进入)不依赖工作计划(页面 query 参数均为字符串)
 const isTrace = computed(() => props.noPlan == "1")
 const productSelected = ref<Objs>([])
 
@@ -349,6 +351,8 @@ const refreshAfterSubmit = async () => {
     await getPlanInfo()
     return
   }
+  // 提交后条码被清空, 工序状态回到未查状态
+  traced.value = false
   getCodeRules()
   if (form.value.checked == "1") await getCheckItemList()
   form.value.result = "1"
@@ -403,6 +407,9 @@ const codeRuleScanSuccess = async (res: string, item: Obj, index: number) => {
   if (res) {
     if (index == 0) await traceSearch(res)
     if (index == 1) await getPackageNum(res)
+  } else if (index == 0) {
+    // 条码清空后工序状态无从判断, 回到未查状态
+    traced.value = false
   }
   if (item.barCode) {
     for (const cr of codeRules.value) {
@@ -428,18 +435,13 @@ const boxBarcodeGenSuccess = (res: string) => {
 const traceSearch = async (barcode: string) => {
   try {
     const res = await getTraceList2({ lineId: form.value.lineId, barcode })
-    if (res.data) {
+    // 工序状态一律用后端返回的真实结果(result: 1 合格 / 0 不合格 / null 该工序无报工记录)
+    if (res.data && res.data.length > 0) {
       processList.value = res.data
-      if (processList.value[0]) {
-        processList.value[0].result = 1
-        processList.value[0].resultName = "ok"
-      }
-      if (processList.value[1]) {
-        processList.value[1].result = 1
-        processList.value[1].resultName = "ok"
-      }
+      traced.value = true
     } else {
       processList.value = []
+      traced.value = false
       setCustomModal({
         visiable: true,
         content: "未查询到此条码报工记录",
@@ -562,8 +564,8 @@ const preSubmit = () => {
   if (form.value.checked == "1") {
     for (const key in processList.value) {
       const item = processList.value[key]
-      const length = processList.value.length
-      if (item.result !== 1 && Number(key) !== length - 1) {
+      // 要跳过的是当前报工的工序(不是最后一道), 其余工序必须已合格
+      if (item.result != 1 && Number(key) != Number(form.value.activeNum)) {
         setCustomModal({ visiable: true, content: "前工序存在未提交或不合格，请确认" })
         return false
       }
