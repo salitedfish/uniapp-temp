@@ -26,7 +26,10 @@
     <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0" v-if="!isTrace">
       <up-input v-model="form.realNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
+  </up-form>
 
+  <!-- 自定义条码：单独一块 -->
+  <up-form class="common-form common-form-next" labelPosition="left" v-if="codeRules && codeRules.length">
     <up-form-item class="common-form-item" :label="`${item.codeName}:`" borderBottom labelWidth="80" style="padding: 0" required v-for="(item, key) in codeRules" :key="key">
       <up-input-scan
         :focus="item.inputFocus"
@@ -39,7 +42,10 @@
         @blur="item.inputFocus = false"
       ></up-input-scan>
     </up-form-item>
+  </up-form>
 
+  <!-- 数量：单独一块 -->
+  <up-form class="common-form common-form-next" labelPosition="left">
     <up-form-item class="common-form-item" label="装箱数量:" borderBottom labelWidth="80" style="padding: 0">
       <up-input v-model="form.packageNum" placeholder="自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
@@ -52,7 +58,8 @@
   <up-text text="检验单明细:" class="grid-title" bold v-if="checkRecords && checkRecords.length"></up-text>
   <CheckRecord :checkItems="checkRecords" :form="form" @setFormResult="setFormResult" @setFailureMod="setFailureMod" v-if="checkRecords && checkRecords.length"> </CheckRecord>
 
-  <up-form class="common-form common-form-next" labelPosition="left">
+  <!-- 块级 v-if 与下面各项的条件保持一致：各项都不渲染时别留一张只有 2px 边框的空卡片（追溯入口就是这种情形） -->
+  <up-form class="common-form common-form-next" labelPosition="left" v-if="form.statistics == '1' || form.result === '0'">
     <up-form-item class="common-form-item" label="是否合格:" borderBottom labelWidth="80" style="padding: 0" required v-if="form.statistics == '1'">
       <u-radio-group placement="row" class="radio-group" v-model="form.result">
         <u-radio :name="'1'" label="是"></u-radio>

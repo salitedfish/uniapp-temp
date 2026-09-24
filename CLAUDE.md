@@ -38,6 +38,22 @@ pnpm run type-check            # TypeScript 类型检查
   - ⚠️ 该步骤条只在 **DZ015（打包）** 模板有（P014 不赋值 `processList`），所以「非末道工序」这条分支只有在 DZ015 工序**不是产线末道**时才走得到；dev 产线是 `DZ014 → DZ014 → DZ015`，测不到该分支，属已知未实测项。
   - 2026-09-24 dev 页面实测（`noPlan=1` 追溯入口，产线 `842778854047813`）：未扫条码＝三个灰圈；扫 `cstm123457` 后按库里真实结果显示 `_000` **红叉**（该工序确无报工记录）、`_001` 蓝勾、`_002` 当前；把 `_002` 的 `ld_line_detail.checked` 置 1 后点「确认」被拦「前工序存在未提交或不合格，请确认」（改动前 `_000` 被硬编码成合格，永不拦）；给 `_000` 补一条合格记录后同样的操作提交成功并落库。测试行与 `checked` 均已还原。
 - **产品缓存**：全局单 key `traceProduct`（localStorage / `uni.setStorageSync`），存 `{productCode, productName, cusProductCode}`。进页面时 `applyCachedProduct()` 在产线条码规则解析之后读取，**仅当本工序的 `codeRules` 里存在该 productCode 才预选**（不命中就保持空、但不清缓存）；计划入口不读不写这个 key，两个入口互不污染
+- **报工页 PC（宽屏浏览器）兼容层（2026-09-24 加）**：报工模板按 750rpx 手机竖屏设计，PC 浏览器里容器被拉满后整体走形（表单项一行一个、按钮铺满整屏、步骤条三个点散到屏幕两端、表格列被均分撑开）。适配全部写在 `traceInfo/index.vue` 的 `<style lang="scss">` 里、由 `.report-page` 包住（该 class 只挂在报工壳页根节点，P014/P015 是它的子组件，规则漏不到别的页面），且整段在 `/* #ifdef H5 */` 内 —— 手机端宽度够不着 768px、App 端被条件编译排除，都不受影响。四条实测踩出来的坑：
+  - **页面 `<style>` 块不写 `scoped` 也会被自动加作用域**（编译出 `[data-v-xxx]`）。表单/按钮/表格都在子组件里，必须用 `:deep()` 才穿透得到 —— 第一版没写，整段规则一条都没生效。
+  - **`uni-table` 的 `th` 宽度按 rpx 经 `uni.upx2px()` 换算**：`width="100rpx"` 在 PC 上会放大到 200px 量级，把表格 `min-width` 顶到 1030px，连「序号」列都有 200 多像素。适配把 `min-width` 与 `th` 宽度一并交回内容决定。
+  - **`up-button` 在 H5 上渲染成 `uni-button`**，uni-app 的全局 base 样式带 `margin-left/right: auto`，按钮不占满整行时会被这组 auto 边距推位置，要固定宽度就得显式清掉。
+  - **垂直居中的三个位置别搞混**：`.u-form-item` 是**纵向** flex，唯一子元素 `.u-form-item__body` 且 `flex: 0 0 auto` 不撑满格子。栅格化后同行被拉成等高，矮的那项（如「装箱数量」这类纯文本项）会贴顶 —— 在 `.u-form-item` 上加 `justify-content: center`（纵向主轴）把 body 居中，再加 `.u-form-item__body { align-items: center }` 让标签与内容对齐。⚠️ **不能在 `.u-form-item` 上加 `align-items: center`**：那是它的交叉轴 = **横向**，会把整块内容横向居中（实测 bodyX=153 vs cellX=29）。
+  - 四个入口（DZ015/DZ014 × 追溯/计划入口）29 个表单项已逐项断言垂直居中；窄屏不受影响（规则全在 `min-width: 768px` 媒体查询内）。
+- **报工表单按语义分块（2026-09-24）**：P014/P015 的 `up-form` 由「一整块」拆成 基础信息 / 自定义条码 / 数量 / 是否合格等 四块，各自独立成卡片（`common-form-next` 给 10px 间距）。
+  - ⚠️ **块级 `v-if` 必须跟着块内子项的条件走**：拆分后每块自成 `up-form`，块内子项的条件全不满足时它会渲染成一张只有 2px 边框的**空卡片**（拆块前这些项与别的项同处一个 form，空 form 根本不存在，属拆分引入的新问题，追溯入口就是这种情形）。已给「是否合格/失效模式/设备」那块补 `v-if`（P015 无设备项，条件少一段）。
+  - **以后往这块加子项，记得同步那个块级条件**，否则会出现「该显示时不显示」或「空壳卡片」。
+- **H5 输入框主题色 + 空值呼吸光晕（2026-09-24 加）**：全局样式写在 `App.vue` 的 `<style lang="scss">` 里、`/* #ifdef H5 */` 内。有边框的输入框（`border="surround"`/`"bottom"`，即 uview-plus 加的 `u-border`/`u-border-bottom`）边框与输入文字统一为主题蓝 `#549df8`（= `store/theme.ts` 的 `globalColor.primary`；**不是** uview-plus 的 `$u-primary` `#3c9cff`，两个蓝不一样），且**只在空值时**外圈 2px 光晕呼吸（2.4s ease-in-out 无限循环）。
+  - **别想拿 `border-color` 做动画**：`common.scss` 里 `.u-border { border-color: $u-border-color !important }` 把边框色锁死，而 `!important` 的优先级高于 `@keyframes`，动画写在它上面也是死的。呼吸因此落在 `box-shadow` 上。（试过用 `::after` 另画一层边框绕开，可行但没必要。）
+  - **判空不能用 `:placeholder-shown`**：uni-app 的 H5 **没给原生 input 挂 placeholder 属性**，占位文字是它自己另画的 div，那个伪类永远匹配不上。实际信号是这个 div 的**内联 style** —— 空值 `"color: ...;"`，有值才追加 `display: none;`。故用 `:has([class*="placeholder"]:not([style*="display: none"]):not([style*="display:none"]))` 反向选中空输入框（`[class*="placeholder"]` 通吃 uview-plus 的 `placeholderClass` 默认值 `input-placeholder`，全项目无人自定义过；两种 display 写法都排掉）。
+  - **输入文字色是内联样式**（`<uni-input style="color: rgb(48,49,51)">`），只有 `!important` 压得过；placeholder 是另一个元素，不受影响、保持灰色。
+  - `:has()` 老浏览器不认会整条跳过，降级成「没有光晕」而不是「一直闪」。
+  - **`border="none"` 的输入框（多为「自动带出」这类只读项）不凭空加框**，只跟着改文字色。
+  - 2026-09-24 dev 实测（报工/工作计划/追溯查询三页）：有边框的输入框边框非蓝 = 0，空值的才呼吸；**清空本已有值的「数量」框后当场转为呼吸**，确认是响应式而非只在初始化时算一次。
 - **API 层**: `src/api/` 使用 TypeScript，通过 Axios 请求后端
 - **MQTT 数采**: 报工页 `src/pages/traceInfo/templateP014.vue` 通过 WebSocket(`VITE_BASE_API_URL_WEB_WEBSOCKET`, 如 `ws://192.168.157.17:8083/mqtt`)直连 **plc_connecter** 项目(`/Users/gexiaokang/work/yl/projects/plc_connecter`，对接硬件设备进行数采的项目)内嵌的 MQTT broker，订阅 `lab_data_hub/get_device_data` 接收设备上报数据；从 `properties` 读取 `equipment_parameters`/`result` 自动回填报工表单(条码规则经 PLC 反馈点位)
 - **多端适配**: 统一代码同时构建 H5、Android/iOS App、各平台小程序
