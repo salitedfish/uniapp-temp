@@ -89,6 +89,14 @@ export const getTracePageList = async (data : Paging & Obj) => {
 	})
 }
 
+// 获取当天已报数量(追溯入口报工页「实际数量」: 当天+选定产品+当前产线明细, 不限计划)
+export const getTraceRealNum = async (data : Obj) => {
+	return await uRequest.post<Return<Num>>({
+		url: "trace/findRealNum",
+		data
+	})
+}
+
 // 获取设备信息
 export const getEquipmentByLineDetailId = async (data : Obj) => {
 	return await uRequest.post<Return<Objs>>({

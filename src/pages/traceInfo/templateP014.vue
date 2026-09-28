@@ -21,8 +21,8 @@
       <up-input v-model="form.planNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
-    <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0" v-if="!isTrace">
-      <up-input v-model="form.realNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
+    <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0">
+      <up-input v-model="form.realNum" :placeholder="isTrace ? '选择产品自动带出' : '计划单号自动带出'" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
   </up-form>
 
@@ -118,7 +118,7 @@ import { globalColor } from "@/store/theme"
 import { Platform } from "@/util/env"
 import { useThrottle, useDebounce, useRmRepeat } from "@ultra-man/noa"
 import mqtt from "mqtt/dist/mqtt.js"
-import { getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, checkHeadTail, codeCheckInfoApi, findCardByUrl, traceResetPlc, getTraceLineDetail } from "@/api/trace"
+import { getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, checkHeadTail, codeCheckInfoApi, findCardByUrl, traceResetPlc, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
 import { getWorkPlan } from "@/api/workPlan"
 import { getProductByCode } from "@/api/product"
 import { P, PK, BarcodeNames, ResultMap } from "./enum"
@@ -298,6 +298,22 @@ const initFormPlan = () => {
   form.value.checked = ""
 }
 
+// 追溯入口: 取「实际数量」= 当天 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
+// 报工提交成功、切换产品后都要重取(见 refreshAfterSubmit / productSelect)
+const refreshRealNum = async () => {
+  if (!isTrace.value) return
+  if (!form.value.productCode || !form.value.lineDetailId) {
+    form.value.realNum = 0
+    return
+  }
+  try {
+    const r = await getTraceRealNum({ lineDetailId: form.value.lineDetailId, productCode: form.value.productCode })
+    form.value.realNum = r.data == null ? 0 : r.data
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 // 追溯入口: 产品弹窗单选回调(换产品必须把上一产品的条码与检测状态全部重来)
 const productSelect = async (res: Objs) => {
   if (res.length <= 0) return
@@ -332,6 +348,7 @@ const productSelect = async (res: Objs) => {
   }
   if (form.value.checked == "1") await getCheckItemList()
   refreshTraceTable()
+  await refreshRealNum()
 }
 
 // 追溯入口: 进页面默认带出上次选的产品(仅当本工序确实配了该产品的条码规则)
@@ -360,6 +377,8 @@ const refreshAfterSubmit = async () => {
   if (form.value.checked == "1") await getCheckItemList()
   form.value.result = "1"
   refreshTraceTable()
+  // 报工完成: 实际数量要重新获取(本次提交已落库)
+  await refreshRealNum()
 }
 
 const getCodeRules = (complete?: boolean) => {
