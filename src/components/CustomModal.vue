@@ -91,6 +91,9 @@
 			flex: 1;
 			padding: 10rpx 30rpx;
 			font-size: 32rpx;
+			/* 条码规则校验失败提示为多行文本(段名称/位置/类型/期望值/实际值), 保留 \n 换行 */
+			white-space: pre-wrap;
+			word-break: break-all;
 		}
 
 		.btn-box {

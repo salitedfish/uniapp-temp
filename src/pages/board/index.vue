@@ -2,6 +2,7 @@
 import { reactive } from "vue"
 import { getBoardsByTvUUID } from "@/api/board"
 
+// 这个deviceId其实是设备的uuid
 const props = defineProps<{
   deviceId: string
 }>()
@@ -66,16 +67,14 @@ const boardIframeHandler = (index: number) => {
 }
 
 // 如果有设备id则开始获取看板
-if (props.deviceId) {
+if (props.deviceId && !!props.deviceId) {
   data.deviceId = props.deviceId
-  if (data.deviceId) {
-    getBoards()
-  } else {
-    uni.showModal({
-      title: "提示",
-      content: `未获取到设备id`,
-    })
-  }
+  getBoards()
+} else {
+  uni.showModal({
+    title: "提示",
+    content: `未获取到deviceId(设备uuid)。如果需要测试，可手动在链接后面添加deviceId=uuid，可展示web端相应uuid配置的看板`,
+  })
 }
 </script>
 

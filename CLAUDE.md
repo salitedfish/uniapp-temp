@@ -23,7 +23,10 @@ pnpm run type-check            # TypeScript 类型检查
 ## 架构要点
 
 - **基于 uni-app 3.x** + uview-plus UI 库
-- **页面**: `src/pages/` 包含追溯信息、工作计划、入库出库、扫码检验、打卡、蓝牙打印等业务页面
+- **页面**: `src/pages/` 包含追溯信息、工作计划、打卡、按灯、蓝牙打印等业务页面
+- **仓储管理整块已下线（2026-09-28）**: 原「仓储管理」12 个页面（`purchaseArrival`/`purchaseStockroom`/`materialOutStockroom`/`productionStockroom`/`deliveryMaterial`/`shelfChange`/`stockroomChange`/`codeCheck`/`otherStockDoc`/`otherOutStockDoc`/`refundDoc`/`outSrDocFlieUpload`，及其 9 个 `*DefaultSetPage`）连同入库/出库/调拨/退货/扫码检验整条链路一并删除。`pages.json` 的「仓库管理」块（原 77–307 行）整块摘除，**只保留块内的 `board`（TV 看板）条目**——它原先混编在仓储块里，是块中唯一不属于仓储的页面。连带删除：`api/{business,checkVouch,deliveryMaterial,purchaseArrival}.ts`、`type/business.ts`、20 个只被仓储页引用的组件（`EmptyContent`/`PrintTypeCheck` + 18 个 `UpInput*Picker`）、`static/home/` 下 11 个仓储专用宫格图标。首页 `home/index.vue` 的 `stockroomManagerList` 与「仓储管理」宫格块、`type/route.ts` 的 `StockroomManagerName`/`DefaultSetRouteName` 同步去掉。
+  - ⚠️ **保留的易混项**：`api/trace.ts` 里的 `codeCheckInfoApi` 与删掉的 `api/checkVouch.ts`/`codeCheck` 页**不是一回事**，它被报工模板 P014/P015 使用，**必须保留**；`board` 页借用的 `static/home/out_sr_doc_upload.svg` 一并保留（该图标语义上是「附件回传」的，属既有借用）。`UpInputScan`/`UpInputScanNew`/`UpInputDatePicker`/`MediaUpload` 等组件被保留页（报工、工作计划、追溯、点检、按灯、打卡）继续使用，**不属仓储孤儿**。
+  - `store/route.ts` 不需改：它遍历 `pages.json` 自动生成 `routes` 与 `needLoginRoutes`，页面删了它自然就少。
 - **报工模板**: 报工在 `src/pages/traceInfo/` 完成，按产线配置的流程编码分派——仅支持「条码自配」(DZ014, templateP014) 与「打包」(DZ015, templateP015)；`enum.ts` 定义 P/PK 枚举
 - **报工两条入口（同一套模板，靠 prop `noPlan` 区分）**:
   - **计划入口**：`pages/workPlan/index`（工作计划）→ `pages/traceInfo/index`（壳，`routes.TraceInfo`）→ 模板，跳转带 `lineDetailId + procedureName + planCode`；计划信息（计划单号/计划数量/实际数量）由 `getPlanInfo()` 扫计划单号带出，产品编码是**只读框**（placeholder「计划单号自动带出」）
@@ -32,6 +35,9 @@ pnpm run type-check            # TypeScript 类型检查
   - 追溯模式：隐藏 计划单号/计划数量；产品编码换成弹窗单选；`preSubmit()` 里计划id、超计划数量校验都跳过，改校验「请先选择产品编码」与「该产品在当前工序未配置条码规则，无法报工」；`headTailCheck()` 首行 `if (isTrace.value) return true`（首末检依赖计划带出的 firstNum/finalNum）；提交成功后走 `refreshAfterSubmit()`（走 `getPlanInfo()` 会被 `initFormPlan()` 清掉已选产品）
   - **「实际数量」两个入口都有，但取数来源不同（2026-09-28 改）**：计划入口由 `getPlanInfo()` 扫计划单号从 `trace/findPlan` 带出（口径 = 该计划 `sum(this_num)`）；追溯入口原先整项隐藏，现改为调 `POST /trace/findRealNum`（入参 `lineDetailId + productCode`，后端按 **当天 + 该产线明细 + 该产品** 统计 `sum(this_num)`，**不限计划**，有计划的报工也计入）——所以追溯模式**不要**再用 `v-if="!isTrace"` 藏它，只换 placeholder（`isTrace ? '选择产品自动带出' : '计划单号自动带出'`）。两个模板各有一个 `refreshRealNum()`，在 **切换产品（`productSelect` 末尾）** 与 **报工提交成功（`refreshAfterSubmit`）** 两处重取；`form.realNum` 在追溯模式下不参与任何校验（超计划校验与 `headTailCheck` 都已被 `isTrace` 挡掉），纯展示。
 - **产品编码弹窗单选**：`src/components/TraceProductPicker.vue`（照 `TraceProcessPicker.vue` 抄改，`TablePicker` 单选 + `selectKey="productCode"`），取数走 `src/api/product.ts` 的 `getProductList`（`ldProduct/pageList`，`useTable(getProductList, { queryType: 0, enabled: 1 })` 只列启用产品）；选中回调 `productSelect` 会把上一产品的条码/数量/检测状态全部重置，并 `getCodeRules(true)` 重新解析该产品在本工序的条码规则（`ld_line_detail.code_rules` 里没配规则就提示「无法报工」且**不缓存**）
+- **条码规则校验失败提示是「多行文本」，靠弹窗的 `white-space` 渲染（2026-09-29）**：扫码校验（`codeCheckInfoApi` → `POST trace/checkBarcode`）失败时，后端 `MsgVO.checkCodeMsg` 回的是 `\n` 分隔的**六行**文本（首行「XXX校验失败」+ 段名称/位置/类型/期望值/实际值，详见 api CLAUDE.md）。P014/P015 两个模板只是把该串**原样**塞进 `setCustomModal({ content })` —— **不解析、不拆分**，所以想改提示格式只改后端。
+  - ⚠️ 因此 `CustomModal.vue` 的 `.content` 必须保留 `white-space: pre-wrap`（配 `word-break: break-all`）。`{{ customModalStore.content }}` 是单个插值，没有这条样式时 `\n` 会**塌成一个空格**，六行糊成一行。对既有所有单行调用方是无副作用的。
+  - 实测（dev，2026-09-29）：六行各自成行渲染正常；`cstm_001` 规则下 `abcd111111` 报「段名称：前缀 / 位置：第 1-4 位 / 类型：固定项 / 期望值：cstm / 实际值：abcd」。
 - **DZ015 报工页顶部「产线各流程提交情况」步骤条 + 前工序校验（2026-09-24 修三处造假/错判）**：步骤条数据来自 `traceSearch` 调的 `POST /trace/search2`（按条码→`serial_code` 聚合该产线各工序的 `result`），`up-steps` 的 `current` 是 **0 基**（`index < current` 渲染成已完成）。三处改动：
   - **`traceSearch` 不再硬编码前两道合格**：原实现拿到结果后直接 `processList[0].result = 1`、`[1].result = 1`，于是**无论库里真假**，前两道永远显示蓝勾、且前工序校验永远放行。现一律用后端返回的真实结果（`1` 合格 / `0` 不合格 / **`null` = 该工序无报工记录**）。
   - **未扫条码时不判状态（新增 `traced` ref）**：`traced` 只在 `search2` 返回非空时置 true；`up-steps` 用 `:current="traced ? form.activeNum : -1"`、`up-steps-item` 的 `:error` 前置 `traced &&` —— 否则条码还没扫，`processList` 里全是 `result = null`，会显示一片假红叉。条码清空、产品切换、提交后（`refreshAfterSubmit`）都置回 `false`。

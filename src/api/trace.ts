@@ -25,38 +25,6 @@ export const getTraceList2 = async (data : Obj = {}) => {
 	})
 }
 
-// 通过编号获取卡片
-export const getTmlmByCode = async (data : Obj = {}) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "tmlm/findByCode",
-		data
-	})
-}
-
-// 获取设备保养方案
-export const getEquipmentSchemeList = async (data : Paging & Obj) => {
-	return await uRequest.post<Return<ReturnList<Obj>>>({
-		url: "checkEquipment/schemeList",
-		data,
-	})
-}
-
-// 获取设备点检项目
-export const getEquipmentSchemeChildList = async (data : Obj) => {
-	return await uRequest.post<Return<Objs>>({
-		url: "tmlm/schemeChildList",
-		data
-	})
-}
-
-// 设备点检审核
-export const submitEquipentSchemeCheckout = async (data : Obj) => {
-	return await uRequest.post<Return<Objs>>({
-		url: "checkEquipment/add",
-		data
-	})
-}
-
 // 获取追溯产线列表
 export const getTraceLineList = async (data : Obj) => {
 	return await uRequest.post<Return<Objs>>({
