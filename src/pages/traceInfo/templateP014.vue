@@ -49,8 +49,54 @@
     </up-form-item>
   </up-form>
 
-  <up-text text="检验单明细:" class="grid-title" bold v-if="checkRecords && checkRecords.length"></up-text>
-  <CheckRecord :checkItems="checkRecords" :form="form" @setFormResult="setFormResult" @setFailureMod="setFailureMod" v-if="checkRecords && checkRecords.length"> </CheckRecord>
+  <!-- 检验单: 主页面只留一行入口, 明细收在右侧弹出栏里点开填写 -->
+  <up-form class="common-form common-form-next" labelPosition="left" v-if="checkRecords && checkRecords.length">
+    <up-form-item class="common-form-item" label="检验单:" borderBottom labelWidth="80" style="padding: 0">
+      <view class="check-entry" @click="checkDrawerVisible = true">
+        <text class="check-entry__sum">共 {{ checkRecords.length }} 项，已填 {{ filledCheckCount }} 项</text>
+        <view class="check-entry__btn">
+          <text class="check-entry__btn-text">去填写</text>
+          <uni-icons type="right" :color="globalColor.primary" size="12"></uni-icons>
+        </view>
+      </view>
+    </up-form-item>
+  </up-form>
+
+  <up-popup :show="checkDrawerVisible" mode="right" :customStyle="checkDrawerStyle" @close="checkDrawerVisible = false">
+    <view class="check-drawer">
+      <view class="check-drawer__head">
+        <view class="check-drawer__bar">
+          <view class="check-drawer__bar-text">
+            <text class="check-drawer__title">检验单</text>
+            <text class="check-drawer__sub">共 {{ checkRecords.length }} 项，已填 {{ filledCheckCount }} 项</text>
+          </view>
+          <view class="check-drawer__close" @click="checkDrawerVisible = false">
+            <uni-icons type="closeempty" color="#ffffff" size="18"></uni-icons>
+          </view>
+        </view>
+        <view class="check-drawer__progress">
+          <view class="check-drawer__progress-inner" :style="{ width: checkProgress + '%' }"></view>
+        </view>
+      </view>
+      <scroll-view class="check-drawer__body" scroll-y>
+        <view class="check-drawer__list">
+          <CheckRecord :checkItems="checkRecords" :form="form" @setFormResult="setFormResult" @setFailureMod="setFailureMod"></CheckRecord>
+          <view class="check-drawer__tip">填完点「完成」收起；返回主页面后别忘了提交报工</view>
+        </view>
+      </scroll-view>
+      <view class="check-drawer__foot">
+        <up-button type="primary" :color="globalColor.primary" text="完成" shape="circle" @click="checkDrawerVisible = false"></up-button>
+      </view>
+    </view>
+  </up-popup>
+
+  <!-- 文档: 本工序+本产品在 web「文档管理」里维护的文档, 入口样式与上面的检验单一致。
+       图片/PDF 点开直接看, 其余格式点开即下载, 见 TraceFileEntry -->
+  <TraceFileEntry :files="traceFiles"></TraceFileEntry>
+
+  <!-- 附件: 工序开了「是否上传附件」(ld_line_detail.upload_file=1) 才出现, 见 TraceAttachUpload。
+       附件选传 —— 不选也能提交(所以没有块级 v-if 的空卡片问题: 这个开关一关整块都不渲染) -->
+  <TraceAttachUpload :modelValue="form.images" v-if="form.uploadFile == '1'"></TraceAttachUpload>
 
   <!-- 块级 v-if 与下面各项的条件保持一致：各项都不渲染时别留一张只有 2px 边框的空卡片（追溯入口就是这种情形） -->
   <up-form class="common-form common-form-next" labelPosition="left" v-if="form.statistics == '1' || form.result === '0'">
@@ -71,6 +117,18 @@
         placeholder="请选择失效模式"
         :multiple="true"
       ></TraceFailureModPicker>
+    </up-form-item>
+  </up-form>
+
+  <!-- 是否返工: 产线明细开了「是否显示返工按钮」(ld_line_detail.reworked=1) 才出现。
+       选「是」提交时 submitType=2(返工提交): 后端按该条码把本条产线明细的原有报工置为历史(del=1)后再补新记录,
+       并跳过条码重复校验与超计划数量校验(数量守恒) -->
+  <up-form class="common-form common-form-next" v-if="form.reworked == 1">
+    <up-form-item class="common-form-item" label="是否返工:" borderBottom labelWidth="80" style="padding: 0" v-if="form.reworked == 1">
+      <u-radio-group placement="row" class="radio-group" v-model="form.submitType">
+        <u-radio :name="'2'" label="是"></u-radio>
+        <u-radio :name="'1'" label="否" style="margin-left: 10px"></u-radio>
+      </u-radio-group>
     </up-form-item>
   </up-form>
 
@@ -111,14 +169,17 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue"
 import type { UploadMedia } from "@/type/file"
 import TraceTablePK5 from "./components/TraceTablePK5.vue"
 import CheckRecord from "./components/CheckRecord.vue"
+import TraceFileEntry from "./components/TraceFileEntry.vue"
+import TraceAttachUpload from "./components/TraceAttachUpload.vue"
 import UpInputScan from "@/components/UpInputScanNew.vue"
 import TraceFailureModPicker from "@/components/TraceFailureModePicker.vue"
 import TraceProductPicker from "@/components/TraceProductPicker.vue"
 import { globalColor } from "@/store/theme"
 import { Platform } from "@/util/env"
+import { genFilePath } from "@/util/common"
 import { useThrottle, useDebounce, useRmRepeat } from "@ultra-man/noa"
 import mqtt from "mqtt/dist/mqtt.js"
-import { getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, codeCheckInfoApi, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
+import { getEquipmentByLineDetailId, getCheckItemListApi, getTraceFilesListApi, productJobSubmit, codeCheckInfoApi, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
 import { getWorkPlan } from "@/api/workPlan"
 import { getProductByCode } from "@/api/product"
 import { P, PK, BarcodeNames, ResultMap } from "./enum"
@@ -187,7 +248,8 @@ const oriForm = () => ({
   procedureKindCode: 0 as PK,
   codeRules: [] as Objs,
   reworked: 0,
-  printed: 0,
+  // 工序是否允许上传附件(ld_line_detail.upload_file, 字符串口径与 checked 一致): 只管附件入口显不显示
+  uploadFile: "",
   activeNum: null as Num,
 })
 const oriCodeCheckInfo = () => ({ canSave: 0 })
@@ -196,6 +258,26 @@ const form = ref(oriForm())
 const codeRules = ref<Objs>([])
 const equipments = ref<Objs[]>([])
 const checkRecords = ref<Objs>([])
+// 「文档管理」里本工序+本产品关联的文档, 与检验单并列的入口(见 TraceFileEntry)
+const traceFiles = ref<Objs>([])
+// 检验单明细收在右侧弹出栏里, 主页面只留入口(见模板里的 .check-entry)
+const checkDrawerVisible = ref(false)
+// 弹出栏宽度: 宽屏(PC 浏览器)按视口 70% 且不超过 720px, 窄屏(手机)占 85%
+const checkDrawerStyle = (() => {
+  const w = uni.getSystemInfoSync().windowWidth || 375
+  return { width: (w >= 768 ? Math.min(720, Math.round(w * 0.7)) : Math.round(w * 0.85)) + "px", height: "100%" }
+})()
+// 单条「填完了」的判据与 preSubmit 里的校验项逐条对齐: 必填项齐了才算, 免得入口显示"已填"、提交却被拦
+const isCheckItemFilled = (item: Obj) =>
+  (item.needSurvey != "1" || (item.surveyValue !== "" && item.surveyValue !== undefined && item.surveyValue !== null)) &&
+  (!item.needPicture || item.images.length > 0) &&
+  !!item.result &&
+  (item.result !== "0" || (item.failureModSelected.length > 0 && !!item.reason))
+const filledCheckCount = computed(() => checkRecords.value.filter(isCheckItemFilled).length)
+// 弹出栏顶部那条进度: 已填项数占比, 纯展示
+const checkProgress = computed(() =>
+  checkRecords.value.length ? Math.round((filledCheckCount.value / checkRecords.value.length) * 100) : 0
+)
 const failureModSelected = ref<Objs>([])
 const codeCheckInfo = ref<Obj>(oriCodeCheckInfo())
 const traceTableRef = ref<Obj | null>(null)
@@ -229,7 +311,7 @@ onMounted(async () => {
     form.value.codeRules = d.codeRules ? JSON.parse(d.codeRules) : []
     form.value.reworked = d.reworked
     form.value.checked = d.checked || ""
-    form.value.printed = d.printed
+    form.value.uploadFile = d.uploadFile || ""
     if (form.value.planCode) {
       getPlanInfo()
     }
@@ -273,6 +355,7 @@ const getPlanInfo = async () => {
     if (re && re.data) form.value.cusProductCode = re.data.cusProductCode
     refreshTraceTable()
     if (form.value.checked == "1") await getCheckItemList()
+    await getTraceFiles()
     getCodeRules()
     form.value.result = "1"
   } catch (e) {
@@ -288,6 +371,8 @@ const initFormPlan = () => {
   form.value.planNum = 0
   form.value.realNum = 0
   form.value.checked = ""
+  // 计划/产品已清空, 关联文档一并清掉(否则会留着上一单的文档)
+  traceFiles.value = []
 }
 
 // 追溯入口: 取「实际数量」= 当天 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
@@ -339,6 +424,7 @@ const productSelect = async (res: Objs) => {
     setCustomModal({ visiable: true, content: "该产品在当前工序未配置条码规则，无法报工" })
   }
   if (form.value.checked == "1") await getCheckItemList()
+  await getTraceFiles()
   refreshTraceTable()
   await refreshRealNum()
 }
@@ -367,6 +453,7 @@ const refreshAfterSubmit = async () => {
   }
   getCodeRules()
   if (form.value.checked == "1") await getCheckItemList()
+  await getTraceFiles()
   form.value.result = "1"
   refreshTraceTable()
   // 报工完成: 实际数量要重新获取(本次提交已落库)
@@ -507,6 +594,19 @@ const getCheckItemList = async () => {
   }))
 }
 
+// 取本工序+本产品在 web「文档管理」里维护的文档; 工序/产品没齐时清空(不查)
+// 自带 try/catch: 文档是报工的附属信息, 查不到不该把报工流程带崩
+const getTraceFiles = async () => {
+  traceFiles.value = []
+  if (!form.value.lineDetailId || !form.value.productCode) return
+  try {
+    const r = await getTraceFilesListApi({ lineDetailId: form.value.lineDetailId, productCode: form.value.productCode })
+    traceFiles.value = r.data || []
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 const setFailureMod = () => {
   const arr = checkRecords.value.filter((item: Obj) => item.failureModeId).map((item: Obj) => ({ id: item.failureModeId, failureModeName: item.failureModeName }))
   failureModSelected.value = useRmRepeat(arr)({ condition: (item: Obj) => item.id })
@@ -564,6 +664,11 @@ const preSubmit = () => {
   }
   if (!isTrace.value && Number(form.value.realNum) + form.value.thisNum > Number(form.value.planNum) && form.value.submitType == "1") {
     setCustomModal({ visiable: true, content: "不能超过计划数量" })
+    return false
+  }
+  // 附件选传(不选也能提交), 但选了就必须传完 —— 否则会把本地临时路径当成附件路径提交上去
+  if (form.value.uploadFile == "1" && form.value.images.some((i: Obj) => i.status != "success")) {
+    setCustomModal({ visiable: true, content: "附件还没上传完，请稍候或删除上传失败的附件" })
     return false
   }
   if (form.value.checked == "1") {
@@ -627,6 +732,28 @@ const codeCheckInfoHandler = async () => {
   }
 }
 
+// 报工携带的检验单明细: 后端 TraceService#saveTraceCheck 会把它落进
+// ld_trace_check_main + ld_trace_check_item —— 与 web「检验单管理」同一个入库位置
+// 工序没开「是否需要检验」时 checkRecords 为空, 传空数组, 后端不产生记录
+const buildCheckList = () =>
+  checkRecords.value.map((item: Obj) => ({
+    checkItemId: item.checkItemId,
+    checkItemCode: item.checkItemCode,
+    checkItemName: item.checkItemName,
+    checkTypeName: item.checkTypeName,
+    checkRateName: item.checkRateName,
+    checkWayName: item.checkWayName,
+    checkContent: item.checkContent,
+    importantItem: item.importantItem,
+    result: item.result ? Number(item.result) : null,
+    reason: item.reason,
+    failureModeId: item.failureModeId || null,
+    failureModeName: item.failureModeName,
+    surveyValue: item.surveyValue,
+    // 检验单图片: 上传组件列表里存的是拼好 base 的展示地址(缩略图要直接用), 入库前还原成相对路径
+    imagesUrl: (item.images || []).map((i: Obj) => genFilePath(i.url)).join(","),
+  }))
+
 const submit = useThrottle(async () => {
   if (!preSubmit()) return
   if (!(await codeCheckInfoHandler())) return
@@ -638,6 +765,7 @@ const submit = useThrottle(async () => {
     params.barcodeList = codeRules.value
     params.barcode1 = params.barcodeList[0]?.barCode
     params.barcode2 = params.barcodeList[1]?.barCode
+    params.checkList = buildCheckList()
     await productJobSubmit(params)
     uni.showToast({ icon: "none", title: "提交成功" })
     await refreshAfterSubmit()
@@ -656,8 +784,100 @@ const submit = useThrottle(async () => {
 </script>
 
 <style scoped lang="scss">
-.grid-title {
-  padding: 20rpx 0;
+.check-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 14px;
+
+  &__sum {
+    color: #606266;
+  }
+  &__btn {
+    display: flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background-color: rgba(84, 157, 248, 0.1);
+  }
+  &__btn-text {
+    margin-right: 2px;
+    font-size: 13px;
+    color: v-bind("globalColor.primary");
+  }
+}
+.check-drawer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__head {
+    padding: 14px 15px 12px;
+    background-color: v-bind("globalColor.primary");
+  }
+  &__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &__bar-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  &__title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+  }
+  &__sub {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  &__close {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.22);
+  }
+  &__progress {
+    height: 4px;
+    margin-top: 10px;
+    border-radius: 2px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  &__progress-inner {
+    height: 100%;
+    border-radius: 2px;
+    background-color: #ffffff;
+    transition: width 0.3s ease;
+  }
+  &__body {
+    flex: 1;
+    min-height: 0;
+    background-color: #f5f6f8;
+  }
+  &__list {
+    padding: 10px 10px 20px;
+  }
+  &__tip {
+    padding: 6px 2px 0;
+    font-size: 12px;
+    color: #909399;
+    text-align: center;
+  }
+  &__foot {
+    padding: 10px 15px;
+    background-color: #ffffff;
+    border-top: 1px solid #ebeef5;
+  }
 }
 .btn-box {
   display: flex;

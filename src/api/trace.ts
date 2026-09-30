@@ -89,6 +89,14 @@ export const getCheckItemListApi = async (data : Obj) => {
 	})
 }
 
+// 获取「文档管理」里本工序+本产品关联的文档
+export const getTraceFilesListApi = async (data : Obj) => {
+	return await uRequest.post<Return<Objs>>({
+		url: "ldTraceFiles/listByLineDetail",
+		data
+	})
+}
+
 // 报工提交
 export const productJobSubmit = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({

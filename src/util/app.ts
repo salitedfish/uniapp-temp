@@ -1,7 +1,14 @@
 import { versionCheck as versionCheckApi } from "@/api/app"
 import { appVersion } from "@/store/common"
+import { genFileUrl } from "@/util/common"
 
-// app版本检查并提示
+// app版本检查并提示。
+//
+// 只用于 App 端: 有新版就弹窗并下载安装包(plus.downloader / plus.runtime), H5/钉钉/微信
+// 没有可安装的包、也没有 plus, 调用方必须自己拦在 App 端(见 pages/home 的「检查更新」)。
+//
+// 原来只有启动页(pages/blank)会静默调一次, "没新版本"不吭声也无所谓;
+// 2026-09-30 改成首页抽屉里的按钮手动触发, 点了必须有反馈, 所以补上「已是最新版本」的提示
 export const versionCheck = async (p : { title ?: string, content ?: string, canceltext ?: string, oktext ?: string }) => {
 	const param = Object.assign({
 		title: "检测到有新版本！",
@@ -14,6 +21,10 @@ export const versionCheck = async (p : { title ?: string, content ?: string, can
 	if (res.data) {
 		// 如果一样就不需要更新
 		if (appVersion.value === res.data.version) {
+			uni.showToast({
+				icon: "none",
+				title: "当前已是最新版本"
+			})
 			return;
 		} else if (res.data.version) {
 			// android进行如下操作
@@ -38,9 +49,10 @@ export const versionCheck = async (p : { title ?: string, content ?: string, can
 }
 
 export const startUpdate = (versionUrl : string) => {
-	// const downloadUrl = getBaseUrl() + versionUrl
-	console.log("更新地址：", versionUrl)
-	const downloadUrl = versionUrl
+	// 库里(app_version.url)存的是相对路径, 与其它附件同口径; 下载器要的是绝对地址, 这里补上当前环境的 base
+	// genFileUrl 带守卫: 存量里还没清洗的绝对地址会原样放行 —— 所以新 App 先发、库里后清洗是安全的
+	const downloadUrl = genFileUrl(versionUrl)
+	console.log("更新地址：", downloadUrl)
 	const downloadOptions = {
 		filename: "_downloads/"
 	}

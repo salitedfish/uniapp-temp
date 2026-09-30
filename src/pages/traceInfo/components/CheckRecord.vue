@@ -2,6 +2,10 @@
 	import {
 		globalColor
 	} from "@/store/theme"
+	// 检验项主数据里的基准图片存的是后端映射的相对路径, 展示/预览前拼当前环境 base
+	import {
+		genFileUrl
+	} from "@/util/common"
 	// 组件
 	import MediaUpload from "@/components/MediaUpload.vue"
 	import TraceFailureModPicker from "@/components/TraceFailureModePicker.vue"
@@ -21,7 +25,7 @@
 		uni.previewImage({
 			indicator: "number",
 			loop: true,
-			urls: imgSrcs.split(",")
+			urls: imgSrcs.split(",").map((u : string) => genFileUrl(u))
 		})
 	}
 
@@ -119,7 +123,7 @@
 				</template>
 				<template #value>
 					<view class="u-cell-text cell-value">
-						<up-image v-for="imgSrc,key in item.filePictureUrl.split(',')" :key="key" :show-loading="true" :src="imgSrc"
+						<up-image v-for="imgSrc,key in item.filePictureUrl.split(',')" :key="key" :show-loading="true" :src="genFileUrl(imgSrc)"
 							width="80px" height="80px" style="margin-left: 5px;" @click="imgPreview(item.filePictureUrl)"></up-image>
 					</view>
 				</template>

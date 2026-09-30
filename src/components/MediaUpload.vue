@@ -1,22 +1,9 @@
 <script lang="ts" setup>
-	import { getBaseUrl } from "@/util/common"
+	import { getBaseUrl, genFileUrl } from "@/util/common"
 	import type { UploadMedia } from "@/type/file"
-	import { Platform } from "@/util/env"
 
-	const genImgUrl = (url : string) => {
-		let target = url
-		// 只有正式环境的H5端才需要转化url
-		// 为了让后端返回的内网地址转成公网地址（否则在公网地址无法回显内网地址的图片），如果h5只在内网用，则不能转换，看情况修改
-		// 或者接口是用代理的情况下，则不用修改
-		// if (import.meta.env.VITE_RUN_TIME === "production" && Platform.isWeb()) {
-		// 	const index = url.indexOf("/uploadFiles/file")
-		// 	target = location.origin + import.meta.env.VITE_BASE_API_URL_WEB + url.slice(index + 1)
-		// }
-		// console.log("VITE_RUN_TIME", import.meta.env.VITE_RUN_TIME)
-		// console.log("isWeb", Platform.isWeb())
-		// console.log("result", target + "?token2=fujianhuichuan")
-		return target + "?token2=fujianhuichuan"
-	}
+	// 上传返回的是后端映射的相对路径(如 uploadFiles/file/202609/xxx.png), 落库也存这个;
+	// 展示时用 genFileUrl 拼当前环境的 base。原先在这里追加的 ?token2=fujianhuichuan 后端零消费方(历史遗留), 已去掉。
 
 	// 直接改props里的数据算了
 	const props = withDefaults(defineProps<{
@@ -59,7 +46,7 @@
 					...oItem,
 					status: "success",
 					message: "",
-					url: genImgUrl(JSON.parse(result).data),
+					url: genFileUrl(JSON.parse(result).data),
 				});
 			} else {
 				props.modelValue.splice(fileListLen, 1, {

@@ -118,5 +118,21 @@ uni-modal {
 .u-textarea .u-textarea__field {
 	color: #549df8 !important;
 }
+
+/**
+ * 图片预览层（uni.previewImage）要压在 uview-plus 的弹出栏之上。
+ *
+ * 报工页的「检验单」「文档」都是右侧弹出栏（up-popup，z-index 10075），栏里的图片点开会调
+ * uni.previewImage —— 但 H5 上它是在 body 上直接插一个 div，**内联 `z-index: 999`**，
+ * 比弹出栏低一个数量级，预览图会被弹出栏盖住（只看得到弹出栏，图片藏在它下层）。
+ * 内联样式只能靠 !important 压过去；10075 < 10100 < 下面的 uni-modal(999999)。
+ *
+ * 认它是靠「fixed 定位 + 内联 z-index: 999 + 子树里有 uni-swiper」这三条同时成立 ——
+ * 该覆盖层是唯一同时满足的节点（实测全页面命中 1 个），页面上其它的轮播不会被误伤。
+ * APP 端走原生预览，HTML 层的这条规则被 #ifdef H5 排除。
+ */
+div[style*="z-index: 999"][style*="position: fixed"]:has(uni-swiper) {
+	z-index: 10100 !important;
+}
 /* #endif */
 </style>
