@@ -125,14 +125,6 @@ export const printProductJob = async (data : Obj) => {
 	})
 }
 
-// 首末件检查
-export const checkHeadTail = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "trace/checkFirstFinal",
-		data,
-	})
-}
-
 // 码规则、重码、上到工序及返工校验
 export const codeCheckInfoApi = async (data : Obj) => {
 	return await uRequest.post<Return<Obj>>({
@@ -141,22 +133,6 @@ export const codeCheckInfoApi = async (data : Obj) => {
 		header: {
 			"Content-Type": "application/json",
 		}
-	})
-}
-
-// 通过网址获取设备编码
-export const findCardByUrl = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "ldEquipment/findCardByUrl",
-		data,
-	});
-};
-
-// 重置设备开关
-export const traceResetPlc = async (data : Obj) => {
-	return await uRequest.post<Return<Obj>>({
-		url: "trace/resetPlc",
-		data
 	})
 }
 

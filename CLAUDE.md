@@ -62,8 +62,20 @@ pnpm run type-check            # TypeScript 类型检查
   - **`border="none"` 的输入框（多为「自动带出」这类只读项）不凭空加框**，只跟着改文字色。
   - 2026-09-24 dev 实测（报工/工作计划/追溯查询三页）：有边框的输入框边框非蓝 = 0，空值的才呼吸；**清空本已有值的「数量」框后当场转为呼吸**，确认是响应式而非只在初始化时算一次。
 - **API 层**: `src/api/` 使用 TypeScript，通过 Axios 请求后端
-- **MQTT 数采**: 报工页 `src/pages/traceInfo/templateP014.vue` 通过 WebSocket(`VITE_BASE_API_URL_WEB_WEBSOCKET`, 如 `ws://192.168.157.17:8083/mqtt`)直连 **plc_connecter** 项目(`/Users/gexiaokang/work/yl/projects/plc_connecter`，对接硬件设备进行数采的项目)内嵌的 MQTT broker，订阅 `lab_data_hub/get_device_data` 接收设备上报数据；从 `properties` 读取 `equipment_parameters`/`result` 自动回填报工表单(条码规则经 PLC 反馈点位)
+- **MQTT 数采**: 报工页 `src/pages/traceInfo/templateP014.vue` 通过 WebSocket(`VITE_BASE_API_URL_WEB_WEBSOCKET`, 如 `ws://192.168.157.17:8083/mqtt`)直连 **plc_connecter** 项目(`/Users/gexiaokang/work/yl/projects/plc_connecter`，对接硬件设备进行数采的项目)内嵌的 MQTT broker，订阅 `lab_data_hub/get_device_data` 接收设备上报数据。**实际只读 `payload.properties` 里的 `result`**（`OK`/缺省→`form.result='1'`，`NG`→`'0'`）并把整个 `properties` 塞进 `form.equipmentContent`；⚠️ 早期文档说的「读 `equipment_parameters` 点位」**已不成立**（该点位 MQTT 已不发送，全仓库 `src/` 里 grep 不到），条码规则仍经 PLC 反馈点位。消息只在 `payload.deviceSn == form.equipmentCode` 时才处理
 - **多端适配**: 统一代码同时构建 H5、Android/iOS App、各平台小程序
 - **工具模块**: `src/util/` 包含钉钉、微信初始化、蓝牙、权限指令等
 - **状态管理**: Pinia-like store (`src/store/`)
 - **环境配置**: `.env.dev` / `.env.tes` / `.env.pro` 三套环境
+- **2026-09-29 报工模板下线两段死逻辑**（`pages/traceInfo/templateP014.vue` 与 `templateP015.vue`，**两处逐字相同、必须同改**）:
+  - **首末件检查**: 删 `api/trace.ts` 的 `checkHeadTail`；模板里删 import、`oriForm()` 的 `checkFirstFinal`/`firstNum`/`finalNum`、`d.checkFirstFinal` 赋值、`getPlanInfo` 里 `firstNum`/`finalNum` 的解构与赋值、`headTailCheck()` 函数整体、`submit` 里的 `if (!(await headTailCheck())) return`。它本来就是**死逻辑** —— `/trace/checkFirstFinal` 只存在于被整段注释的 `doc/other`，`PlanVO.firstNum/finalNum` 后端从不下发，`firstNum && finalNum` 恒为假。后端 `ld_check_ff_set` / `ld_check_ff_audit` 两张表也已 DROP
+  - **`resetPlc`（是否控制设备）**: 删 import 的 `traceResetPlc`、`oriForm()` 的 `resetPlc: 0`、`d.resetPlc` 赋值、以及 `resetBarCode1A2` 里 `if (form.value.resetPlc) { traceResetPlc({...}) }` 整块。⚠️ **该函数其余逻辑（清条码 / 清数量 / 取条码规则 / 清 equipmentContent）不动**。它端到端是坏的 —— app 每次扫码重置条码后都会调 `POST trace/resetPlc`，而该端点在 TraceController 的 13 个端点里根本不存在，只会打 404
+  - ⚠️ **`isTrace` 不能删** —— 超计划校验与 `applyCachedProduct` 还在用它。`ld_line_detail` 的 `check_first_final` / `reset_plc` 两列已随之 DROP，见 api CLAUDE.md
+  - 2026-09-29 dev 实测: 追溯入口 P014（csgx_001 / `cstm900001`）与 P015（csgx_002 / `cstm900001`+`cstm900002`）各真实提交一条，页面列表可见，**两次都零 4xx/5xx**（唯一 404 是 `/uview/empty/order.png`，uview 静态资源，与本改动无关）。测试行已删净，`ld_trace` 回到 9 行基线
+- **2026-09-29 设备维护重构（app 侧，**⚠️ 本批 h5 改动未实测**）**（与上面「报工模板下线两段死逻辑」是**同一天的两批**；同一份工作区里两批的改动叠在一起，看 `git diff` 时别混）:
+  - **背景**：后端把「工序 ↔ 设备」关系表 `ld_process_mold` 整张删掉、换成 `ld_process_equipment`（列名 `mold_code/mold_name` → `equipment_code/equipment_name`），并删掉了工模透传端点 `ldEquipment/findCardByUrl`。h5 有真实调用，**不同步改就会扫码即报错**，故本批必须动。
+  - **`src/api/trace.ts`**: 删 `findCardByUrl`（`ldEquipment/findCardByUrl`）；同一处顺带删掉 `checkHeadTail` 与 `traceResetPlc`（属上一批「死逻辑下线」，见上一条）。
+  - **`templateP014.vue`**: `getEquipment()` 里映射的 `item.moldCode/item.moldName` → **`item.equipmentCode/item.equipmentName`**（后端 `/trace/findEquipment` 返回体字段随换表改名，**这是本批唯一的接口契约变更**）；`equipmentSelect()` 里「输入值是 http 网址 → 调 `findCardByUrl` 换设备编码」整段删除（`code` 直接用输入值）；`codeRuleScanSuccess()` 里「扫码结果是网址 → 调 `findCardByUrl` 换工装编码」整段删除（`item.barCode = res` 一行了事）。
+  - **`templateP015.vue`**: `codeRuleScanSuccess()` 里同样的 http 分支删除（P015 没有设备选择项，无 `moldCode` 映射要改）。
+  - ⚠️ **代价（用户已拍板接受，交付时也如实标注过）**：h5 报工里「**扫工模卡片二维码自动换出设备编码/工装编码**」这个能力消失 —— 扫到网址串时条码值就是**网址本身**。这是删掉 `findCardByUrl` 端点的必然结果。
+  - ⚠️ **本批 h5 改动未实测**：dev 环境的 h5 登录态已过期，按硬规则不尝试任何登录方式，故**只做了静态检查（无残留引用：`src/` 里 `findCardByUrl` / `moldCode` / `moldName` 均已 grep 为 0），没有在页面上跑过一次报工**。后端契约（`/trace/findEquipment` 返回 `equipmentCode/equipmentName`）是从后端代码逐字核对的，属**推断**不属实测。设备数据来源那侧（`getEquipmentByLineDetailId` → `trace/findEquipment` → `TraceServiceImpl.findProcessEquipments`）在 web 侧有等价的页面实测覆盖（见 web CLAUDE.md），但 **h5 这条入口本身没跑过**

@@ -118,7 +118,7 @@ import { globalColor } from "@/store/theme"
 import { Platform } from "@/util/env"
 import { useThrottle, useDebounce, useRmRepeat } from "@ultra-man/noa"
 import mqtt from "mqtt/dist/mqtt.js"
-import { getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, checkHeadTail, codeCheckInfoApi, findCardByUrl, traceResetPlc, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
+import { getEquipmentByLineDetailId, getCheckItemListApi, productJobSubmit, codeCheckInfoApi, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
 import { getWorkPlan } from "@/api/workPlan"
 import { getProductByCode } from "@/api/product"
 import { P, PK, BarcodeNames, ResultMap } from "./enum"
@@ -147,9 +147,6 @@ const oriForm = () => ({
   packageNum: null as Num,
   thisNum: 1,
   checked: "",
-  checkFirstFinal: 0,
-  firstNum: 0,
-  finalNum: 0,
   barcode1: "",
   barcodeName1: "",
   barcode2: "",
@@ -190,7 +187,6 @@ const oriForm = () => ({
   procedureKindCode: 0 as PK,
   codeRules: [] as Objs,
   reworked: 0,
-  resetPlc: 0,
   printed: 0,
   activeNum: null as Num,
 })
@@ -230,11 +226,9 @@ onMounted(async () => {
     form.value.barcodeName2 = BarcodeNames[d.relation2] || ""
     form.value.unbind = d.unbind
     form.value.scanCode = d.scanCode
-    form.value.checkFirstFinal = d.checkFirstFinal
     form.value.codeRules = d.codeRules ? JSON.parse(d.codeRules) : []
     form.value.reworked = d.reworked
     form.value.checked = d.checked || ""
-    form.value.resetPlc = d.resetPlc
     form.value.printed = d.printed
     if (form.value.planCode) {
       getPlanInfo()
@@ -270,13 +264,11 @@ const getPlanInfo = async () => {
   uni.showLoading({ mask: true, title: "计划详情获取中" })
   try {
     const r = await getWorkPlan({ planCode: form.value.planCode, lineDetailId: form.value.lineDetailId })
-    const { planId, productCode, planNum, realNum, firstNum, finalNum } = r.data
+    const { planId, productCode, planNum, realNum } = r.data
     form.value.planId = planId
     form.value.productCode = productCode
     form.value.planNum = planNum
     form.value.realNum = realNum
-    form.value.firstNum = firstNum
-    form.value.finalNum = finalNum
     const re = await getProductByCode({ productCode })
     if (re && re.data) form.value.cusProductCode = re.data.cusProductCode
     refreshTraceTable()
@@ -446,8 +438,8 @@ const getEquipment = async () => {
   })
   if (res.data && res.data.length > 0) {
     equipments.value[0] = res.data.map((item: Obj) => ({
-      equipmentCode: item.moldCode,
-      equipmentName: item.moldName,
+      equipmentCode: item.equipmentCode,
+      equipmentName: item.equipmentName,
     }))
     const equipment = JSON.parse(uni.getStorageSync("traceEquipment") || "{}")
     form.value.equipmentCode = equipment.equipmentCode
@@ -469,13 +461,6 @@ const equipmentSelect = useThrottle(async (res: { value: Objs }) => {
   form.value.equipmentContent = ""
   form.value.result = "1"
   let code = res.value[0].equipmentCode
-  if (code.indexOf("http") !== -1) {
-    uni.showLoading({ mask: true, title: "设备获取中" })
-    const ree = await findCardByUrl({ url: code })
-    if (ree.data) code = ree.data.split(",")[0]
-    form.value.equipmentCode = code
-    uni.hideLoading()
-  }
   showEquipmentPicker.value = false
   for (const item of equipments.value[0]) {
     if (item.equipmentCode === code) {
@@ -496,15 +481,7 @@ const equipmentSelect = useThrottle(async (res: { value: Objs }) => {
 })
 
 const codeRuleScanSuccess = async (res: string, item: Obj, index: number) => {
-  if (res && res.indexOf("http") !== -1) {
-    uni.showLoading({ mask: true, title: "工装获取中" })
-    let ree = await findCardByUrl({ url: res })
-    if (ree.data) ree = ree.data.split(",")[0]
-    item.barCode = ree
-    uni.hideLoading()
-  } else {
-    item.barCode = res
-  }
+  item.barCode = res
   if (item.barCode) {
     for (const cr of codeRules.value) {
       if (!cr.barCode) {
@@ -561,9 +538,6 @@ const resetBarCode1A2 = () => {
   form.value.thisNum = 1
   form.value.packageNum = 0
   getCodeRules(true)
-  if (form.value.resetPlc) {
-    traceResetPlc({ equipmentCode: form.value.equipmentCode })
-  }
   form.value.equipmentContent = ""
   form.value.result = "1"
 }
@@ -623,20 +597,6 @@ const preSubmit = () => {
   return true
 }
 
-const headTailCheck = async () => {
-  // 追溯入口没有计划: 首末检依赖计划带出的 firstNum/finalNum, 直接跳过
-  if (isTrace.value) return true
-  if (form.value.checkFirstFinal && form.value.firstNum && form.value.finalNum) {
-    if (Number(form.value.realNum) >= form.value.firstNum) {
-      await checkHeadTail({
-        planCode: form.value.planCode,
-        checkTypeCode: Number(form.value.realNum) >= form.value.finalNum ? 2 : 1,
-      })
-    }
-  }
-  return true
-}
-
 const codeCheckInfoHandler = async () => {
   uni.showLoading({ mask: true, title: "条码校验中" })
   try {
@@ -669,7 +629,6 @@ const codeCheckInfoHandler = async () => {
 
 const submit = useThrottle(async () => {
   if (!preSubmit()) return
-  if (!(await headTailCheck())) return
   if (!(await codeCheckInfoHandler())) return
   uni.showLoading({ mask: true, title: "提交中" })
   try {

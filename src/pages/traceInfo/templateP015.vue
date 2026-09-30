@@ -117,7 +117,7 @@ import BoxBarcodeRePrinter1 from "./components/BoxBarcodeRePrinter1.vue"
 import { Platform } from "@/util/env"
 import { useThrottle, useRmRepeat } from "@ultra-man/noa"
 import { printBoxBarcode } from "./util"
-import { getPackageNumApi, getCheckItemListApi, productJobSubmit, checkHeadTail, codeCheckInfoApi, findCardByUrl, getTraceList2, getTraceLineDetail, traceResetPlc, getTraceRealNum } from "@/api/trace"
+import { getPackageNumApi, getCheckItemListApi, productJobSubmit, codeCheckInfoApi, getTraceList2, getTraceLineDetail, getTraceRealNum } from "@/api/trace"
 import { getWorkPlan } from "@/api/workPlan"
 import { getProductByCode } from "@/api/product"
 import { getBarcodeList } from "@/api/codeRule"
@@ -147,9 +147,6 @@ const oriForm = () => ({
   packageNum: null as Num,
   thisNum: 1,
   checked: "",
-  checkFirstFinal: 0,
-  firstNum: 0,
-  finalNum: 0,
   barcode1: "",
   barcodeName1: "",
   barcode2: "",
@@ -191,7 +188,6 @@ const oriForm = () => ({
   codeRules: [] as Objs,
   reworked: 0,
   activeNum: null as Num,
-  resetPlc: 0,
   printed: 0,
 })
 const oriCodeCheckInfo = () => ({ canSave: 0 })
@@ -230,11 +226,9 @@ onMounted(async () => {
     form.value.barcodeName2 = BarcodeNames[d.relation2] || ""
     form.value.unbind = d.unbind
     form.value.scanCode = d.scanCode
-    form.value.checkFirstFinal = d.checkFirstFinal
     form.value.codeRules = d.codeRules ? JSON.parse(d.codeRules) : []
     form.value.reworked = d.reworked
     form.value.checked = d.checked || ""
-    form.value.resetPlc = d.resetPlc
     form.value.printed = d.printed
     if (form.value.planCode) {
       getPlanInfo()
@@ -272,13 +266,11 @@ const getPlanInfo = async () => {
   try {
     uni.showLoading({ mask: true, title: "计划详情获取中" })
     const r = await getWorkPlan({ planCode: form.value.planCode, lineDetailId: form.value.lineDetailId })
-    const { planId, productCode, planNum, realNum, firstNum, finalNum } = r.data
+    const { planId, productCode, planNum, realNum } = r.data
     form.value.planId = planId
     form.value.productCode = productCode
     form.value.planNum = planNum
     form.value.realNum = realNum
-    form.value.firstNum = firstNum
-    form.value.finalNum = finalNum
     const re = await getProductByCode({ productCode })
     if (re && re.data) form.value.cusProductCode = re.data.cusProductCode
     refreshTraceTable()
@@ -416,20 +408,7 @@ const getCodeRules = (complete?: boolean) => {
 }
 
 const codeRuleScanSuccess = async (res: string, item: Obj, index: number) => {
-  if (res && res.indexOf("http") !== -1) {
-    try {
-      uni.showLoading({ mask: true, title: "工装获取中" })
-      let ree = await findCardByUrl({ url: res })
-      if (ree.data) ree = ree.data.split(",")[0]
-      item.barCode = ree
-    } catch (err) {
-      console.log(err)
-    } finally {
-      uni.hideLoading()
-    }
-  } else {
-    item.barCode = res
-  }
+  item.barCode = res
   if (res) {
     if (index == 0) await traceSearch(res)
     if (index == 1) await getPackageNum(res)
@@ -559,9 +538,6 @@ const resetBarCode1A2 = () => {
   form.value.packageNum = 0
   const bzCode = codeRules.value[1]?.barCode
   getCodeRules(true)
-  if (form.value.resetPlc) {
-    traceResetPlc({ equipmentCode: form.value.equipmentCode })
-  }
   if (codeRules.value[1]) {
     codeRules.value[1].barCode = bzCode
   }
@@ -632,20 +608,6 @@ const preSubmit = () => {
   return true
 }
 
-const headTailCheck = async () => {
-  // 追溯入口没有计划: 首末检依赖计划带出的 firstNum/finalNum, 直接跳过
-  if (isTrace.value) return true
-  if (form.value.checkFirstFinal && form.value.firstNum && form.value.finalNum) {
-    if (Number(form.value.realNum) >= form.value.firstNum) {
-      await checkHeadTail({
-        planCode: form.value.planCode,
-        checkTypeCode: Number(form.value.realNum) >= form.value.finalNum ? 2 : 1,
-      })
-    }
-  }
-  return true
-}
-
 const codeCheckInfoHandler = async () => {
   try {
     uni.showLoading({ mask: true, title: "条码校验中" })
@@ -678,7 +640,6 @@ const codeCheckInfoHandler = async () => {
 
 const submit = useThrottle(async () => {
   if (!preSubmit()) return
-  if (!(await headTailCheck())) return
   if (!(await codeCheckInfoHandler())) return
   try {
     uni.showLoading({ mask: true, title: "提交中" })
