@@ -26,8 +26,8 @@ pnpm run type-check            # TypeScript 类型检查
 
 - **页面**：`src/pages/`（追溯信息、工作计划、打卡、按灯、蓝牙打印等）；**API** `src/api/`（TS + Axios）；**状态** Pinia-like `src/store/`；**工具** `src/util/`；**环境** `.env.dev` / `.env.tes` / `.env.pro`。**多端条件编译**：同一份代码构建 H5 / App / 小程序，平台差异用 `Platform.isApp()` 或 `/* #ifdef H5 */` 分流。
 - **首页右上角抽屉：检查更新 + 退出登陆**（`pages/home/index.vue`，`up-popup mode="right"`，宽约视口 72% / 封顶 320px，与报工页右侧栏同一观感）。右上角仍是关机图标 `icon-guanji`，语义已从「退出」变成「打开更多菜单」，刻意没换图标。
-  - **「检查更新」只在 App 端渲染**（`v-if="Platform.isApp()"`）—— 更新走 `plus.downloader` + `plus.runtime.install`，H5/钉钉/微信没有 `plus`，**H5 上抽屉里只有「退出登陆」，这是预期不是漏做**。**启动不再检查更新**：原来在 `pages/blank/index.vue`（`pages.json` 第一页的启动页）里 `#ifdef APP-PLUS` 调一次 `versionCheck`，已整段移除、改由这个按钮手动触发。**别再加回 blank 页**，两处都查会重复弹升级弹窗。
-  - **「退出登陆」不再有二次确认**（抽屉本身就是那一步确认），走 `useLogout()` 的 `logout()` + `closeAfterLogout()`（`hook/useCloseApp.ts`：钉钉 `dingding.biz.navigation.close`、其余端 `redirectTo` 登录页）。`useCloseApp` 本体保留（报工内嵌页拿 `CLOSE_APP` 指令那处 `moldLink` 还在用）。
+  - **「检查更新」只在 App 端渲染**（`v-if="Platform.isApp()"`）—— 更新走 `plus.downloader` + `plus.runtime.install`，H5/钉钉/微信没有 `plus`，**H5 上抽屉里只有「退出登陆」，这是预期不是漏做**。**启动页 `pages/blank/index.vue`（`pages.json` 第一页）里没有 `versionCheck`**：更新只由这个按钮手动触发。**别在 blank 页加回来**，两处都查会重复弹升级弹窗。
+  - **「退出登陆」没有二次确认**（抽屉本身就是那一步确认），走 `useLogout()` 的 `logout()` + `closeAfterLogout()`（`hook/useCloseApp.ts`：钉钉 `dingding.biz.navigation.close`、其余端 `redirectTo` 登录页）。`useCloseApp` 本体保留（报工内嵌页拿 `CLOSE_APP` 指令那处 `moldLink` 还在用）。
 - **报工模板**：报工在 `src/pages/traceInfo/` 完成，按产线配置的流程编码分派 —— 仅「条码自配」(DZ014, `templateP014.vue`) 与「打包」(DZ015, `templateP015.vue`)。
 - **产品缓存**：全局单 key `traceProduct`（localStorage），存 `{productCode, productName, cusProductCode}`。进页面 `applyCachedProduct()` 在条码规则解析之后读，**仅当本工序 `codeRules` 里存在该 productCode 才预选**（不命中保持空、不清缓存）；计划入口不读不写这个 key。
 - **MQTT 数采**：`templateP014.vue` 经 WebSocket 直连 **plc_connecter** 内嵌 broker（订阅 `lab_data_hub/get_device_data`）。**只读 `payload.properties` 里的 `result`**（`OK`/缺省→`form.result='1'`，`NG`→`'0'`），整包 `properties` 塞进 `form.equipmentContent`；消息只在 `payload.deviceSn == form.equipmentCode` 时处理。⚠️ 早期文档说的「读 `equipment_parameters` 点位」**已不成立**（该点位已不发送）。
@@ -37,7 +37,7 @@ pnpm run type-check            # TypeScript 类型检查
 ⚠️ **两个模板的多处改动是"逐字相同、必须同改"的**：检验单入口、文档入口、附件入口、条码校验提示通路 —— 改一处必须同步改另一处。
 
 ### 两条入口（同一套模板，靠 prop `noPlan` 区分）
-- ⚠️ **壳页「正文空白」（只剩导航栏、无报错无提示）= 该产线明细不在可渲染的模板组合里**：`traceInfo/index.vue` 只在 `procedureKindCode == 4`（定制流程）**且** `procedureCode` 命中 `DZ014`/`DZ015` 时才挂载模板，其余一律什么都不渲染。字段来自 `POST ldLine/findDetailByLineDetailId`（`queryById` 直出实体，不加工）。2026-10-14 实测踩到：dev 库 `ld_line_detail.procedure_kind_code` 被灌库工具压成 1 → 报工页全空白。
+- ⚠️ **壳页「正文空白」（只剩导航栏、无报错无提示）= 该产线明细不在可渲染的模板组合里**：`traceInfo/index.vue` 只在 `procedureKindCode == 4`（定制流程）**且** `procedureCode` 命中 `DZ014`/`DZ015` 时才挂载模板，其余一律什么都不渲染。字段来自 `POST ldLine/findDetailByLineDetailId`（`queryById` 直出实体，不加工）。踩过的实例：dev 库 `ld_line_detail.procedure_kind_code` 被灌库工具压成 1 → 报工页全空白（见 [开发日志](../开发日志/2026-10-14.md)）。
 - **计划入口**：`pages/workPlan/index` → `pages/traceInfo/index`（壳）→ 模板，跳转带 `lineDetailId + procedureName + planCode`；计划信息由 `getPlanInfo()` 扫计划单号带出，产品编码是只读框。**追溯入口**：`pages/traceManager/index` → `pages/traceProcess/index`（跳转 URL 追加 `&noPlan=1`）→ 同一壳页/模板，**不传 planCode**。
 - 壳页与两个模板都有 prop `noPlan?: string`，模板内 `const isTrace = computed(() => props.noPlan == "1")` 守门全部追溯模式行为。⚠️ **必须用显式 prop 判定，不要用 `!planCode` 隐式判断**（计划入口本来就允许 planCode 为空）；query 参数一律是字符串，判断用 `==`。⚠️ **`isTrace` 绝不能删**（超计划校验与 `applyCachedProduct` 还在用）。
 - 追溯模式：隐藏计划单号/计划数量；产品编码换弹窗单选（`components/TraceProductPicker.vue`，只列启用产品）；`preSubmit()` 跳过计划 id 与超计划校验；`headTailCheck()` 首行 `if (isTrace.value) return true`；提交成功后走 `refreshAfterSubmit()`。
@@ -75,4 +75,4 @@ pnpm run type-check            # TypeScript 类型检查
 - **仓储管理整块**（12 个页面 + 9 个 `*DefaultSetPage` + 入库/出库/调拨/退货/扫码检验链路 + `api/{business,checkVouch,deliveryMaterial,purchaseArrival}.ts` + 20 个专用组件 + 11 个仓储宫格图标）；`pages.json` 的「仓库管理」块摘除、**只保留块内的 `board`（TV 看板）**。⚠️ **保留的易混项**：`api/trace.ts` 的 `codeCheckInfoApi` 与删掉的 `api/checkVouch.ts`/`codeCheck` 页**不是一回事**，它被报工模板 P014/P015 使用；`board` 页借用的 `static/home/out_sr_doc_upload.svg` 也保留。`UpInputScan`/`UpInputDatePicker`/`MediaUpload` 等被保留页继续使用，不属仓储孤儿。
 - **报工模板两段死逻辑**：首末件检查（`checkHeadTail` + `headTailCheck()` + `firstNum/finalNum`，后端 `ld_check_ff_set`/`ld_check_ff_audit` 已 DROP）；`resetPlc`（`if (form.value.resetPlc)` 调 `traceResetPlc` —— **该端点从未存在**、只会打 404）。
 - **打包页「生成托车码 / 重打印」第二组按钮**（`BoxBarcodePrinter1`/`BoxBarcodeRePrinter1` 两文件 + `templateP015.vue` 里 `v-if="form.printed == 1"` 整块 + `util.ts` 的 `printBoxBarcode1`）—— 与上半组调同一端点 `ldPrintBarcode/add2`、数据链早已停用。⚠️ **`printBoxBarcode`（箱码，上半组在用）不动**。`ld_line_detail.printed` 列**两库均已 DROP**（43 → 42 列）。
-- **设备维护重构的接口契约变更**（⚠️ 本批 h5 改动未实测，只做了静态检查）：`/trace/findEquipment` 返回体字段 `moldCode/moldName` → **`equipmentCode/equipmentName`**；`ldEquipment/findCardByUrl` 端点已删，h5 里「扫工模卡片二维码自动换出设备编码/工装编码」整段逻辑随之删除。**代价（用户已拍板接受）**：扫到网址串时条码值就是**网址本身**。
+- **设备维护重构的接口契约**（⚠️ 这批 h5 改动只做过静态检查、未实机实测）：`/trace/findEquipment` 返回体字段是 **`equipmentCode`/`equipmentName`**（不是 `moldCode`/`moldName`）；`ldEquipment/findCardByUrl` 端点不存在，h5 没有「扫工模卡片二维码自动换出设备编码/工装编码」逻辑。**代价（用户已拍板接受）**：扫到网址串时条码值就是**网址本身**。

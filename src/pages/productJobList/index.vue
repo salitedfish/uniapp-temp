@@ -10,10 +10,6 @@
 	import {
 		routes
 	} from "@/store/route"
-	// 工具
-	import {
-		useTimesClick
-	} from "@ultra-man/noa"
 	// hook
 	import {
 		useTable
@@ -61,15 +57,6 @@
 		searchParam.value.currentPage = page.current
 		searchList()
 	}
-
-
-	const goPrinter = (obj: Obj) => {
-		console.log("跳重打印的信息", obj)
-		uni.navigateTo({
-			url: `${routes.ProductJobPrinter.path}?id=${obj.traceId}`,
-		})
-	}
-	const goWorkDouble = useTimesClick(goPrinter)
 </script>
 
 <template>
@@ -99,14 +86,13 @@
 					<!-- <uni-th class="nowrap table-fixed-right" align="left" width="100rpx">操作</uni-th> -->
 				</uni-tr>
 				<!-- 表格数据行 -->
-				<uni-tr v-for="item,key in resultData?.list" :key="key" @click='goWorkDouble(item)'>
+				<uni-tr v-for="item,key in resultData?.list" :key="key">
 					<uni-td class="nowrap">{{ key + 1 }}</uni-td>
 					<uni-td class="nowrap">{{ item.procedureName }}</uni-td>
 					<uni-td class="nowrap">{{ item.productCode }}</uni-td>
 					<!-- <uni-td class="nowrap">{{ item.planCode }}</uni-td> -->
 					<uni-td class="nowrap">{{ item.createName }}</uni-td>
 					<uni-td class="nowrap">{{ item.createTime }}</uni-td>
-					<!-- <uni-td class="nowrap primary table-fixed-right" @click="goPrinter(item)">重打印</uni-td> -->
 				</uni-tr>
 			</uni-table>
 		</view>
