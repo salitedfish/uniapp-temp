@@ -27,6 +27,7 @@
 	})
 
 	// 生成分页所需的数据和方法
+	// 报工记录: 只看当前生产日 + 当前所选产品(后端按工序「生产日分界时间」算生产日窗口)
 	const {
 		searching,
 		searchParam,
@@ -36,7 +37,9 @@
 		reSetList
 	} = useTable(getTracePageList, {
 		lineDetailId: props.form.lineDetailId,
-		planId: props.form.planId
+		planId: props.form.planId,
+		productCode: "",
+		currentProductionDay: 1
 	})
 
 	// 分页搜索

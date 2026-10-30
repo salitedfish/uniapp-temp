@@ -37,6 +37,8 @@
 		if (dates.length > 0) {
 			searchParam.value.createTimeStart = dates[0]
 			searchParam.value.createTimeEnd = dates[1]
+			// 日期变了回到第一页, 否则可能停在新结果范围外的页码上
+			searchParam.value.currentPage = 1
 		}
 	}
 
@@ -64,8 +66,8 @@
 		<CustomNavBar :title="routes.ProductJobList.style.navigationBarTitleText"></CustomNavBar>
 
 		<up-form class="common-form" labelPosition="left">
-			<up-form-item class="common-form-item" label="报工日期:" borderBottom labelWidth="80" style="padding: 0">
-				<UpInputDatePicker border="none" placeholder="请选择报工日期" clearable class="input-item" readonly
+			<up-form-item class="common-form-item" label="生产日期:" borderBottom labelWidth="80" style="padding: 0">
+				<UpInputDatePicker border="none" placeholder="请选择生产日期" clearable class="input-item" readonly
 					v-model:selected="dateSelected" @select="dateSelect" :maxDate="Date.now()" mode="range">
 				</UpInputDatePicker>
 			</up-form-item>

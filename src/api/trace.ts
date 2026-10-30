@@ -49,7 +49,8 @@ export const getLineDetail = async (data : Obj) => {
 	})
 }
 
-// 获取报工列表
+// 获取报工记录列表(报工页底部传 currentProductionDay=1 + productCode 只看当前生产日+所选产品;
+// 独立报工记录页不传标记, createTimeStart/End 按生产日期解释)
 export const getTracePageList = async (data : Paging & Obj) => {
 	return await uRequest.post<Return<ReturnList<Obj>>>({
 		url: "trace/pageList",
@@ -57,7 +58,7 @@ export const getTracePageList = async (data : Paging & Obj) => {
 	})
 }
 
-// 获取当天已报数量(追溯入口报工页「实际数量」: 当天+选定产品+当前产线明细, 不限计划)
+// 获取当前生产日已报数量(追溯入口报工页「实际数量」: 当前生产日+选定产品+当前产线明细, 不限计划)
 export const getTraceRealNum = async (data : Obj) => {
 	return await uRequest.post<Return<Num>>({
 		url: "trace/findRealNum",

@@ -329,9 +329,16 @@ onMounted(async () => {
   }
 })
 
+// 报工记录列表: 当前生产日 + 当前所选产品(换产品/换计划/提交后都重查, 并回到第一页)
 const refreshTraceTable = () => {
   if (traceTableRef.value) {
-    traceTableRef.value.searchList({ lineDetailId: form.value.lineDetailId, planId: form.value.planId })
+    traceTableRef.value.reSetPage()
+    traceTableRef.value.searchList({
+      lineDetailId: form.value.lineDetailId,
+      planId: form.value.planId,
+      productCode: form.value.productCode,
+      currentProductionDay: 1
+    })
   }
 }
 
@@ -364,6 +371,8 @@ const getPlanInfo = async () => {
 
 const initFormPlan = () => {
   form.value.planCode = ""
+  // 计划已清空: planId 也要清, 否则底部报工记录还按上一单过滤
+  form.value.planId = ""
   form.value.productCode = ""
   form.value.planNum = 0
   form.value.realNum = 0
@@ -372,7 +381,7 @@ const initFormPlan = () => {
   traceFiles.value = []
 }
 
-// 追溯入口: 取「实际数量」= 当天 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
+// 追溯入口: 取「实际数量」= 当前生产日 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
 // 报工提交成功、切换产品后都要重取(见 refreshAfterSubmit / productSelect)
 const refreshRealNum = async () => {
   if (!isTrace.value) return
