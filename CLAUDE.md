@@ -20,6 +20,8 @@ pnpm run dev:mp-weixin         # 微信小程序开发
 pnpm run type-check            # TypeScript 类型检查
 ```
 
+H5 dev 的接口走 `vite.config.ts` 的 `^/api` proxy，后端地址只能从那里的 `target` 读，不要另猜。当前 `target` 是 `http://127.0.0.1:8097/`（本机 dev API）。仓库 HEAD 里的 `192.168.190.42:8097` 在本机连不通（curl 超时，全站接口 000），换机器前先 `curl` 确认目标可达。
+
 ⚠️ 本机默认 node 16.15.1 跑不动 pnpm，先切 `/usr/local/n/versions/node/20.12.1/bin`。
 
 ## 架构要点
@@ -41,7 +43,7 @@ pnpm run type-check            # TypeScript 类型检查
 - **计划入口**：`pages/workPlan/index` → `pages/traceInfo/index`（壳）→ 模板，跳转带 `lineDetailId + procedureName + planCode`；计划信息由 `getPlanInfo()` 扫计划单号带出，产品编码是只读框。**追溯入口**：`pages/traceManager/index` → `pages/traceProcess/index`（跳转 URL 追加 `&noPlan=1`）→ 同一壳页/模板，**不传 planCode**。
 - 壳页与两个模板都有 prop `noPlan?: string`，模板内 `const isTrace = computed(() => props.noPlan == "1")` 守门全部追溯模式行为。⚠️ **必须用显式 prop 判定，不要用 `!planCode` 隐式判断**（计划入口本来就允许 planCode 为空）；query 参数一律是字符串，判断用 `==`。⚠️ **`isTrace` 绝不能删**（超计划校验与 `applyCachedProduct` 还在用）。
 - 追溯模式：隐藏计划单号/计划数量；产品编码换弹窗单选（`components/TraceProductPicker.vue`，只列启用产品）；`preSubmit()` 跳过计划 id 与超计划校验；`headTailCheck()` 首行 `if (isTrace.value) return true`；提交成功后走 `refreshAfterSubmit()`。
-- **「实际数量」两入口都有、取数来源不同**：计划入口由 `getPlanInfo()` 从 `trace/findPlan` 带出（口径 = 该计划 `sum(this_num)`）；追溯入口调 `POST /trace/findRealNum`（**当前生产日 + 该产线明细 + 该产品**，不限计划；生产日按工序档案的「生产日分界时间」切，由后端算窗口）。⚠️ 追溯模式**不要**再用 `v-if="!isTrace"` 藏它，只换 placeholder。两模板各有 `refreshRealNum()`，在**切换产品**与**提交成功**两处重取。
+- **「实际数量」两入口都有、取数来源不同**：计划入口由 `getPlanInfo()` 从 `trace/findPlan` 带出（口径 = 该计划 `sum(this_num)`）；追溯入口调 `POST /trace/findRealNum`（**当前生产日 + 该产线明细 + 该产品**，不限计划；生产日按**工序档案的「预计加工时间段」**切，D = `[D 第一段加工开始时刻, D+1 第一段加工开始时刻)`，段后收尾/加班归前一段（该工序没配按自然日，不回落设备档案），由后端算窗口）。⚠️ 追溯模式**不要**再用 `v-if="!isTrace"` 藏它，只换 placeholder。两模板各有 `refreshRealNum()`，在**切换产品**与**提交成功**两处重取。
 - **底部「报工记录」列表（`TraceTablePK5.vue`）固定传 `currentProductionDay=1` + `productCode`**：只看当前生产日 + 当前所选产品（`lineDetailId/planId` 照旧）；换产品/换计划/提交后由 `refreshTraceTable()` 先 `reSetPage()` 再查。独立「报工记录」菜单页（`productJobList`）不传标记，日期范围按**生产日期**解释（后端 `trace/pageList` 同口径）。
 - **DZ015 顶部「产线各流程提交情况」步骤条**：数据来自 `traceSearch` → `POST /trace/search2`；`up-steps` 的 `current` 是 **0 基**。⚠️ **一律用后端真实结果**（`1` 合格 / `0` 不合格 / `null` = 无报工记录），不要硬编码；未扫条码时不判状态（`:current="traced ? form.activeNum : -1"` + `:error` 前置 `traced &&`），否则显示一片假红叉。⚠️ `preSubmit` 跳过的判据是 `Number(key) != Number(form.value.activeNum)`（**跳过"当前报工的工序"，不是"最后一道"**）。
 - ⚠️ **回归 P015（DZ015 打包）的前置条件：上道工序必须先有报工记录**（`prev_check=1` 且 `prev_id1` 非空时，条码1 必须在那个工序有 `result=1` 的 `ld_trace` 记录，否则扫码弹「上道工序检查未通过」）—— **这不是 bug**。P015 若两条规则都是「精准」，后端要求**提交的条码数与规则数一致（都要填）**。
@@ -66,6 +68,7 @@ pnpm run type-check            # TypeScript 类型检查
 
 ## 关键坑
 
+- **`uni-pagination` 的 `@change` 不能直接绑 `searchList()`**：分页组件会回传 `{ current }`，直接调 `searchList()` 会丢掉页码，`searchParam.currentPage` 永远是 1，翻页始终查第一页（`TraceLinePicker`、`TraceFailureModePicker` 曾中招）。统一绑 `pageSearch(page)`：先 `searchParam.value.currentPage = page.current`，再 `searchList()`。
 - ⚠️ **别用 `page.goto` 打开 h5**：`http://localhost:5173/h5` 会把**已登录会话踢回** `/h5/pages/login/index`。点测时先登一次，之后一律用页面内导航（`.grid-item` 点击 / `history.back()`）。
 - **H5 输入框主题色 + 空值呼吸光晕**（`App.vue` 的 `#ifdef H5` 块）：有边框的输入框边框与文字统一主题蓝 `#549df8`（= `store/theme.ts` 的 `globalColor.primary`，**不是** uview-plus 的 `$u-primary` `#3c9cff`），且**只在空值时**外圈 `box-shadow` 呼吸。⚠️ **别想拿 `border-color` 做动画**：`common.scss` 里 `.u-border` 的 `border-color` 带 `!important`，优先级高于 `@keyframes`，动画是死的 → 呼吸落在 `box-shadow` 上。⚠️ **判空不能用 `:placeholder-shown`**：uni-app 的 H5 **没给原生 input 挂 placeholder 属性**（占位是它自己另画的 div），该伪类**永远匹配不上**。实际信号是那个 div 的**内联 style**（空值 `"color: ...;"`、有值才追加 `display: none;`），故用 `:has([class*="placeholder"]:not([style*="display: none"])…)` 反向选中。`:has()` 老浏览器不认会整条跳过、降级成「没有光晕」。
 - **报工页 PC（宽屏浏览器）兼容层**（`traceInfo/index.vue` 的 `<style>`，整段在 `/* #ifdef H5 */` 内、由 `.report-page` 包住）。⚠️ **页面 `<style>` 块不写 `scoped` 也会被自动加作用域**（`[data-v-xxx]`），表单/按钮/表格都在子组件里，**必须 `:deep()` 才穿透得到**。⚠️ **`up-button` 在 H5 上渲染成 `uni-button`**，uni-app 的全局 base 样式带 `margin-left/right: auto`，固定宽度前要显式清掉。⚠️ **垂直居中的位置别搞混**：`.u-form-item` 是**纵向** flex，要在它上面加 `justify-content: center`（纵向主轴）+ `.u-form-item__body { align-items: center }`；**不能在 `.u-form-item` 上加 `align-items: center`**（那是交叉轴 = 横向，会把内容横向居中）。

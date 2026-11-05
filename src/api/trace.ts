@@ -50,7 +50,9 @@ export const getLineDetail = async (data : Obj) => {
 }
 
 // 获取报工记录列表(报工页底部传 currentProductionDay=1 + productCode 只看当前生产日+所选产品;
-// 独立报工记录页不传标记, createTimeStart/End 按生产日期解释)
+// 独立报工记录页不传标记, createTimeStart/End 按生产日期解释)。
+// 生产日 D = [D 第一段加工开始时刻, D+1 第一段加工开始时刻), 按工序档案「预计加工时间段」推导,
+// 段后到下一段开始之间的收尾/加班归上一段(窗口由后端算, 前端只管传标记/日期)
 export const getTracePageList = async (data : Paging & Obj) => {
 	return await uRequest.post<Return<ReturnList<Obj>>>({
 		url: "trace/pageList",

@@ -58,6 +58,12 @@
 	// 生成分页所需的数据和方法
 	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getFailureModList)
 
+	// 分页搜索
+	const pageSearch = (page : { current : number }) => {
+		searchParam.value.currentPage = page.current
+		searchList()
+	}
+
 	const select = (selected : Objs) => {
 		// emit("select", selected)
 		close()
@@ -86,7 +92,7 @@
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
 									:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
-									@change="searchList()"></uni-pagination>
+									@change="pageSearch"></uni-pagination>
 							</view>
 
 						</TablePicker>
