@@ -25,18 +25,21 @@ pnpm build:app          # App 包
 - 跳转用 `src/store/route.ts` 的 `routes.页面name.path`。
 - 首页功能菜单在 `src/pages/home/index.vue` 的 `traceManagerList`（追溯）/ `stockroomManagerList`（仓储）中配置；菜单项需 `auth`（`authList.value.includes(routes.页面name.name)`），新页面须在系统角色授权后可见。
 - 追溯管理现有页面：上岗打卡、工作计划、按灯预警、追溯管理、追溯流程、追溯信息、追溯查询、报工记录、报工打印、**标签校验**。
+- 首页右上角关机图标打开右侧抽屉（`home/index.vue` 的 `up-popup`）：App 端有「检查更新」+「退出登陆」，H5/钉钉/微信只有「退出登陆」。启动页 `pages/blank` 不再静默检查更新。
 
 ## 接口对接
 
 - api 模块放 `src/api/*.ts`，统一用 `uRequest.post<Return<T>>({ url, data })`（见 `src/api/instance.ts`）。
 - 返回类型：`Return<T>` / `ReturnList<T>`（`{list, currentPage, pageSize, totalCount}`）在 `src/type/common.ts`。
 - 分页列表用 `src/hook/usePageTable.ts` 的 `useTable(api, options)` + `uni-table` + `uni-pagination`（参考 `pages/productJobList/index.vue`）。
+- `uni-pagination` 的 `@change` 必须绑 `pageSearch(page)`，先把 `searchParam.value.currentPage = page.current` 再 `searchList()`；直接写 `@change="searchList()"` 会丢页码，翻页永远查第一页。
 
 ## 常用组件/弹窗
 
 - 扫码输入框：`up-input-scan`（`src/components/UpInputScan.vue`，`v-model` + `@scanSuccess`）。
 - 红色错误弹窗：`setCustomModal({ visiable: true, content })`（`src/store/customModal.ts`，背景色 `globalColor.error`）。
 - 成功提示：`uni.showToast({ icon: "success", title })`。
+- 登出收尾统一用 `useCloseApp.ts` 的 `closeAfterLogout()`（钉钉关容器，其余端 `redirectTo` 登录页）；带确认框的 `useCloseApp()` 只留给报工页内嵌页的 CLOSE_APP 指令。
 
 ## 编码规则
 

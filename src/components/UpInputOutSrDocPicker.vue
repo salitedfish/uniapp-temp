@@ -53,6 +53,12 @@
 	// 生成分页所需的数据和方法
 	const { searching, searchParam, resultData, searchList, reSetPage, reSetList } = useTable(getDepartment)
 
+	// 分页搜索
+	const pageSearch = (page : { current : number }) => {
+		searchParam.value.currentPage = page.current
+		searchList()
+	}
+
 
 	// 确认搜索
 	const search = async () => {
@@ -125,7 +131,7 @@
 							<view class="page-box">
 								<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount"
 									:current="searchParam.currentPage" :pageSize="searchParam.pageSize"
-									@change="searchList()"></uni-pagination>
+									@change="pageSearch"></uni-pagination>
 							</view>
 
 						</TablePicker>
