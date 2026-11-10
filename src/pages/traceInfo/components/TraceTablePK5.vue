@@ -27,7 +27,7 @@
 	})
 
 	// 生成分页所需的数据和方法
-	// 报工记录: 只看当前生产日 + 当前所选产品(后端按工序「预计加工时间段」算生产日窗口)
+	// 报工记录: 当前产线明细下的全部历史(不按生产日过滤), 换产品/换计划时再按所选产品/计划收窄
 	const {
 		searching,
 		searchParam,
@@ -38,8 +38,7 @@
 	} = useTable(getTracePageList, {
 		lineDetailId: props.form.lineDetailId,
 		planId: props.form.planId,
-		productCode: "",
-		currentProductionDay: 1
+		productCode: ""
 	})
 
 	// 分页搜索
