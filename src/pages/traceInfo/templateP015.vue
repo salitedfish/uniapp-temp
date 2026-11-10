@@ -23,7 +23,7 @@
       <up-input v-model="form.planNum" placeholder="计划单号自动带出" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
 
-    <up-form-item class="common-form-item" label="实际数量:" borderBottom labelWidth="80" style="padding: 0">
+    <up-form-item class="common-form-item" :label="isTrace ? '当日数量:' : '实际数量:'" borderBottom labelWidth="80" style="padding: 0">
       <up-input v-model="form.realNum" :placeholder="isTrace ? '选择产品自动带出' : '计划单号自动带出'" clearable class="input-item" readonly border="none"></up-input>
     </up-form-item>
   </up-form>
@@ -329,15 +329,14 @@ onMounted(async () => {
   }
 })
 
-// 报工记录列表: 当前生产日 + 当前所选产品(换产品/换计划/提交后都重查, 并回到第一页)
+// 报工记录列表: 当前产线明细下的全部历史(不按生产日过滤), 换产品/换计划/提交后都重查并回到第一页
 const refreshTraceTable = () => {
   if (traceTableRef.value) {
     traceTableRef.value.reSetPage()
     traceTableRef.value.searchList({
       lineDetailId: form.value.lineDetailId,
       planId: form.value.planId,
-      productCode: form.value.productCode,
-      currentProductionDay: 1
+      productCode: form.value.productCode
     })
   }
 }
@@ -381,7 +380,7 @@ const initFormPlan = () => {
   traceFiles.value = []
 }
 
-// 追溯入口: 取「实际数量」= 当前生产日 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
+// 追溯入口: 取「当日数量」= 当前生产日 + 选定产品 + 当前产线明细的报工数量之和(不限计划)
 // 报工提交成功、切换产品后都要重取(见 refreshAfterSubmit / productSelect)
 const refreshRealNum = async () => {
   if (!isTrace.value) return
@@ -464,7 +463,7 @@ const refreshAfterSubmit = async () => {
   await getTraceFiles()
   form.value.result = "1"
   refreshTraceTable()
-  // 报工完成: 实际数量要重新获取(本次提交已落库)
+  // 报工完成: 当日数量要重新获取(本次提交已落库)
   await refreshRealNum()
 }
 
