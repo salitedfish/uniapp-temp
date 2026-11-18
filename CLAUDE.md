@@ -27,6 +27,7 @@ H5 dev 的接口走 `vite.config.ts` 的 `^/api` proxy，后端地址只能从�
 ## 架构要点
 
 - **页面**：`src/pages/`（追溯信息、工作计划、打卡、按灯、蓝牙打印等）；**API** `src/api/`（TS + Axios）；**状态** Pinia-like `src/store/`；**工具** `src/util/`；**环境** `.env.dev` / `.env.tes` / `.env.pro`。**多端条件编译**：同一份代码构建 H5 / App / 小程序，平台差异用 `Platform.isApp()` 或 `/* #ifdef H5 */` 分流。
+- **app 页面权限只认「移动页面权限」**：`store/auth.ts` 的 `authList` 只取 `/token/getToken` 的 `menusDingdingRole` —— 即 web「角色管理 → 编辑权限 → 移动页面权限」勾选的项，存 `sys_role.menus_dingding_role`；权限树在 web 的 `views/organization/roleManagement/ddPage.json`（当前 6 项：`LdOnDuty`/`LdWorkPlan`/`LdAndon`/`Trace`/`TraceSearch`/`ProductJobList`）。⚠️ **不要再合并 `menusRoles`（PC 菜单权限）**：`LdOnDuty`/`LdAndon` 等名字既是 web 路由名又是 app 页面名，合并会让没勾移动权限的角色在首页凭空多出入口（生产曾出现只配 3 项却显示 5 个入口）。首页宫格与 H5 直接访问 `needLogin` 页面都按 `authList` 过滤；新增 app 可授权页面时要同步加 `ddPage.json`。首页「看板」入口仅 dev 构建显示、不进权限体系。
 - **首页右上角抽屉：检查更新 + 退出登陆**（`pages/home/index.vue`，`up-popup mode="right"`，宽约视口 72% / 封顶 320px，与报工页右侧栏同一观感）。右上角仍是关机图标 `icon-guanji`，语义已从「退出」变成「打开更多菜单」，刻意没换图标。
   - **「检查更新」只在 App 端渲染**（`v-if="Platform.isApp()"`）—— 更新走 `plus.downloader` + `plus.runtime.install`，H5/钉钉/微信没有 `plus`，**H5 上抽屉里只有「退出登陆」，这是预期不是漏做**。**启动页 `pages/blank/index.vue`（`pages.json` 第一页）里没有 `versionCheck`**：更新只由这个按钮手动触发。**别在 blank 页加回来**，两处都查会重复弹升级弹窗。
   - **「退出登陆」没有二次确认**（抽屉本身就是那一步确认），走 `useLogout()` 的 `logout()` + `closeAfterLogout()`（`hook/useCloseApp.ts`：钉钉 `dingding.biz.navigation.close`、其余端 `redirectTo` 登录页）。`useCloseApp` 本体保留（报工内嵌页拿 `CLOSE_APP` 指令那处 `moldLink` 还在用）。

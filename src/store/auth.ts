@@ -20,11 +20,10 @@ export const setUserInfo = async () => {
 		// 获取用户信息成功
 		userInfo.value = res.data
 		uni.setStorageSync("userInfo", res.data)
-		// 接口返回的权限列表有menusDingdingRole和menusRole，根据menusDingdingRole
+		// app 页面权限只认「移动页面权限」(web 角色管理 → 编辑权限 → 移动页面权限, 存 sys_role.menus_dingding_role)。
+		// 接口还会返回 PC 菜单权限 menusRoles, 但那是 web 路由名, 与 app 页面名(LdOnDuty/LdAndon 等)重名,
+		// 合并进来会让没勾移动权限的角色在 app 首页多出入口, 故只取 menusDingdingRole。
 		authList.value = userInfo.value.menusDingdingRole ? userInfo.value.menusDingdingRole.split(",") : []
-		if (userInfo.value.menusRoles) {
-			authList.value.push(...userInfo.value.menusRoles.split(","))
-		}
 		uni.setStorageSync("userAuth", authList.value)
 	}
 }
