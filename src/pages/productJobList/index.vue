@@ -59,6 +59,18 @@
 		searchParam.value.currentPage = page.current
 		searchList()
 	}
+
+	// 数据信息详情（与追溯查询同款：内容按分号分条展示）
+	const detail = ref("")
+	const detailDialogVisible = ref(false)
+	const showDetail = (content: string) => {
+		detail.value = content || ""
+		detailDialogVisible.value = true
+	}
+	const hideDetail = () => {
+		detail.value = ""
+		detailDialogVisible.value = false
+	}
 </script>
 
 <template>
@@ -85,6 +97,7 @@
 					<!-- <uni-th class="nowrap" align="left" width="100rpx">计划单号</uni-th> -->
 					<uni-th class="nowrap" align="left" width="100rpx">报工人员</uni-th>
 					<uni-th class="nowrap" align="left" width="100rpx">报工时间</uni-th>
+					<uni-th class="nowrap" align="left" width="100rpx">数据信息</uni-th>
 					<!-- <uni-th class="nowrap table-fixed-right" align="left" width="100rpx">操作</uni-th> -->
 				</uni-tr>
 				<!-- 表格数据行 -->
@@ -95,6 +108,12 @@
 					<!-- <uni-td class="nowrap">{{ item.planCode }}</uni-td> -->
 					<uni-td class="nowrap">{{ item.createName }}</uni-td>
 					<uni-td class="nowrap">{{ item.createTime }}</uni-td>
+					<uni-td class="nowrap">
+						<view v-if="item.content" style="text-align: left;" class="link" @click="showDetail(item.content)">
+							查看详情
+						</view>
+						<view v-else>-</view>
+					</uni-td>
 				</uni-tr>
 			</uni-table>
 		</view>
@@ -102,6 +121,12 @@
 			<uni-pagination title="分页" show-icon="true" :total="resultData?.totalCount" :current="searchParam.currentPage"
 				:pageSize="searchParam.pageSize" @change="pageSearch"></uni-pagination>
 		</view>
+
+		<up-popup :show="detailDialogVisible" mode="center" @close="hideDetail" :round="10">
+			<view style="padding: 10px 15px; width: 85vw; min-height: 20vh;">
+				<view v-for="item, key in detail.split(';')" :key="key">{{ item }}</view>
+			</view>
+		</up-popup>
 
 	</view>
 </template>
