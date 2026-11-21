@@ -716,9 +716,19 @@ const codeCheckInfoHandler = async () => {
     const r = await codeCheckInfoApi({ ...form.value, barcodeList: codeRules.value })
     codeCheckInfo.value = r.data || oriCodeCheckInfo()
     if (r.data && r.data.canSave === 1) return true
+    // prevResult: 1 合格 / 0 不合格 / -1 无数据(上工序没报过这个条码) —— -1 不能被 !prevResult 吃掉, 否则弹窗内容为空
+    const checkData = r.data || {}
+    let checkContent = checkData.checkCodeMsg
+    if (!checkContent) {
+      if (checkData.prevCheck == 1 && checkData.prevResult != 1) {
+        checkContent = checkData.prevResult == -1 ? "上道工序无报工记录，请先完成上道工序报工" : "上道工序检查未通过"
+      } else {
+        checkContent = "条码校验未通过"
+      }
+    }
     setCustomModal({
       visiable: true,
-      content: r.data.checkCodeMsg || (r.data.prevCheck && !r.data.prevResult ? "上道工序检查未通过" : ""),
+      content: checkContent,
       showSlot: true,
       success: () => {
         return true
