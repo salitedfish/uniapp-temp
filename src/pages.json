@@ -184,6 +184,40 @@
 			},
 			"type": "nav",
 			"needLogin": true
+		},
+		// 发货管理
+		{
+			"name": "BoxCodeGenerate",
+			"path": "pages/boxCode/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "箱码生成"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "PalletCodeGenerate",
+			"path": "pages/palletCode/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "托码生成"
+			},
+			"type": "nav",
+			"needLogin": true
+		},
+		{
+			"name": "PackingListCheck",
+			"path": "pages/packingListCheck/index",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "#f8f8f8",
+				"navigationBarTitleText": "装箱单校验"
+			},
+			"type": "nav",
+			"needLogin": true
 		}
 	],
 

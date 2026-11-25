@@ -52,7 +52,7 @@ export class ScanCode {
 	private static async ddRun(runConfig : FunConfig) {
 		return new Promise((resolve, reject) => {
 			dingding.biz.util.scan({
-				type: "qrCode", // type 为 all、qrCode、barCode，默认是all。
+				type: "all", // type 为 all、qrCode、barCode：箱码页要同时支持条形码与二维码
 				onSuccess: (obj : Obj) => {
 					resolve(obj.text)
 				},

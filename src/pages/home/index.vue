@@ -71,6 +71,33 @@
 		]
 	})
 
+	// 发货管理页面
+	const shippingManagerList = computed<FunItem[]>(() => {
+		return [
+			{
+				name: routes.BoxCodeGenerate.name,
+				title: routes.BoxCodeGenerate.style.navigationBarTitleText,
+				icon: "/static/home/code_inventory.svg",
+				route: routes.BoxCodeGenerate,
+				auth: authList.value.includes(routes.BoxCodeGenerate.name)
+			},
+			{
+				name: routes.PalletCodeGenerate.name,
+				title: routes.PalletCodeGenerate.style.navigationBarTitleText,
+				icon: "/static/home/outbound_order.svg",
+				route: routes.PalletCodeGenerate,
+				auth: authList.value.includes(routes.PalletCodeGenerate.name)
+			},
+			{
+				name: routes.PackingListCheck.name,
+				title: routes.PackingListCheck.style.navigationBarTitleText,
+				icon: "/static/home/checkout.svg",
+				route: routes.PackingListCheck,
+				auth: authList.value.includes(routes.PackingListCheck.name)
+			},
+		]
+	})
+
 	// 独立的页面，开发时展示，打包时会隐藏入口
 	const devList = computed<FunItem[]>(() => {
 		return process.env.NODE_ENV === Env.DEV ? [
@@ -171,6 +198,15 @@
 	<up-text text="追溯管理" class="grid-title" bold v-if="traceManagerList.filter(item => !!item.auth).length"></up-text>
 	<u-grid :border="true" class="grid-box">
 		<u-grid-item @click="itemClick(item)" v-for="(item,index) in traceManagerList.filter(item => !!item.auth)"
+			:key="index" class="grid-item">
+			<image :src="item.icon" class="grid-icon"></image>
+			<text class="grid-text">{{item.title}}</text>
+		</u-grid-item>
+	</u-grid>
+
+	<up-text text="发货管理" class="grid-title" bold v-if="shippingManagerList.filter(item => !!item.auth).length"></up-text>
+	<u-grid :border="true" class="grid-box">
+		<u-grid-item @click="itemClick(item)" v-for="(item,index) in shippingManagerList.filter(item => !!item.auth)"
 			:key="index" class="grid-item">
 			<image :src="item.icon" class="grid-icon"></image>
 			<text class="grid-text">{{item.title}}</text>

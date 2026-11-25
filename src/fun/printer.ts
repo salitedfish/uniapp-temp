@@ -24,15 +24,19 @@ export class Printer {
 	public setPrinterParams(printerParams : PrinterParams) {
 		this.printerParams = printerParams
 	}
-	// 调用打印
+	// 调用打印（不等待结果，维持原调用方式）
 	public print(commands : string[], printerParams ?: PrinterParams) {
+		this.printAsync(commands, printerParams)
+	}
+	// 调用打印并等待完成（参数校验/打印失败均已在内部 toast，不向外抛错）
+	public async printAsync(commands : string[], printerParams ?: PrinterParams) {
 		if (printerParams) {
 			this.setPrinterParams(printerParams)
 		}
-		this.writeBLECharacteristicValue(commands)
+		await this.writeBLECharacteristicValue(commands)
 	}
 	// 参数判断
-	private writeBLECharacteristicValue = (commands : string[]) => {
+	private writeBLECharacteristicValue = async (commands : string[]) => {
 		if (!this.printerParams.deviceId) {
 			uni.showToast({
 				icon: "none",
@@ -66,7 +70,7 @@ export class Printer {
 			title: "打印中",
 		})
 		// 开始打印数据
-		this.startPrintData(commands)
+		await this.startPrintData(commands)
 	}
 	// 开始打印数据
 	private async startPrintData(commands : string[]) {

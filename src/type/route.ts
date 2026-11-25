@@ -6,10 +6,12 @@ const pages = pagesJSON.pages
 type TabRouteName = "login" | "home" | "blueTooth" | "demo" | "demoInside"
 // 追溯管理的路由
 type TraceManagerRouteName = "LdOnDuty" | "LdWorkPlan" | "LdAndon" | "Trace" | "TraceProcess" | "TraceInfo" | "TraceSearch" | "ProductJobList" | "ProductJobPrinter"
+// 发货管理的路由
+type ShippingRouteName = "BoxCodeGenerate" | "PalletCodeGenerate" | "PackingListCheck"
 // 外链路由
 type LinkRouteName = "moldLink" | "board"
 
-export type RouteName = TabRouteName | TraceManagerRouteName | LinkRouteName
+export type RouteName = TabRouteName | TraceManagerRouteName | ShippingRouteName | LinkRouteName
 // 从json中获取路由类型
 export type Route = typeof pages[0]
 
