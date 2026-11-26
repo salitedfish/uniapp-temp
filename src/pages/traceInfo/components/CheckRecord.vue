@@ -174,10 +174,14 @@
 					<view class="u-cell-text cell-label">失效模式</view>
 				</template>
 				<template #value>
-					<TraceFailureModPicker v-model:selected="item.failureModSelected"
-						@select="(mods: Objs) => failuerModSelect(item, mods)" :processId="item.processId" :orgIds="form.orgIds"
-						readonly border="none" placeholder="请选择失效模式">
-					</TraceFailureModPicker>
+					<!-- 必须套 .cell-value: up-cell 的 #value 插槽内容直接是 .u-cell__body(flex) 的子项,
+					     选择器根节点 width:100% 会把左侧标题(flex:1)挤成 0 -->
+					<view class="u-cell-text cell-value">
+						<TraceFailureModPicker v-model:selected="item.failureModSelected"
+							@select="(mods: Objs) => failuerModSelect(item, mods)" :processId="item.processId" :orgIds="form.orgIds"
+							readonly border="none" placeholder="请选择失效模式">
+						</TraceFailureModPicker>
+					</view>
 				</template>
 			</up-cell>
 
@@ -187,7 +191,7 @@
 				</template>
 				<template #value>
 					<view class="u-cell-text cell-value">
-						<up-textarea placeholder="请输入不合格理由" border="surround" style="text-align: left;"
+						<up-textarea placeholder="请输入不合格理由（选填）" border="surround" style="text-align: left;"
 							v-model="item.reason"></up-textarea>
 					</view>
 				</template>

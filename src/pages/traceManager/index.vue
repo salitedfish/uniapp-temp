@@ -11,7 +11,8 @@
 		routes
 	} from "@/store/route"
 	import {
-		userInfo
+		userInfo,
+		setUserInfo
 	} from "@/store/auth"
 	import {
 		globalColor
@@ -20,6 +21,11 @@
 	import {
 		getTraceLineList
 	} from "@/api/trace"
+
+	// 被 web 端「追溯管理 → 人工报工」用 iframe 内嵌时（地址带 embed=1）：不显示自带导航栏，
+	// 这个返回箭头在 iframe 里没有去处，留着只是干扰
+	const isEmbed = typeof location !== "undefined" &&
+		new URLSearchParams(location.search).get("embed") === "1"
 
 	onMounted(() => {
 		initData()
@@ -31,6 +37,11 @@
 			uni.showLoading({
 				title: "查询中"
 			})
+			// 内嵌进 web 时页面可能比 App.vue 的 setUserInfo 先挂载，这里补一次，
+			// 否则 personId 为空，查出来的产线清单会跟登录后不一致
+			if (!userInfo.value || !userInfo.value.orgId) {
+				await setUserInfo()
+			}
 			const res = await getTraceLineList({
 				personId: userInfo.value.orgId
 			});
@@ -50,7 +61,7 @@
 </script>
 
 <template>
-	<CustomNavBar :title="routes.Trace.style.navigationBarTitleText"></CustomNavBar>
+	<CustomNavBar v-if="!isEmbed" :title="routes.Trace.style.navigationBarTitleText"></CustomNavBar>
 
 	<up-empty mode="order" icon="http://cdn.uviewui.com/uview/empty/order.png" text="暂无追溯项目"
 		v-if="tableData.length === 0">

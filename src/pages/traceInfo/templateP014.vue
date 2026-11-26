@@ -284,7 +284,7 @@ const traceTableRef = ref<Obj | null>(null)
 const processList = ref<Objs>([])
 const showEquipmentPicker = ref(false)
 const unlockCode = ref()
-// 追溯入口(从追溯报工进入)不依赖工作计划(页面 query 参数均为字符串)
+// 追溯入口(从人工报工进入)不依赖工作计划(页面 query 参数均为字符串)
 const isTrace = computed(() => props.noPlan == "1")
 const productSelected = ref<Objs>([])
 let mqttClient: mqtt.MqttClient | null = null
@@ -618,6 +618,9 @@ const getTraceFiles = async () => {
 const setFailureMod = () => {
   const arr = checkRecords.value.filter((item: Obj) => item.failureModeId).map((item: Obj) => ({ id: item.failureModeId, failureModeName: item.failureModeName }))
   failureModSelected.value = useRmRepeat(arr)({ condition: (item: Obj) => item.id })
+  // 检验单里选的失效模式要同步回主表单再随报工提交: 主表单那块只是 readonly 展示,
+  // 不写回 failureModeIds 的话 ld_trace_failure_mode 就没有数据(看板/统计读的是那张表)
+  failuerModSelect()
 }
 
 const setFormResult = () => {
@@ -695,10 +698,6 @@ const preSubmit = () => {
       }
       if (item.result === "0" && item.failureModSelected.length <= 0) {
         setCustomModal({ visiable: true, content: "请选择检验单失效模式" })
-        return false
-      }
-      if (item.result === "0" && !item.reason) {
-        setCustomModal({ visiable: true, content: "请填写不合格理由" })
         return false
       }
       if (item.result === "0" && form.value.result === "1") {

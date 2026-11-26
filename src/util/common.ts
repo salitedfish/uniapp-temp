@@ -41,15 +41,31 @@ export const getBaseUrl = () => {
 	return baseUrl
 }
 
+// H5 下把站内路径转成带 origin 的绝对地址:
+// uni-h5 的图片组件(uni-image)内部会走 getRealPath → addBase, 把以 / 开头的 src 再拼一次路由 base
+// (如 /digitalPlatform_h5/), /digitalPlatform_api_prod/uploadFiles/... 会被改成
+// /digitalPlatform_h5/digitalPlatform_api_prod/uploadFiles/... —— 打不中静态映射, 只拿到 index.html, 图片必然挂。
+// 只有 http(s)/data/blob 开头的地址会被原样放行, 所以站内文件一律输出全绝对地址。
+const toH5Absolute = (path : string) => {
+	// #ifdef H5
+	if (typeof window !== "undefined" && path.charAt(0) == "/" && path.charAt(1) != "/") {
+		return window.location.origin + path
+	}
+	// #endif
+	return path
+}
+
 // 展示用: 库里(报工附件/文档/检验单图片/APK地址)存的是后端映射的相对路径(如 uploadFiles/file/fujian/202609/xxx.png),
 // 各端按自己环境的 base 拼成可直接访问的地址 —— 与 web 的 utils/index.js#fileUrl 同口径。
-// 带守卫: 值已是绝对地址(http/https/data/blob)或以 / 开头的一律原样返回 —— 兼容外部地址与改造前的历史数据。
+// 带守卫: 值已是绝对地址(http/https/data/blob)的一律原样返回 —— 兼容外部地址。
+// 以 / 开头的历史站内路径在 H5 下补 origin(见 toH5Absolute), 其余端原样返回。
 // 入库前一律还原成相对路径(别把拼好的地址存回去)。
 export const genFileUrl = (url : string) => {
 	const target = url || ""
 	if (!target) return ""
-	if (/^(https?:|data:|blob:)/i.test(target) || target.charAt(0) == "/") return target
-	return getBaseUrl() + target
+	if (/^(https?:|data:|blob:)/i.test(target)) return target
+	if (target.charAt(0) == "/") return toH5Absolute(target)
+	return toH5Absolute(getBaseUrl() + target)
 }
 
 // 入库用: 展示地址还原成后端映射的相对路径(与 genFileUrl 互逆)。
@@ -59,6 +75,15 @@ export const genFilePath = (url : string) => {
 	const target = url || ""
 	if (!target) return ""
 	const base = getBaseUrl()
+	// #ifdef H5
+	// 展示地址已带 origin(见 genFileUrl), 入库前把 origin 一起去掉
+	const origin = typeof window !== "undefined" ? window.location.origin : ""
+	if (origin && target.indexOf(origin) === 0) {
+		const rest = target.slice(origin.length)
+		if (base && base.length > 1 && rest.indexOf(base) === 0) return rest.slice(base.length)
+		return rest
+	}
+	// #endif
 	if (base && base.length > 1 && target.indexOf(base) === 0) return target.slice(base.length)
 	return target
 }

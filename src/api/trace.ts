@@ -84,6 +84,21 @@ export const getFailureModList = async (data : Paging & Obj) => {
 	})
 }
 
+// 获取失效模式类型(选择器筛选用)
+export const getFailureModTypeList = async () => {
+	return await uRequest.post<Return<Objs>>({
+		url: "ldFailureModeType/listAll"
+	})
+}
+
+// 失效模式类型分页列表(类型选择器用)
+export const getFailureModTypePageList = async (data : Paging & Obj) => {
+	return await uRequest.post<Return<ReturnList<Obj>>>({
+		url: "ldFailureModeType/pageList",
+		data
+	})
+}
+
 // 获取检验单列表
 export const getCheckItemListApi = async (data : Obj) => {
 	return await uRequest.post<Return<Objs>>({
