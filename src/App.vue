@@ -11,15 +11,14 @@ import { routes } from "@/store/route"
 
 onLaunch(async () => {
   console.log("App Launch")
-  // uni.navigateTo({
-  // 	url: `${routes.board.path}?deviceId=${Platform.deviceId}`
-  // })
-  // return
 
   // 大屏且是app端则进入看板页面
   if (Platform.isBigScreen() && Platform.isApp()) {
     uni.navigateTo({
       url: `${routes.board.path}?deviceId=${Platform.deviceId}`,
+      fail: (err) => {
+        console.log("跳转看板失败:", err)
+      },
     })
   }
   // 小屏则正常初始化

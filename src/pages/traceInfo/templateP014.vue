@@ -101,9 +101,11 @@
   <!-- 块级 v-if 与下面各项的条件保持一致：各项都不渲染时别留一张只有 2px 边框的空卡片（追溯入口就是这种情形） -->
   <up-form class="common-form common-form-next" labelPosition="left" v-if="form.statistics == '1' || form.result === '0'">
     <up-form-item class="common-form-item" label="是否合格:" borderBottom labelWidth="80" style="padding: 0" required v-if="form.statistics == '1'">
-      <u-radio-group placement="row" class="radio-group" v-model="form.result">
-        <u-radio :name="'1'" label="是"></u-radio>
-        <u-radio :name="'0'" label="否" style="margin-left: 10px"></u-radio>
+      <u-radio-group placement="row" iconPlacement="right" class="radio-group result-radio-group" v-model="form.result">
+        <u-radio name="1" label="合格" class="result-radio result-radio--pass" :class="{ 'result-radio--active': form.result == '1' }"
+          :labelColor="form.result == '1' ? '#ffffff' : '#909399'" activeColor="#ffffff" iconColor="#67c23a" inactiveColor="#c0c4cc"></u-radio>
+        <u-radio name="0" label="不合格" class="result-radio result-radio--fail" :class="{ 'result-radio--active': form.result == '0' }"
+          :labelColor="form.result == '0' ? '#ffffff' : '#909399'" activeColor="#ffffff" iconColor="#f56c6c" inactiveColor="#c0c4cc"></u-radio>
       </u-radio-group>
     </up-form-item>
     <up-form-item class="common-form-item" label="失效模式:" borderBottom labelWidth="80" style="padding: 0" required v-if="form.result === '0'">
@@ -906,5 +908,37 @@ const submit = useThrottle(async () => {
 }
 .radio-group {
   justify-content: space-around;
+}
+// 是否合格：两个选项做成独立的圆角色块，合格绿、不合格红。
+// 未选中浅色填充 + 同色文字；选中后整块填成实色、文字转白（文字色由模板按 form.result 绑定）。
+// iconPlacement=right 时 u-radio 整块响应点击（见 u-radio 的 wrapperClickHandler），点击范围比只点文字/圆圈大
+.result-radio-group {
+  justify-content: space-between;
+  .result-radio {
+    flex: 1;
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 14px;
+    margin: 0;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    background-color: #f5f7fa;
+    box-sizing: border-box;
+    // 只有选中项才上色：文字转白（模板按 form.result 绑定），边框与底色变实色
+    &.result-radio--active {
+      &.result-radio--pass {
+        border-color: #67c23a;
+        background-color: #67c23a;
+      }
+      &.result-radio--fail {
+        border-color: #f56c6c;
+        background-color: #f56c6c;
+      }
+    }
+  }
+  // 两块平分整行，中间只留 12px 空隙
+  .result-radio + .result-radio {
+    margin-left: 12px;
+  }
 }
 </style>

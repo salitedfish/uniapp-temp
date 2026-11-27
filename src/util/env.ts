@@ -44,15 +44,26 @@ export class Platform {
 	}
 }
 
+const applySystemInfo = (res: any) => {
+	console.log("系统信息:", res)
+	Platform.platform = res.uniPlatform
+	Platform.webPlatform = res.platform
+
+	Platform.deviceId = res.deviceId
+
+	Platform.windowWidth = res.windowWidth
+	Platform.windowHeight = res.windowHeight
+}
+
+// App.vue 的 onLaunch 要靠 platform / 屏幕宽高分流（大屏进看板、其余走 initXxx），
+// 异步接口的回调在个别设备上可能晚于 onLaunch：那时 Platform 还是初值，
+// isApp() / isBigScreen() 全 false，任何分支都不进，应用就停在空白启动页。
+// 所以启动前先同步取一次，异步回调只作后续刷新。
+try {
+	applySystemInfo(uni.getSystemInfoSync())
+} catch (err) {
+	console.log("getSystemInfoSync 失败:", err)
+}
 uni.getSystemInfo({
-	success(res) {
-		console.log("系统信息:", res)
-		Platform.platform = res.uniPlatform
-		Platform.webPlatform = res.platform
-
-		Platform.deviceId = res.deviceId
-
-		Platform.windowWidth = res.windowWidth
-		Platform.windowHeight = res.windowHeight
-	}
+	success: applySystemInfo
 })
